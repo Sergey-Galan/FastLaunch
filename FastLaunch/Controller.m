@@ -172,7 +172,7 @@ AYProgressIndicator *progressView;
 }
 
 - (void)awakeFromNib {
-    // Load settings from AppSettings.plist in app bundle
+    // Load settings from app bundle
     [self loadAppSettings];
     
     // Prepare UI
@@ -588,10 +588,8 @@ if (![fileManager fileExistsAtPath:folder]) {
     NSLog(@"text changed: %@", self.ServerKey);
 
     self.UserKey = [_UserTextField stringValue];
-  //  NSLog(@"text changed: %@", self.UserKey);
 
     self.PassKey = [_PassTextField stringValue];
-  //  NSLog(@"text changed: %@", self.PassKey);
 
     NSString * command = [NSString stringWithFormat:@"/usr/bin/security delete-generic-password -a ${USER} -s postftp 2>/dev/null | /usr/bin/security add-generic-password -a ${USER} -s postftp -w %@ 2>/dev/null", self.PassKey];
     NSTask *taskPass = [[NSTask alloc] init];
