@@ -8,6 +8,7 @@ There is an opportunity to disconnect coding (FFmpeg), having left only FTP the 
 ![1](https://github.com/Sergey-Galan/FastLaunch/assets/30828202/43c0cdb9-817f-49c5-8c57-529845319d88)
 
 ![2](https://github.com/Sergey-Galan/FastLaunch/assets/30828202/5be0d5ee-7de4-4c3a-8ea6-26b38c4f78e7)
+
 The password is stored in "Bunch of keys"
 
 ![3](https://github.com/Sergey-Galan/FastLaunch/assets/30828202/5ca670ef-bea3-48fe-beaf-9fee5431de66)
