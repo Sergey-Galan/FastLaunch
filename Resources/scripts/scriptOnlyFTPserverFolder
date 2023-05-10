@@ -1,0 +1,325 @@
+#!/bin/sh
+
+MessageFTP()
+{
+lan=`defaults read -g AppleLocale | cut -d "_" -f1`
+
+if [[ "$lan" = "ru" ]]; then
+echo "Info:Не удается установить связь с FTP-сервером"
+
+elif [[ "$lan" = "uk" ]]; then
+echo "Info:Неможливо встановити зв'язок з FTP-сервером"
+else
+echo "Info:Unable to communicate with FTP-server"
+fi
+
+}
+
+
+MessageFileFTP()
+{
+lan=`defaults read -g AppleLocale | cut -d "_" -f1`
+
+if [[ "$lan" = "ru" ]]; then
+echo "Info:Файл с таким названием есть на сервере"
+
+elif [[ "$lan" = "uk" ]]; then
+echo "Info:Файл з такою назвою є на сервері"
+else
+echo "Info:There is a file with the same name on the server"
+fi
+
+}
+
+
+MessageTempfiles()
+{
+lan=`defaults read -g AppleLocale | cut -d "_" -f1`
+
+if [[ "$lan" = "ru" ]]; then
+echo "Info:Видеофайл в процессе кодирования, следует подождать $duration3 из $duration1"
+
+elif [[ "$lan" = "uk" ]]; then
+echo "Info:Відеофайл в процесі кодування, слід почекати $duration3 з $duration1"
+else
+echo "Info:Video file in the course of encoding, it is necessary to wait $duration3 of $duration1"
+fi
+
+}
+
+
+XML()
+{
+  uuid=`uuidgen`
+  out=$(($(wc -c < "/private/tmp/FastLaunch/$file_end.$ext")))
+  filename_xml="/private/tmp/FastLaunch/$file_end.$ext"
+  MD5=$(md5 "$filename_xml"); MD5=${MD5/* /}
+  echo "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"no\" ?>
+  <message uuid=\""$uuid"\" id=\""$file_end.$ext"\">
+  <envelope sent=\""$(date)"\" subject=\""$file_end.$ext"\">
+  <to>
+  <account address=\"From FastLaunch\" personal=\"\" />
+  </to>
+  <from>
+  FastLaunch $ScriptVersion
+  <account personal=\"FastLaunch: FFMPEG\" network-address=\"`hostname -f`\" />
+  </from>
+  </envelope>
+  <parcel>
+  <content name=\""$file_end.$ext"\" type=\"movie\">
+  <file name=\""$file_end.$ext"\" path=\""$sr$file_end.$ext"\" size=\""$out"\" version=\"original\" md5=\"$MD5\">
+  <protocol>
+  <connection />
+  </protocol>
+  <container>
+  <codec uuid=\"00000000-0000-0000-0000-000000000000\" />
+  </container>
+  </file>
+  </content>
+  </parcel>
+  </message>" > $filename_xml.xml
+
+}
+
+
+Time()
+{
+finishTime=$(date -u "+%s")
+processedTime=$(expr $finishTime - $startTime)
+
+if [[ $processedTime -gt 3599 ]]; then
+    processedTime=$(printf "%dh%dm%ds\n" $((processedTime/3600%3600)) $((processedTime/60%60)) $((processedTime%60)))
+
+elif [[ $processedTime -gt 59 ]]; then
+    processedTime=$(printf "%dm%ds\n" $((processedTime/60%60)) $((processedTime%60)))
+ else
+    processedTime=$(printf "%ds\n" $((processedTime)))
+fi
+
+}
+
+
+Tempfiles()
+{
+duration1="$(./tools/mediainfo --Inform="General;%Duration/String3%" "$file" | cut -d '.' -f1)"
+duration3="$(./tools/mediainfo --Inform="Video;%Duration/String3%" "$file" | cut -d '.' -f1)"
+duration4="$(./tools/mediainfo --Inform="Audio;%Duration/String3%" "$file" | cut -d '.' -f1)"
+duration2="$(./tools/ffmpeg -i "$file" 2>&1 | grep Duration | cut -d ' ' -f4 | sed s/,// | cut -d '.' -f1)"
+
+until [[ "$duration1" = "$duration3" ]] || [[ "$duration1" = "$duration4" ]] || [[ "$duration1" = "$duration2" ]] && [[ "$duration2" ]]
+do
+duration1="$(./tools/mediainfo --Inform="General;%Duration/String3%" "$file" | cut -d '.' -f1)"
+duration2="$(./tools/ffmpeg -i "$file" 2>&1 | grep Duration | cut -d ' ' -f4 | sed s/,// | cut -d '.' -f1)"
+duration4="$(./tools/mediainfo --Inform="Audio;%Duration/String3%" "$file" | cut -d '.' -f1)"
+duration3="$(./tools/mediainfo --Inform="Video;%Duration/String3%" "$file" | cut -d '.' -f1)"
+MessageTempfiles
+sleep 2
+done
+sleep 1
+
+}
+
+
+DetectFTP()
+{
+
+if curl --max-time 4 -s -I -v "$sr" --user "$un":"$ps" &> /dev/null; then
+echo "Info:Detect... $sr... OK"
+      else
+MessageFTP
+afplay sound/Cartoon1.mp3 &> /dev/null
+exit
+fi
+
+}
+
+
+TestFileFTP()
+{
+
+if curl --max-time 4 -s -I "$sr"/"$file_end.$ext" --user "$un":"$ps" &> /dev/null; then
+MessageFileFTP
+afplay sound/Cartoon1.mp3 &> /dev/null
+exit
+fi
+
+}
+
+
+StartFTP()
+{
+
+echo "ONLY:BLUE"
+for files in "/private/tmp/FastLaunch"/"$file_end.$ext"; do
+echo "Progress:0% "
+echo "FPS: "
+echo "Size:""Size:            0 of 0"
+echo "Time:""Time:            --:--:-- --:--:--"
+echo "Speed:""Speed:          0"
+echo "Duration: "
+  size="$(./tools/mediainfo --Inform="General;%FileSize/String%" "$files")"
+  size=${size/' '/}
+  size=${size/' '/}
+  size=${size/'i'*/}
+  h="$(./tools/ffmpeg -i "$files" 2>&1 | grep Duration | cut -d ' ' -f4 | sed s/,// | cut -c1,2)"
+  m="$(./tools/ffmpeg -i "$files" 2>&1 | grep Duration | cut -d ' ' -f4 | sed s/,// | cut -c4,5)"
+  s="$(./tools/ffmpeg -i "$files" 2>&1 | grep Duration | cut -d ' ' -f4 | sed s/,// | cut -c7,8)"
+  ms="$(./tools/ffmpeg -i "$files" 2>&1 | grep Duration | cut -d ' ' -f4 | sed s/,// | cut -c10,11)"
+  prth=$(expr $h \* 3600 2>/dev/null);
+  prtm=$(expr $m \* 60 2>/dev/null);
+  prt=$(expr $prth + $prtm + $s 2>/dev/null)
+echo y | ./tools/ffmpeg -ss 00:00:02 -i "$files" -s 340x190 -frames:v 1 -q:v 5 /private/tmp/img.jpeg 2>/dev/null &
+echo "Info:Start sending file to FTP-server... "
+echo "Files:file://"$file""
+
+until curl -C - -T "$files" "$sr" --user "$un":"$ps"; do
+sleep 1
+done 2>&1 |
+
+while IFS= read -d $'\r' -r p; do
+  pr=${p:(0):(3)}
+  pr=${pr%'**'*}
+  sh=${p:(25):(6)}
+  sh=${sh%'byte'*}
+  sh=${sh/* /}
+  tm=${p:(64):(8)}
+  tm=${tm%'d % Xfe'*}
+  tm=${tm/' '/}
+  tms=${p:(55):(8)}
+  tms=${tms/* /}
+  sp=${p:(72):(6)}
+  sp=${sp%'rd'*}
+  sp=${sp/* /}
+  s=$(echo 'scale = 2 ; '$prt' / '100' * '$pr'' | bc 2>/dev/null);
+  echo "$p"
+
+if [[ `"$p" 2>&1 | grep -e 'Could not resolve host' ` ]] || [[ `"$p" 2>&1 | grep -e 'Send failure: Broken pipe' ` ]] || [[ `"$p" 2>&1 | grep -e 'server response timeout' ` ]] || [[ `"$p" 2>&1 | grep -e 'Failed to connect' ` ]]; then
+MessageFTP
+echo "Progress:0% "
+echo "Size:""Size:            0 of 0"
+echo "Time:""Time:            --:--:-- --:--:--"
+echo "Speed:""Speed:          0"
+sleep 10
+
+elif [[ -n "$pr" ]]; then
+tempfiles="${files##*/}"
+echo "Seconds:$s"
+echo "Info:Start sending file to FTP-server... "
+echo "Progress:$pr% "
+echo "FPS: "
+echo "Size:""Size:             $sh of $size"
+echo "Time:""Time:            $tms $tm"
+echo "Speed:""Speed:          $sp"
+echo "Duration: "
+fi
+echo "Name:$file_end.$ext"
+done
+
+echo "Size:""Size:             $size of $size"
+echo "Progress:100% "
+sleep 1
+done
+
+in=`echo $(curl --max-time 10 -s -I "$sr$file_end.$ext" --user "$un":"$ps" | tr -d '\r') | cut -d " " -f9`
+out=$(($(wc -c < "/private/tmp/FastLaunch/$file_end.$ext")))
+
+if [[ $XMLfile = 1 ]]; then
+  XML # создание XML
+  for filexml in "/private/tmp/FastLaunch"/"$file_end.$ext.xml"; do
+    until curl -C - -T "$filexml" "$sr" --user "$un":"$ps"; do
+    sleep 1
+    done
+  done
+echo "Info:Sending an XML file"
+sleep 1
+fi
+
+videoduration="$(./tools/ffmpeg -i "/private/tmp/FastLaunch/$file_end.$ext" 2>&1 | grep Duration | cut -d ' ' -f4 | sed s/,// | cut -d '.' -f1)"
+
+Time
+
+if [[ "$out" = "$in" ]]; then
+afplay sound/done.mp3 &> /dev/null &
+echo "Info:🙂 Complete: Video file  Total processed: $processedTime Time: $(date "+%Y-%m-%d %H:%M:%S %z")"
+echo "NOTIFICATION:"$file_end.$ext" Complite 🙂 \r"Duration... $videoduration Size... $size""
+else
+afplay sound/Cartoon1.mp3 &> /dev/null &
+echo "Info:😡 Complete: Video file Error!!!  Total processed: $processedTime Time: $(date "+%Y-%m-%d %H:%M:%S %z")"
+echo "NOTIFICATION:"$file_end.$ext" Error!!! 😡 \r"Duration... $videoduration Size... $size""
+#rm -rf "/private/tmp/img.jpeg" &> /dev/null
+rm -rf "/private/tmp/FastLaunch/"* &> /dev/null
+exit
+fi
+#rm -rf "/private/tmp/img.jpeg" &> /dev/null
+rm -rf "/private/tmp/FastLaunch/"* &> /dev/null
+}
+
+
+
+##################################################################################
+###### Start script ##############################################################
+##################################################################################
+error=""
+
+FastLaunchPlist="$HOME/Library/Preferences/org.SerhiiHalan.SettingsFastLaunch.plist" &> /dev/null
+XMLfile="$(defaults read $FastLaunchPlist XMLfile)"
+Wait="$(defaults read $FastLaunchPlist Wait)"
+sr="$(defaults read $FastLaunchPlist sr)"
+un="$(defaults read $FastLaunchPlist un)"
+ps=$(security find-generic-password -a ${USER} -s postftp -w)
+if [[ -z "$un" ]] && [[ -z "$ps" ]]; then
+un=ftp
+ps=ftp
+fi
+
+
+if [[ -f "$file" ]]; then
+echo "Progress:0% "
+startTime=$(date -u "+%s")
+ ext="${file##*.}"
+ tempfile="${file##*/}"
+ file_end="${tempfile%.*}"
+  if [[ `echo "mov qt mp4 mpg4 mpg mpeg mpe m75 m15 mts mkv mxf 3gp m4v avi wm wmv vfw ts flv webm vob asf asx bin dat drv f4v gtp mod moov rm rmvd spl vcd vid 3g2 3gp 3gp2 3gpp 3gpp2 dif swf dv m2v m2p m2t mpegts yuv bsf evo exp hdmov hdv mpv mqv" 2>&1 | grep -i $ext` ]]; then
+
+    echo "Info:`./tools/mediainfo --version | grep -v 'MediaInfo Command line,'`,   `curl -V | awk '{ print $1,$2 }' | sed '2,$d'`"
+    sleep 0.5
+    DetectFTP
+
+    file_end=`echo "$file_end" | awk '{ gsub(" ","\_"); print }'`  #Замена пробела
+    TestFileFTP
+    
+    if [[ $Wait = 1 ]]; then
+     Tempfiles
+    fi
+
+    ln -s "$file" "/private/tmp/FastLaunch/$file_end.$ext"
+    Mfile="$file"
+    put=OUTPUT
+    Minfo
+    StartFTP # стартует отправка
+    echo "$(date "+%Y-%m-%d %H:%M:%S") $file_end.$ext" >> "$DestinationFolder"/report.txt
+    tempfile="${file##*/}"
+    file_end="${tempfile%.*}"
+    mv "$MonitoringFolder"/"$file_end.$ext" "$HOME"/.Trash
+   sleep 1
+else
+   mkdir "$MonitoringFolder/Not video files" &> /dev/null
+   mv "$MonitoringFolder"/"$file_end.$ext" "$MonitoringFolder/Not video files/"
+echo "Info:"$file_end.$ext" Not a video file"
+sleep 1
+fi
+
+for file in "$MonitoringFolder"/*.*; do
+break
+done
+
+if [[ -f "$file" ]]
+then
+sleep 1
+source scripts/scriptStart
+fi
+exit
+fi
+
+echo "Info:Drag video files to process"
+exit

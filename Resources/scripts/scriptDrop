@@ -1,0 +1,83 @@
+#!/bin/sh
+
+MessageUploading()
+{
+lan=`defaults read -g AppleLocale | cut -d "_" -f1`
+
+if [[ "$lan" = "ru" ]]; then
+echo "Info:Если не хотите завершения выгрузки видеофайла, перезапустите программу"
+
+elif [[ "$lan" = "uk" ]]; then
+echo "Info:Якщо не хочете завершення вивантаження відеофайлу, перезапустіть програму"
+else
+echo "Info:If you do not want to finish uploading the video file, restart the program"
+fi
+
+}
+
+Minfo()
+{
+echo "Media:Video "$put"\r`./tools/mediainfo --Inform="General;Size...............: %FileSize/String%" "$Mfile" &`\r`./tools/mediainfo --Inform="General;Duration.........: %Duration/String2%" "$Mfile" &`\r`./tools/mediainfo --Inform="Video;Format...........: %Format%" "$Mfile" &`\r`./tools/mediainfo --Inform="Video;Profile............: %Format_Profile%" "$Mfile" &`\r`./tools/mediainfo --Inform="Video;Codec ID........: %CodecID%" "$Mfile" &`\r`./tools/mediainfo --Inform="Video;Bit Rate..........: %BitRate/String%" "$Mfile" &`\r`./tools/mediainfo --Inform="Video;Resolution......: %Width%x%Height%" "$Mfile" &`\r`./tools/mediainfo --Inform="Video;Aspect Ratio...: %DisplayAspectRatio/String%" "$Mfile"`\r`./tools/mediainfo --Inform="Video;Frame Rate.....: %FrameRate% fps" "$Mfile"`\r`./tools/mediainfo --Inform="Video;Color Space....: %ColorSpace% %ChromaSubsampling%" "$Mfile" &`\r`./tools/mediainfo --Inform="Video;Bit Depth........: %BitDepth/String%" "$Mfile" &`\r`./tools/mediainfo --Inform="Video;Scan Type.......: %ScanType%" "$Mfile" &`\rAudio\r`./tools/mediainfo --Inform="Audio;%Format% %BitRate/String% %BitRate_Mode% %Channel(s)%ch %Codec/String% %SamplingRate/String%" "$Mfile"`"
+}
+
+
+##################################################################################
+###### Start script execution routine ############################################
+##################################################################################
+
+
+ScriptVersion=5.4.0
+
+FastLaunchPlist="$HOME/Library/Preferences/org.SerhiiHalan.SettingsFastLaunch.plist" &> /dev/null
+MonitoringFolder="$(/usr/libexec/PlistBuddy -c "Print :MonitoringFolder" "$FastLaunchPlist")"
+DestinationFolder="$(/usr/libexec/PlistBuddy -c "Print :DestinationFolder" "$FastLaunchPlist")"
+StartType="$(defaults read $FastLaunchPlist Mode)"
+mkdir "$DestinationFolder" &> /dev/null
+
+ for part in "$DestinationFolder"/*.part;
+  do
+    rm -f "$part"
+   done
+
+for file in "/private/tmp/FastLaunch"/*.*; do
+if [[ -f "$file" ]]; then
+if [[ -f "$@" ]]; then
+echo "Files:file://"$file""
+echo "Seconds:2"
+tempfile="${file##*/}"
+echo "Name:$tempfile"
+MessageUploading
+exit
+fi
+MessageUploading
+sleep 0.1
+echo "Info:"
+sleep 0.1
+MessageUploading
+sleep 0.1
+echo "Info:"
+sleep 0.1
+MessageUploading
+sleep 0.1
+echo "Info:"
+sleep 0.1
+MessageUploading
+sleep 4
+source scripts/scriptOnlyFTPserver
+fi
+done
+
+rm -rf "/private/tmp/img.jpeg" &> /dev/null
+
+if [[ $StartType = 'Encoding and Server' ]]; then
+source scripts/scriptEncodingAndServer
+fi
+
+if [[ $StartType = 'Only FTP-server' ]]; then
+source scripts/scriptOnlyFTPserver
+fi
+
+if [[ $StartType = 'Only Encoding' ]]; then
+source scripts/scriptOnlyEncoding
+fi
+exit

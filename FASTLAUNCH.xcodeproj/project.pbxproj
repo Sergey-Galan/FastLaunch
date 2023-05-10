@@ -1,0 +1,639 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 53;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		A506A73626BD91D10071ECB5 /* sound in Resources */ = {isa = PBXBuildFile; fileRef = A506A72826BD91D00071ECB5 /* sound */; };
+		A506A73E26BD91D10071ECB5 /* MainMenu.xib in Resources */ = {isa = PBXBuildFile; fileRef = A506A73026BD91D10071ECB5 /* MainMenu.xib */; };
+		A50F9EA826BC55E200369BCA /* FastLaunchJob.m in Sources */ = {isa = PBXBuildFile; fileRef = A50F9EA226BC55E200369BCA /* FastLaunchJob.m */; };
+		A50F9EAA26BC55E200369BCA /* Controller.m in Sources */ = {isa = PBXBuildFile; fileRef = A50F9EA426BC55E200369BCA /* Controller.m */; };
+		A50F9EAB26BC55E200369BCA /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = A50F9EA726BC55E200369BCA /* main.m */; };
+		A54DB86229C3D56600B544FA /* Security.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A5C0ED01269DF03F00A115FF /* Security.framework */; };
+		A54DB86529C3D58400B544FA /* AVFoundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A5DA28F526B4B5CD00B1EC06 /* AVFoundation.framework */; };
+		A562D1A829FA8CD2002CC266 /* Credits.html in Resources */ = {isa = PBXBuildFile; fileRef = A562D1A729FA8CD2002CC266 /* Credits.html */; };
+		A5706F8F29DE1BBA002B4159 /* appIcon.icns in Resources */ = {isa = PBXBuildFile; fileRef = A5706F8E29DE1BBA002B4159 /* appIcon.icns */; };
+		A59836CA29E32B9800590907 /* pencil.png in Resources */ = {isa = PBXBuildFile; fileRef = A59836C929E32B9800590907 /* pencil.png */; };
+		A59836D029E332F800590907 /* video.png in Resources */ = {isa = PBXBuildFile; fileRef = A59836CF29E332F800590907 /* video.png */; };
+		A5A5B26C29E5D555007A99B2 /* AYProgressIndicator.m in Sources */ = {isa = PBXBuildFile; fileRef = A5A5B26A29E5D555007A99B2 /* AYProgressIndicator.m */; };
+		A5D6E6EE29E3505B00C69C7D /* scripts in Resources */ = {isa = PBXBuildFile; fileRef = A5D6E6ED29E3505B00C69C7D /* scripts */; };
+		A5D6E6F029E3569100C69C7D /* tools in Resources */ = {isa = PBXBuildFile; fileRef = A5D6E6EF29E3569100C69C7D /* tools */; };
+		A5E8DE5729DC665700AB204E /* DockProgressBarRed.mm in Sources */ = {isa = PBXBuildFile; fileRef = A5E8DE5529DC665600AB204E /* DockProgressBarRed.mm */; };
+		A5F955CD29DCB77F0029CEBA /* DockProgressBarBlue.mm in Sources */ = {isa = PBXBuildFile; fileRef = A5F955CB29DCB77E0029CEBA /* DockProgressBarBlue.mm */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXFileReference section */
+		A506A72826BD91D00071ECB5 /* sound */ = {isa = PBXFileReference; lastKnownFileType = folder; path = sound; sourceTree = "<group>"; };
+		A506A73026BD91D10071ECB5 /* MainMenu.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = MainMenu.xib; sourceTree = "<group>"; };
+		A50F9EA226BC55E200369BCA /* FastLaunchJob.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = FastLaunchJob.m; path = FastLaunch/FastLaunchJob.m; sourceTree = "<group>"; };
+		A50F9EA426BC55E200369BCA /* Controller.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = Controller.m; path = FastLaunch/Controller.m; sourceTree = "<group>"; };
+		A50F9EA526BC55E200369BCA /* Controller.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Controller.h; path = FastLaunch/Controller.h; sourceTree = "<group>"; };
+		A50F9EA726BC55E200369BCA /* main.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = main.m; path = FastLaunch/main.m; sourceTree = "<group>"; };
+		A562D1A729FA8CD2002CC266 /* Credits.html */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.html; path = Credits.html; sourceTree = "<group>"; };
+		A5706F8E29DE1BBA002B4159 /* appIcon.icns */ = {isa = PBXFileReference; lastKnownFileType = image.icns; path = appIcon.icns; sourceTree = "<group>"; };
+		A59836C929E32B9800590907 /* pencil.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = pencil.png; sourceTree = "<group>"; };
+		A59836CF29E332F800590907 /* video.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = video.png; sourceTree = "<group>"; };
+		A5A5B26A29E5D555007A99B2 /* AYProgressIndicator.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = AYProgressIndicator.m; path = FastLaunch/AYProgressIndicator.m; sourceTree = "<group>"; };
+		A5A5B26B29E5D555007A99B2 /* AYProgressIndicator.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = AYProgressIndicator.h; path = FastLaunch/AYProgressIndicator.h; sourceTree = "<group>"; };
+		A5C0ED01269DF03F00A115FF /* Security.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Security.framework; path = ../../../../System/Library/Frameworks/Security.framework; sourceTree = "<group>"; };
+		A5D6E6ED29E3505B00C69C7D /* scripts */ = {isa = PBXFileReference; lastKnownFileType = folder; path = scripts; sourceTree = "<group>"; };
+		A5D6E6EF29E3569100C69C7D /* tools */ = {isa = PBXFileReference; lastKnownFileType = folder; path = tools; sourceTree = "<group>"; };
+		A5D8198326B76656008F9D42 /* IOKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = IOKit.framework; path = System/Library/Frameworks/IOKit.framework; sourceTree = SDKROOT; };
+		A5D87B3C26BC67B0001AA183 /* FastLaunchJob.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = FastLaunchJob.h; path = FastLaunch/FastLaunchJob.h; sourceTree = "<group>"; };
+		A5DA28F526B4B5CD00B1EC06 /* AVFoundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AVFoundation.framework; path = System/Library/Frameworks/AVFoundation.framework; sourceTree = SDKROOT; };
+		A5E8DE5529DC665600AB204E /* DockProgressBarRed.mm */ = {isa = PBXFileReference; explicitFileType = sourcecode.c.objc; fileEncoding = 4; name = DockProgressBarRed.mm; path = Shared/DockProgressBarRed.mm; sourceTree = "<group>"; };
+		A5E8DE5629DC665600AB204E /* DockProgressBarRed.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = DockProgressBarRed.h; path = Shared/DockProgressBarRed.h; sourceTree = "<group>"; };
+		A5F955CB29DCB77E0029CEBA /* DockProgressBarBlue.mm */ = {isa = PBXFileReference; explicitFileType = sourcecode.c.objc; fileEncoding = 4; name = DockProgressBarBlue.mm; path = Shared/DockProgressBarBlue.mm; sourceTree = "<group>"; };
+		A5F955CC29DCB77E0029CEBA /* DockProgressBarBlue.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = DockProgressBarBlue.h; path = Shared/DockProgressBarBlue.h; sourceTree = "<group>"; };
+		F42A93D52178365C00C40D46 /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = System/Library/Frameworks/Foundation.framework; sourceTree = SDKROOT; };
+		F42A93D62178365C00C40D46 /* AppKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AppKit.framework; path = System/Library/Frameworks/AppKit.framework; sourceTree = SDKROOT; };
+		F48B774111F7661C00351575 /* FastLaunch.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = FastLaunch.app; sourceTree = BUILT_PRODUCTS_DIR; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		F48B773F11F7661C00351575 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				A54DB86529C3D58400B544FA /* AVFoundation.framework in Frameworks */,
+				A54DB86229C3D56600B544FA /* Security.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		080E96DDFE201D6D7F000001 /* Shared */ = {
+			isa = PBXGroup;
+			children = (
+				A5E8DE5429DC65F600AB204E /* DockProgressBar */,
+			);
+			name = Shared;
+			sourceTree = "<group>";
+		};
+		19C28FACFE9D520D11CA2CBB /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				F48B774111F7661C00351575 /* FastLaunch.app */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		29B97314FDCFA39411CA2CEA /* FastLaunch */ = {
+			isa = PBXGroup;
+			children = (
+				F48B7B8811F766CA00351575 /* FastLaunch */,
+				080E96DDFE201D6D7F000001 /* Shared */,
+				29B97323FDCFA39411CA2CEA /* Frameworks */,
+				19C28FACFE9D520D11CA2CBB /* Products */,
+			);
+			name = FastLaunch;
+			sourceTree = "<group>";
+		};
+		29B97323FDCFA39411CA2CEA /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				A5D8198326B76656008F9D42 /* IOKit.framework */,
+				A5DA28F526B4B5CD00B1EC06 /* AVFoundation.framework */,
+				F42A93D62178365C00C40D46 /* AppKit.framework */,
+				F42A93D52178365C00C40D46 /* Foundation.framework */,
+				A5C0ED01269DF03F00A115FF /* Security.framework */,
+			);
+			name = Frameworks;
+			sourceTree = "<group>";
+		};
+		A506A70726BD90DC0071ECB5 /* Resources */ = {
+			isa = PBXGroup;
+			children = (
+				A562D1A729FA8CD2002CC266 /* Credits.html */,
+				A5706F8E29DE1BBA002B4159 /* appIcon.icns */,
+				A506A73026BD91D10071ECB5 /* MainMenu.xib */,
+				A5D6E6ED29E3505B00C69C7D /* scripts */,
+				A5D6E6EF29E3569100C69C7D /* tools */,
+				A506A72826BD91D00071ECB5 /* sound */,
+				A59836C929E32B9800590907 /* pencil.png */,
+				A59836CF29E332F800590907 /* video.png */,
+			);
+			path = Resources;
+			sourceTree = "<group>";
+		};
+		A5E8DE5429DC65F600AB204E /* DockProgressBar */ = {
+			isa = PBXGroup;
+			children = (
+				A5E8DE5629DC665600AB204E /* DockProgressBarRed.h */,
+				A5E8DE5529DC665600AB204E /* DockProgressBarRed.mm */,
+				A5F955CC29DCB77E0029CEBA /* DockProgressBarBlue.h */,
+				A5F955CB29DCB77E0029CEBA /* DockProgressBarBlue.mm */,
+			);
+			name = DockProgressBar;
+			sourceTree = "<group>";
+		};
+		F48B7B8811F766CA00351575 /* FastLaunch */ = {
+			isa = PBXGroup;
+			children = (
+				A50F9EA526BC55E200369BCA /* Controller.h */,
+				A50F9EA426BC55E200369BCA /* Controller.m */,
+				A50F9EA726BC55E200369BCA /* main.m */,
+				A5A5B26B29E5D555007A99B2 /* AYProgressIndicator.h */,
+				A5A5B26A29E5D555007A99B2 /* AYProgressIndicator.m */,
+				A5D87B3C26BC67B0001AA183 /* FastLaunchJob.h */,
+				A50F9EA226BC55E200369BCA /* FastLaunchJob.m */,
+				A506A70726BD90DC0071ECB5 /* Resources */,
+			);
+			name = FastLaunch;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		F48B774011F7661C00351575 /* FastLaunch */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = F48B774711F7661D00351575 /* Build configuration list for PBXNativeTarget "FastLaunch" */;
+			buildPhases = (
+				F48B773D11F7661C00351575 /* Resources */,
+				F48B773E11F7661C00351575 /* Sources */,
+				F48B773F11F7661C00351575 /* Frameworks */,
+				F4302B7B21C5A04A001C8BEC /* ShellScript */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = FastLaunch;
+			productName = FastLaunch;
+			productReference = F48B774111F7661C00351575 /* FastLaunch.app */;
+			productType = "com.apple.product-type.application";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		29B97313FDCFA39411CA2CEA /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				BuildIndependentTargetsInParallel = YES;
+				LastUpgradeCheck = 1430;
+				ORGANIZATIONNAME = "Sergey Galan";
+				TargetAttributes = {
+					F48B774011F7661C00351575 = {
+						DevelopmentTeam = WSC9LR5SDP;
+						ProvisioningStyle = Manual;
+					};
+				};
+			};
+			buildConfigurationList = F41B2181085CD8FF00B63B0D /* Build configuration list for PBXProject "FASTLAUNCH" */;
+			compatibilityVersion = "Xcode 3.2";
+			developmentRegion = en;
+			hasScannedForEncodings = 1;
+			knownRegions = (
+				fr,
+				Base,
+				ja,
+				en,
+				de,
+			);
+			mainGroup = 29B97314FDCFA39411CA2CEA /* FastLaunch */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				F48B774011F7661C00351575 /* FastLaunch */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		F48B773D11F7661C00351575 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				A5D6E6F029E3569100C69C7D /* tools in Resources */,
+				A59836CA29E32B9800590907 /* pencil.png in Resources */,
+				A59836D029E332F800590907 /* video.png in Resources */,
+				A506A73626BD91D10071ECB5 /* sound in Resources */,
+				A506A73E26BD91D10071ECB5 /* MainMenu.xib in Resources */,
+				A562D1A829FA8CD2002CC266 /* Credits.html in Resources */,
+				A5706F8F29DE1BBA002B4159 /* appIcon.icns in Resources */,
+				A5D6E6EE29E3505B00C69C7D /* scripts in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXShellScriptBuildPhase section */
+		F4302B7B21C5A04A001C8BEC /* ShellScript */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+			);
+			outputFileListPaths = (
+			);
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+		};
+/* End PBXShellScriptBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		F48B773E11F7661C00351575 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				A50F9EA826BC55E200369BCA /* FastLaunchJob.m in Sources */,
+				A50F9EAA26BC55E200369BCA /* Controller.m in Sources */,
+				A5A5B26C29E5D555007A99B2 /* AYProgressIndicator.m in Sources */,
+				A5E8DE5729DC665700AB204E /* DockProgressBarRed.mm in Sources */,
+				A50F9EAB26BC55E200369BCA /* main.m in Sources */,
+				A5F955CD29DCB77F0029CEBA /* DockProgressBarBlue.mm in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin XCBuildConfiguration section */
+		F41B2182085CD8FF00B63B0D /* Development */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_LOCALIZABILITY_NONLOCALIZED = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_LINK_OBJC_RUNTIME = YES;
+				CLANG_WARN_ASSIGN_ENUM = NO;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = NO;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_SEMICOLON_BEFORE_METHOD_BODY = NO;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_IMPLICIT_CONVERSION = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				CODE_SIGN_IDENTITY = "";
+				DEAD_CODE_STRIPPING = YES;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				DEPLOYMENT_POSTPROCESSING = YES;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_TESTABILITY = YES;
+				GCC_CW_ASM_SYNTAX = NO;
+				GCC_ENABLE_CPP_EXCEPTIONS = NO;
+				GCC_ENABLE_CPP_RTTI = NO;
+				GCC_ENABLE_OBJC_EXCEPTIONS = YES;
+				GCC_ENABLE_PASCAL_STRINGS = NO;
+				GCC_GENERATE_DEBUGGING_SYMBOLS = YES;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_PREPROCESSOR_DEFINITIONS = "DEBUG=1";
+				GCC_STRICT_ALIASING = YES;
+				GCC_TREAT_IMPLICIT_FUNCTION_DECLARATIONS_AS_ERRORS = NO;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_MISSING_NEWLINE = YES;
+				GCC_WARN_ABOUT_MISSING_PROTOTYPES = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES;
+				GCC_WARN_FOUR_CHARACTER_CONSTANTS = NO;
+				GCC_WARN_PEDANTIC = YES;
+				GCC_WARN_SHADOW = YES;
+				GCC_WARN_STRICT_SELECTOR_MATCH = NO;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_LABEL = YES;
+				GCC_WARN_UNUSED_PARAMETER = NO;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				GENERATE_PROFILING_CODE = YES;
+				IBC_FLATTEN_NIBS = YES;
+				INFOPLIST_EXPAND_BUILD_SETTINGS = NO;
+				INFOPLIST_OUTPUT_FORMAT = binary;
+				INFOPLIST_PREPROCESS = NO;
+				MACOSX_DEPLOYMENT_TARGET = 10.13;
+				ONLY_ACTIVE_ARCH = YES;
+				OTHER_LDFLAGS = "";
+				PLIST_FILE_OUTPUT_FORMAT = XML;
+				SCAN_ALL_SOURCE_FILES_FOR_INCLUDES = NO;
+				SDKROOT = macosx;
+				SKIP_INSTALL = YES;
+				STRINGS_FILE_OUTPUT_ENCODING = "UTF-8";
+				STRIPFLAGS = "-x";
+				SYMROOT = build;
+				VALID_ARCHS = x86_64;
+				WARNING_CFLAGS = "-Wpartial-availability";
+			};
+			name = Development;
+		};
+		F41B2183085CD8FF00B63B0D /* Deployment */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_LOCALIZABILITY_NONLOCALIZED = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_LINK_OBJC_RUNTIME = YES;
+				CLANG_WARN_ASSIGN_ENUM = NO;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = NO;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_SEMICOLON_BEFORE_METHOD_BODY = NO;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_IMPLICIT_CONVERSION = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				CODE_SIGN_IDENTITY = "";
+				DEAD_CODE_STRIPPING = YES;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				DEPLOYMENT_POSTPROCESSING = YES;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_TESTABILITY = NO;
+				GCC_CW_ASM_SYNTAX = NO;
+				GCC_ENABLE_CPP_EXCEPTIONS = NO;
+				GCC_ENABLE_CPP_RTTI = NO;
+				GCC_ENABLE_OBJC_EXCEPTIONS = YES;
+				GCC_ENABLE_PASCAL_STRINGS = NO;
+				GCC_GENERATE_DEBUGGING_SYMBOLS = NO;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_PREPROCESSOR_DEFINITIONS = "";
+				GCC_STRICT_ALIASING = YES;
+				GCC_SYMBOLS_PRIVATE_EXTERN = YES;
+				GCC_TREAT_IMPLICIT_FUNCTION_DECLARATIONS_AS_ERRORS = NO;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_MISSING_NEWLINE = YES;
+				GCC_WARN_ABOUT_MISSING_PROTOTYPES = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES;
+				GCC_WARN_FOUR_CHARACTER_CONSTANTS = NO;
+				GCC_WARN_PEDANTIC = YES;
+				GCC_WARN_SHADOW = YES;
+				GCC_WARN_STRICT_SELECTOR_MATCH = NO;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_LABEL = YES;
+				GCC_WARN_UNUSED_PARAMETER = NO;
+				GCC_WARN_UNUSED_VALUE = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IBC_FLATTEN_NIBS = YES;
+				INFOPLIST_EXPAND_BUILD_SETTINGS = NO;
+				INFOPLIST_OUTPUT_FORMAT = binary;
+				INFOPLIST_PREPROCESS = NO;
+				LINKER_DISPLAYS_MANGLED_NAMES = NO;
+				MACOSX_DEPLOYMENT_TARGET = 10.13;
+				ONLY_ACTIVE_ARCH = NO;
+				OTHER_LDFLAGS = "";
+				PLIST_FILE_OUTPUT_FORMAT = binary;
+				SCAN_ALL_SOURCE_FILES_FOR_INCLUDES = NO;
+				SDKROOT = macosx;
+				SKIP_INSTALL = YES;
+				STRINGS_FILE_OUTPUT_ENCODING = binary;
+				STRIPFLAGS = "-x";
+				SYMROOT = build;
+				VALID_ARCHS = x86_64;
+				WARNING_CFLAGS = "-Wpartial-availability";
+			};
+			name = Deployment;
+		};
+		F41B2184085CD8FF00B63B0D /* Default */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_LOCALIZABILITY_NONLOCALIZED = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_LINK_OBJC_RUNTIME = YES;
+				CLANG_WARN_ASSIGN_ENUM = NO;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = NO;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_SEMICOLON_BEFORE_METHOD_BODY = NO;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_IMPLICIT_CONVERSION = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				CODE_SIGN_IDENTITY = "";
+				CONFIGURATION_TEMP_DIR = "";
+				DEAD_CODE_STRIPPING = YES;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				DEPLOYMENT_POSTPROCESSING = YES;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_TESTABILITY = NO;
+				GCC_CW_ASM_SYNTAX = NO;
+				GCC_ENABLE_CPP_EXCEPTIONS = NO;
+				GCC_ENABLE_CPP_RTTI = NO;
+				GCC_ENABLE_OBJC_EXCEPTIONS = YES;
+				GCC_ENABLE_PASCAL_STRINGS = NO;
+				GCC_GENERATE_DEBUGGING_SYMBOLS = NO;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_PREPROCESSOR_DEFINITIONS = "";
+				GCC_STRICT_ALIASING = YES;
+				GCC_TREAT_IMPLICIT_FUNCTION_DECLARATIONS_AS_ERRORS = NO;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_MISSING_NEWLINE = YES;
+				GCC_WARN_ABOUT_MISSING_PROTOTYPES = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES;
+				GCC_WARN_FOUR_CHARACTER_CONSTANTS = NO;
+				GCC_WARN_PEDANTIC = YES;
+				GCC_WARN_SHADOW = YES;
+				GCC_WARN_STRICT_SELECTOR_MATCH = NO;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_LABEL = YES;
+				GCC_WARN_UNUSED_PARAMETER = NO;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IBC_FLATTEN_NIBS = YES;
+				INFOPLIST_EXPAND_BUILD_SETTINGS = NO;
+				INFOPLIST_OUTPUT_FORMAT = binary;
+				INFOPLIST_PREPROCESS = NO;
+				MACOSX_DEPLOYMENT_TARGET = 10.13;
+				ONLY_ACTIVE_ARCH = NO;
+				OTHER_LDFLAGS = "";
+				PLIST_FILE_OUTPUT_FORMAT = binary;
+				SCAN_ALL_SOURCE_FILES_FOR_INCLUDES = NO;
+				SDKROOT = macosx;
+				SKIP_INSTALL = YES;
+				STRINGS_FILE_OUTPUT_ENCODING = binary;
+				STRIPFLAGS = "-x";
+				SYMROOT = build;
+				VALID_ARCHS = x86_64;
+				WARNING_CFLAGS = "-Wpartial-availability";
+			};
+			name = Default;
+		};
+		F48B774411F7661D00351575 /* Development */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ALLOW_NON_MODULAR_INCLUDES_IN_FRAMEWORK_MODULES = YES;
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CODE_SIGN_IDENTITY = "Apple Development";
+				"CODE_SIGN_IDENTITY[sdk=macosx*]" = "-";
+				CODE_SIGN_STYLE = Manual;
+				COMBINE_HIDPI_IMAGES = YES;
+				COPY_PHASE_STRIP = NO;
+				CURRENT_PROJECT_VERSION = 5.4.0;
+				DEAD_CODE_STRIPPING = YES;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				DEVELOPMENT_TEAM = "";
+				"DEVELOPMENT_TEAM[sdk=macosx*]" = WSC9LR5SDP;
+				ENABLE_HARDENED_RUNTIME = YES;
+				EXCLUDED_SOURCE_FILE_NAMES = "";
+				GCC_CW_ASM_SYNTAX = NO;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_ENABLE_PASCAL_STRINGS = YES;
+				GCC_GENERATE_DEBUGGING_SYMBOLS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PRECOMPILE_PREFIX_HEADER = NO;
+				GENERATE_PKGINFO_FILE = NO;
+				IBC_FLATTEN_NIBS = NO;
+				INFOPLIST_EXPAND_BUILD_SETTINGS = NO;
+				INFOPLIST_FILE = "FastLaunch/Resources/FastLaunch-Info.plist";
+				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.video";
+				INFOPLIST_OTHER_PREPROCESSOR_FLAGS = "-traditional";
+				INFOPLIST_OUTPUT_FORMAT = XML;
+				INSTALL_PATH = "";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+				);
+				MACOSX_DEPLOYMENT_TARGET = 10.13;
+				MARKETING_VERSION = 5.4.0;
+				ONLY_ACTIVE_ARCH = YES;
+				PLIST_FILE_OUTPUT_FORMAT = xml;
+				PRODUCT_BUNDLE_IDENTIFIER = org.SerhiiHalan.FastLaunch;
+				PRODUCT_NAME = FastLaunch;
+				PROVISIONING_PROFILE_SPECIFIER = "";
+				WARNING_CFLAGS = "-Wpartial-availability";
+			};
+			name = Development;
+		};
+		F48B774511F7661D00351575 /* Deployment */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ALLOW_NON_MODULAR_INCLUDES_IN_FRAMEWORK_MODULES = YES;
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CODE_SIGN_IDENTITY = "Apple Development";
+				"CODE_SIGN_IDENTITY[sdk=macosx*]" = "-";
+				CODE_SIGN_STYLE = Manual;
+				COMBINE_HIDPI_IMAGES = YES;
+				COPY_PHASE_STRIP = YES;
+				CURRENT_PROJECT_VERSION = 5.4.0;
+				DEAD_CODE_STRIPPING = YES;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				DEVELOPMENT_TEAM = "";
+				"DEVELOPMENT_TEAM[sdk=macosx*]" = WSC9LR5SDP;
+				ENABLE_HARDENED_RUNTIME = YES;
+				EXCLUDED_SOURCE_FILE_NAMES = "";
+				GCC_CW_ASM_SYNTAX = NO;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_ENABLE_PASCAL_STRINGS = YES;
+				GCC_PRECOMPILE_PREFIX_HEADER = NO;
+				GCC_UNROLL_LOOPS = NO;
+				GENERATE_PKGINFO_FILE = NO;
+				IBC_FLATTEN_NIBS = NO;
+				INFOPLIST_EXPAND_BUILD_SETTINGS = NO;
+				INFOPLIST_FILE = "FastLaunch/Resources/FastLaunch-Info.plist";
+				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.video";
+				INFOPLIST_OTHER_PREPROCESSOR_FLAGS = "-traditional";
+				INFOPLIST_OUTPUT_FORMAT = binary;
+				INSTALL_PATH = "";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+				);
+				MACOSX_DEPLOYMENT_TARGET = 10.13;
+				MARKETING_VERSION = 5.4.0;
+				PLIST_FILE_OUTPUT_FORMAT = binary;
+				PRODUCT_BUNDLE_IDENTIFIER = org.SerhiiHalan.FastLaunch;
+				PRODUCT_NAME = FastLaunch;
+				PROVISIONING_PROFILE_SPECIFIER = "";
+				WARNING_CFLAGS = "-Wpartial-availability";
+			};
+			name = Deployment;
+		};
+		F48B774611F7661D00351575 /* Default */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ALLOW_NON_MODULAR_INCLUDES_IN_FRAMEWORK_MODULES = YES;
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CODE_SIGN_IDENTITY = "Apple Development";
+				"CODE_SIGN_IDENTITY[sdk=macosx*]" = "-";
+				CODE_SIGN_STYLE = Manual;
+				COMBINE_HIDPI_IMAGES = YES;
+				CURRENT_PROJECT_VERSION = 5.4.0;
+				DEAD_CODE_STRIPPING = YES;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				DEVELOPMENT_TEAM = "";
+				"DEVELOPMENT_TEAM[sdk=macosx*]" = WSC9LR5SDP;
+				ENABLE_HARDENED_RUNTIME = YES;
+				EXCLUDED_SOURCE_FILE_NAMES = "";
+				GCC_CW_ASM_SYNTAX = NO;
+				GCC_ENABLE_PASCAL_STRINGS = YES;
+				GCC_PRECOMPILE_PREFIX_HEADER = NO;
+				GENERATE_PKGINFO_FILE = NO;
+				IBC_FLATTEN_NIBS = NO;
+				INFOPLIST_EXPAND_BUILD_SETTINGS = NO;
+				INFOPLIST_FILE = "FastLaunch/Resources/FastLaunch-Info.plist";
+				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.video";
+				INFOPLIST_OTHER_PREPROCESSOR_FLAGS = "-traditional";
+				INSTALL_PATH = "";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+				);
+				MACOSX_DEPLOYMENT_TARGET = 10.13;
+				MARKETING_VERSION = 5.4.0;
+				PRODUCT_BUNDLE_IDENTIFIER = org.SerhiiHalan.FastLaunch;
+				PRODUCT_NAME = FastLaunch;
+				PROVISIONING_PROFILE_SPECIFIER = "";
+				WARNING_CFLAGS = "-Wpartial-availability";
+			};
+			name = Default;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		F41B2181085CD8FF00B63B0D /* Build configuration list for PBXProject "FASTLAUNCH" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				F41B2182085CD8FF00B63B0D /* Development */,
+				F41B2183085CD8FF00B63B0D /* Deployment */,
+				F41B2184085CD8FF00B63B0D /* Default */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Default;
+		};
+		F48B774711F7661D00351575 /* Build configuration list for PBXNativeTarget "FastLaunch" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				F48B774411F7661D00351575 /* Development */,
+				F48B774511F7661D00351575 /* Deployment */,
+				F48B774611F7661D00351575 /* Default */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Default;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = 29B97313FDCFA39411CA2CEA /* Project object */;
+}
