@@ -7,47 +7,47 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		A506A73626BD91D10071ECB5 /* sound in Resources */ = {isa = PBXBuildFile; fileRef = A506A72826BD91D00071ECB5 /* sound */; };
-		A506A73E26BD91D10071ECB5 /* MainMenu.xib in Resources */ = {isa = PBXBuildFile; fileRef = A506A73026BD91D10071ECB5 /* MainMenu.xib */; };
-		A50F9EA826BC55E200369BCA /* FastLaunchJob.m in Sources */ = {isa = PBXBuildFile; fileRef = A50F9EA226BC55E200369BCA /* FastLaunchJob.m */; };
-		A50F9EAA26BC55E200369BCA /* Controller.m in Sources */ = {isa = PBXBuildFile; fileRef = A50F9EA426BC55E200369BCA /* Controller.m */; };
-		A50F9EAB26BC55E200369BCA /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = A50F9EA726BC55E200369BCA /* main.m */; };
 		A54DB86229C3D56600B544FA /* Security.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A5C0ED01269DF03F00A115FF /* Security.framework */; };
 		A54DB86529C3D58400B544FA /* AVFoundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A5DA28F526B4B5CD00B1EC06 /* AVFoundation.framework */; };
-		A562D1A829FA8CD2002CC266 /* Credits.html in Resources */ = {isa = PBXBuildFile; fileRef = A562D1A729FA8CD2002CC266 /* Credits.html */; };
-		A5706F8F29DE1BBA002B4159 /* appIcon.icns in Resources */ = {isa = PBXBuildFile; fileRef = A5706F8E29DE1BBA002B4159 /* appIcon.icns */; };
-		A59836CA29E32B9800590907 /* pencil.png in Resources */ = {isa = PBXBuildFile; fileRef = A59836C929E32B9800590907 /* pencil.png */; };
-		A59836D029E332F800590907 /* video.png in Resources */ = {isa = PBXBuildFile; fileRef = A59836CF29E332F800590907 /* video.png */; };
-		A5A5B26C29E5D555007A99B2 /* AYProgressIndicator.m in Sources */ = {isa = PBXBuildFile; fileRef = A5A5B26A29E5D555007A99B2 /* AYProgressIndicator.m */; };
-		A5D6E6EE29E3505B00C69C7D /* scripts in Resources */ = {isa = PBXBuildFile; fileRef = A5D6E6ED29E3505B00C69C7D /* scripts */; };
-		A5D6E6F029E3569100C69C7D /* tools in Resources */ = {isa = PBXBuildFile; fileRef = A5D6E6EF29E3569100C69C7D /* tools */; };
-		A5E8DE5729DC665700AB204E /* DockProgressBarRed.mm in Sources */ = {isa = PBXBuildFile; fileRef = A5E8DE5529DC665600AB204E /* DockProgressBarRed.mm */; };
-		A5F955CD29DCB77F0029CEBA /* DockProgressBarBlue.mm in Sources */ = {isa = PBXBuildFile; fileRef = A5F955CB29DCB77E0029CEBA /* DockProgressBarBlue.mm */; };
+		A5F508642A0BFFC200EB7213 /* FastLaunchJob.m in Sources */ = {isa = PBXBuildFile; fileRef = A5F5085A2A0BFFC000EB7213 /* FastLaunchJob.m */; };
+		A5F508682A0BFFC200EB7213 /* Controller.m in Sources */ = {isa = PBXBuildFile; fileRef = A5F508612A0BFFC200EB7213 /* Controller.m */; };
+		A5F508692A0BFFC200EB7213 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = A5F508632A0BFFC200EB7213 /* main.m */; };
+		A5F508822A0C001A00EB7213 /* pencil.png in Resources */ = {isa = PBXBuildFile; fileRef = A5F5086E2A0C001800EB7213 /* pencil.png */; };
+		A5F508832A0C001A00EB7213 /* appIcon.icns in Resources */ = {isa = PBXBuildFile; fileRef = A5F5086F2A0C001800EB7213 /* appIcon.icns */; };
+		A5F5088E2A0C001A00EB7213 /* MainMenu.xib in Resources */ = {isa = PBXBuildFile; fileRef = A5F5087C2A0C001A00EB7213 /* MainMenu.xib */; };
+		A5F508912A0C001A00EB7213 /* Credits.html in Resources */ = {isa = PBXBuildFile; fileRef = A5F508802A0C001A00EB7213 /* Credits.html */; };
+		A5F508922A0C001A00EB7213 /* video.png in Resources */ = {isa = PBXBuildFile; fileRef = A5F508812A0C001A00EB7213 /* video.png */; };
+		A5F508962A0C007700EB7213 /* tools in Resources */ = {isa = PBXBuildFile; fileRef = A5F508932A0C007700EB7213 /* tools */; };
+		A5F508972A0C007700EB7213 /* sound in Resources */ = {isa = PBXBuildFile; fileRef = A5F508942A0C007700EB7213 /* sound */; };
+		A5F508982A0C007700EB7213 /* scripts in Resources */ = {isa = PBXBuildFile; fileRef = A5F508952A0C007700EB7213 /* scripts */; };
+		A5F508A22A0C011E00EB7213 /* AYProgressIndicator.m in Sources */ = {isa = PBXBuildFile; fileRef = A5F508A12A0C011E00EB7213 /* AYProgressIndicator.m */; };
+		A5F508A72A0C014F00EB7213 /* DockProgressBarBlue.mm in Sources */ = {isa = PBXBuildFile; fileRef = A5F508A42A0C014F00EB7213 /* DockProgressBarBlue.mm */; };
+		A5F508A82A0C014F00EB7213 /* DockProgressBarRed.mm in Sources */ = {isa = PBXBuildFile; fileRef = A5F508A62A0C014F00EB7213 /* DockProgressBarRed.mm */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
-		A506A72826BD91D00071ECB5 /* sound */ = {isa = PBXFileReference; lastKnownFileType = folder; path = sound; sourceTree = "<group>"; };
-		A506A73026BD91D10071ECB5 /* MainMenu.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = MainMenu.xib; sourceTree = "<group>"; };
-		A50F9EA226BC55E200369BCA /* FastLaunchJob.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = FastLaunchJob.m; path = FastLaunch/FastLaunchJob.m; sourceTree = "<group>"; };
-		A50F9EA426BC55E200369BCA /* Controller.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = Controller.m; path = FastLaunch/Controller.m; sourceTree = "<group>"; };
-		A50F9EA526BC55E200369BCA /* Controller.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Controller.h; path = FastLaunch/Controller.h; sourceTree = "<group>"; };
-		A50F9EA726BC55E200369BCA /* main.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = main.m; path = FastLaunch/main.m; sourceTree = "<group>"; };
-		A562D1A729FA8CD2002CC266 /* Credits.html */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.html; path = Credits.html; sourceTree = "<group>"; };
-		A5706F8E29DE1BBA002B4159 /* appIcon.icns */ = {isa = PBXFileReference; lastKnownFileType = image.icns; path = appIcon.icns; sourceTree = "<group>"; };
-		A59836C929E32B9800590907 /* pencil.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = pencil.png; sourceTree = "<group>"; };
-		A59836CF29E332F800590907 /* video.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = video.png; sourceTree = "<group>"; };
-		A5A5B26A29E5D555007A99B2 /* AYProgressIndicator.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = AYProgressIndicator.m; path = FastLaunch/AYProgressIndicator.m; sourceTree = "<group>"; };
-		A5A5B26B29E5D555007A99B2 /* AYProgressIndicator.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = AYProgressIndicator.h; path = FastLaunch/AYProgressIndicator.h; sourceTree = "<group>"; };
 		A5C0ED01269DF03F00A115FF /* Security.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Security.framework; path = ../../../../System/Library/Frameworks/Security.framework; sourceTree = "<group>"; };
-		A5D6E6ED29E3505B00C69C7D /* scripts */ = {isa = PBXFileReference; lastKnownFileType = folder; path = scripts; sourceTree = "<group>"; };
-		A5D6E6EF29E3569100C69C7D /* tools */ = {isa = PBXFileReference; lastKnownFileType = folder; path = tools; sourceTree = "<group>"; };
 		A5D8198326B76656008F9D42 /* IOKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = IOKit.framework; path = System/Library/Frameworks/IOKit.framework; sourceTree = SDKROOT; };
-		A5D87B3C26BC67B0001AA183 /* FastLaunchJob.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = FastLaunchJob.h; path = FastLaunch/FastLaunchJob.h; sourceTree = "<group>"; };
 		A5DA28F526B4B5CD00B1EC06 /* AVFoundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AVFoundation.framework; path = System/Library/Frameworks/AVFoundation.framework; sourceTree = SDKROOT; };
-		A5E8DE5529DC665600AB204E /* DockProgressBarRed.mm */ = {isa = PBXFileReference; explicitFileType = sourcecode.c.objc; fileEncoding = 4; name = DockProgressBarRed.mm; path = Shared/DockProgressBarRed.mm; sourceTree = "<group>"; };
-		A5E8DE5629DC665600AB204E /* DockProgressBarRed.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = DockProgressBarRed.h; path = Shared/DockProgressBarRed.h; sourceTree = "<group>"; };
-		A5F955CB29DCB77E0029CEBA /* DockProgressBarBlue.mm */ = {isa = PBXFileReference; explicitFileType = sourcecode.c.objc; fileEncoding = 4; name = DockProgressBarBlue.mm; path = Shared/DockProgressBarBlue.mm; sourceTree = "<group>"; };
-		A5F955CC29DCB77E0029CEBA /* DockProgressBarBlue.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = DockProgressBarBlue.h; path = Shared/DockProgressBarBlue.h; sourceTree = "<group>"; };
+		A5F508592A0BFFC000EB7213 /* Controller.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Controller.h; sourceTree = "<group>"; };
+		A5F5085A2A0BFFC000EB7213 /* FastLaunchJob.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = FastLaunchJob.m; sourceTree = "<group>"; };
+		A5F508612A0BFFC200EB7213 /* Controller.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Controller.m; sourceTree = "<group>"; };
+		A5F508622A0BFFC200EB7213 /* FastLaunchJob.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FastLaunchJob.h; sourceTree = "<group>"; };
+		A5F508632A0BFFC200EB7213 /* main.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = "<group>"; };
+		A5F5086E2A0C001800EB7213 /* pencil.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = pencil.png; sourceTree = "<group>"; };
+		A5F5086F2A0C001800EB7213 /* appIcon.icns */ = {isa = PBXFileReference; lastKnownFileType = image.icns; path = appIcon.icns; sourceTree = "<group>"; };
+		A5F5087C2A0C001A00EB7213 /* MainMenu.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = MainMenu.xib; sourceTree = "<group>"; };
+		A5F508802A0C001A00EB7213 /* Credits.html */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.html; path = Credits.html; sourceTree = "<group>"; };
+		A5F508812A0C001A00EB7213 /* video.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = video.png; sourceTree = "<group>"; };
+		A5F508932A0C007700EB7213 /* tools */ = {isa = PBXFileReference; lastKnownFileType = folder; path = tools; sourceTree = "<group>"; };
+		A5F508942A0C007700EB7213 /* sound */ = {isa = PBXFileReference; lastKnownFileType = folder; path = sound; sourceTree = "<group>"; };
+		A5F508952A0C007700EB7213 /* scripts */ = {isa = PBXFileReference; lastKnownFileType = folder; path = scripts; sourceTree = "<group>"; };
+		A5F508A02A0C011E00EB7213 /* AYProgressIndicator.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = AYProgressIndicator.h; path = FastLaunch/AYProgressIndicator.h; sourceTree = "<group>"; };
+		A5F508A12A0C011E00EB7213 /* AYProgressIndicator.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = AYProgressIndicator.m; path = FastLaunch/AYProgressIndicator.m; sourceTree = "<group>"; };
+		A5F508A32A0C014F00EB7213 /* DockProgressBarBlue.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = DockProgressBarBlue.h; path = FastLaunch/DockProgressBarBlue.h; sourceTree = "<group>"; };
+		A5F508A42A0C014F00EB7213 /* DockProgressBarBlue.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; name = DockProgressBarBlue.mm; path = FastLaunch/DockProgressBarBlue.mm; sourceTree = "<group>"; };
+		A5F508A52A0C014F00EB7213 /* DockProgressBarRed.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = DockProgressBarRed.h; path = FastLaunch/DockProgressBarRed.h; sourceTree = "<group>"; };
+		A5F508A62A0C014F00EB7213 /* DockProgressBarRed.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; name = DockProgressBarRed.mm; path = FastLaunch/DockProgressBarRed.mm; sourceTree = "<group>"; };
 		F42A93D52178365C00C40D46 /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = System/Library/Frameworks/Foundation.framework; sourceTree = SDKROOT; };
 		F42A93D62178365C00C40D46 /* AppKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AppKit.framework; path = System/Library/Frameworks/AppKit.framework; sourceTree = SDKROOT; };
 		F48B774111F7661C00351575 /* FastLaunch.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = FastLaunch.app; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -69,6 +69,7 @@
 		080E96DDFE201D6D7F000001 /* Shared */ = {
 			isa = PBXGroup;
 			children = (
+				A5F5089F2A0C00FB00EB7213 /* ProgressIndicator */,
 				A5E8DE5429DC65F600AB204E /* DockProgressBar */,
 			);
 			name = Shared;
@@ -85,7 +86,7 @@
 		29B97314FDCFA39411CA2CEA /* FastLaunch */ = {
 			isa = PBXGroup;
 			children = (
-				F48B7B8811F766CA00351575 /* FastLaunch */,
+				A5F508352A0BFEE700EB7213 /* FastLaunch */,
 				080E96DDFE201D6D7F000001 /* Shared */,
 				29B97323FDCFA39411CA2CEA /* Frameworks */,
 				19C28FACFE9D520D11CA2CBB /* Products */,
@@ -105,45 +106,52 @@
 			name = Frameworks;
 			sourceTree = "<group>";
 		};
-		A506A70726BD90DC0071ECB5 /* Resources */ = {
-			isa = PBXGroup;
-			children = (
-				A562D1A729FA8CD2002CC266 /* Credits.html */,
-				A5706F8E29DE1BBA002B4159 /* appIcon.icns */,
-				A506A73026BD91D10071ECB5 /* MainMenu.xib */,
-				A5D6E6ED29E3505B00C69C7D /* scripts */,
-				A5D6E6EF29E3569100C69C7D /* tools */,
-				A506A72826BD91D00071ECB5 /* sound */,
-				A59836C929E32B9800590907 /* pencil.png */,
-				A59836CF29E332F800590907 /* video.png */,
-			);
-			path = Resources;
-			sourceTree = "<group>";
-		};
 		A5E8DE5429DC65F600AB204E /* DockProgressBar */ = {
 			isa = PBXGroup;
 			children = (
-				A5E8DE5629DC665600AB204E /* DockProgressBarRed.h */,
-				A5E8DE5529DC665600AB204E /* DockProgressBarRed.mm */,
-				A5F955CC29DCB77E0029CEBA /* DockProgressBarBlue.h */,
-				A5F955CB29DCB77E0029CEBA /* DockProgressBarBlue.mm */,
+				A5F508A32A0C014F00EB7213 /* DockProgressBarBlue.h */,
+				A5F508A42A0C014F00EB7213 /* DockProgressBarBlue.mm */,
+				A5F508A52A0C014F00EB7213 /* DockProgressBarRed.h */,
+				A5F508A62A0C014F00EB7213 /* DockProgressBarRed.mm */,
 			);
 			name = DockProgressBar;
 			sourceTree = "<group>";
 		};
-		F48B7B8811F766CA00351575 /* FastLaunch */ = {
+		A5F508352A0BFEE700EB7213 /* FastLaunch */ = {
 			isa = PBXGroup;
 			children = (
-				A50F9EA526BC55E200369BCA /* Controller.h */,
-				A50F9EA426BC55E200369BCA /* Controller.m */,
-				A50F9EA726BC55E200369BCA /* main.m */,
-				A5A5B26B29E5D555007A99B2 /* AYProgressIndicator.h */,
-				A5A5B26A29E5D555007A99B2 /* AYProgressIndicator.m */,
-				A5D87B3C26BC67B0001AA183 /* FastLaunchJob.h */,
-				A50F9EA226BC55E200369BCA /* FastLaunchJob.m */,
-				A506A70726BD90DC0071ECB5 /* Resources */,
+				A5F508592A0BFFC000EB7213 /* Controller.h */,
+				A5F508612A0BFFC200EB7213 /* Controller.m */,
+				A5F508622A0BFFC200EB7213 /* FastLaunchJob.h */,
+				A5F5085A2A0BFFC000EB7213 /* FastLaunchJob.m */,
+				A5F508632A0BFFC200EB7213 /* main.m */,
+				A5F508362A0BFF0600EB7213 /* Resources */,
 			);
-			name = FastLaunch;
+			path = FastLaunch;
+			sourceTree = "<group>";
+		};
+		A5F508362A0BFF0600EB7213 /* Resources */ = {
+			isa = PBXGroup;
+			children = (
+				A5F5086F2A0C001800EB7213 /* appIcon.icns */,
+				A5F508802A0C001A00EB7213 /* Credits.html */,
+				A5F5087C2A0C001A00EB7213 /* MainMenu.xib */,
+				A5F5086E2A0C001800EB7213 /* pencil.png */,
+				A5F508812A0C001A00EB7213 /* video.png */,
+				A5F508952A0C007700EB7213 /* scripts */,
+				A5F508942A0C007700EB7213 /* sound */,
+				A5F508932A0C007700EB7213 /* tools */,
+			);
+			path = Resources;
+			sourceTree = "<group>";
+		};
+		A5F5089F2A0C00FB00EB7213 /* ProgressIndicator */ = {
+			isa = PBXGroup;
+			children = (
+				A5F508A02A0C011E00EB7213 /* AYProgressIndicator.h */,
+				A5F508A12A0C011E00EB7213 /* AYProgressIndicator.m */,
+			);
+			name = ProgressIndicator;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -208,14 +216,14 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				A5D6E6F029E3569100C69C7D /* tools in Resources */,
-				A59836CA29E32B9800590907 /* pencil.png in Resources */,
-				A59836D029E332F800590907 /* video.png in Resources */,
-				A506A73626BD91D10071ECB5 /* sound in Resources */,
-				A506A73E26BD91D10071ECB5 /* MainMenu.xib in Resources */,
-				A562D1A829FA8CD2002CC266 /* Credits.html in Resources */,
-				A5706F8F29DE1BBA002B4159 /* appIcon.icns in Resources */,
-				A5D6E6EE29E3505B00C69C7D /* scripts in Resources */,
+				A5F508962A0C007700EB7213 /* tools in Resources */,
+				A5F508912A0C001A00EB7213 /* Credits.html in Resources */,
+				A5F5088E2A0C001A00EB7213 /* MainMenu.xib in Resources */,
+				A5F508822A0C001A00EB7213 /* pencil.png in Resources */,
+				A5F508922A0C001A00EB7213 /* video.png in Resources */,
+				A5F508832A0C001A00EB7213 /* appIcon.icns in Resources */,
+				A5F508972A0C007700EB7213 /* sound in Resources */,
+				A5F508982A0C007700EB7213 /* scripts in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -245,12 +253,12 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				A50F9EA826BC55E200369BCA /* FastLaunchJob.m in Sources */,
-				A50F9EAA26BC55E200369BCA /* Controller.m in Sources */,
-				A5A5B26C29E5D555007A99B2 /* AYProgressIndicator.m in Sources */,
-				A5E8DE5729DC665700AB204E /* DockProgressBarRed.mm in Sources */,
-				A50F9EAB26BC55E200369BCA /* main.m in Sources */,
-				A5F955CD29DCB77F0029CEBA /* DockProgressBarBlue.mm in Sources */,
+				A5F508A22A0C011E00EB7213 /* AYProgressIndicator.m in Sources */,
+				A5F508A82A0C014F00EB7213 /* DockProgressBarRed.mm in Sources */,
+				A5F508A72A0C014F00EB7213 /* DockProgressBarBlue.mm in Sources */,
+				A5F508642A0BFFC200EB7213 /* FastLaunchJob.m in Sources */,
+				A5F508682A0BFFC200EB7213 /* Controller.m in Sources */,
+				A5F508692A0BFFC200EB7213 /* main.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
