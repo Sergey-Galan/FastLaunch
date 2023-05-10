@@ -1,9 +1,10 @@
 # FastLaunch
 
-Compatible with Mac OS X 10.13 and up
+Compatible with Mac OS X 10.13 and up.
+
 The program converts video and sends to the FTP-server, checks comparing the size in bytes, generates a XML metadata file, in case of a breakaway of connection with the Internet there is an opportunity to resume transmission of the file to the server.
-If in the program to open a video file in the course of conversion (for example Final Cut Pro), the program passes into a standby mode and only after completion of conversion will take it in processing.
-There is an opportunity to disconnect coding (FFmpeg), having left only FTP the Client (Curl).
+
+If in the program to open a video file in the course of conversion (for example Final Cut Pro), the program passes into a standby mode and only after completion of conversion will take it in processing. There is an opportunity to disconnect coding (FFmpeg), having left only FTP the Client (Curl).
 
 ![1](https://github.com/Sergey-Galan/FastLaunch/assets/30828202/43c0cdb9-817f-49c5-8c57-529845319d88)
 
