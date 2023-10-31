@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="21701" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES">
+<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="22155" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES">
     <dependencies>
         <deployment identifier="macosx"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="21701"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="22155"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
     <objects>
@@ -39,6 +39,7 @@
                 <outlet property="MessageTextFieldTime" destination="sdE-2R-gUM" id="u9K-rP-jS6"/>
                 <outlet property="PassTextField" destination="CQP-bY-A7E" id="Wz1-T0-gCv"/>
                 <outlet property="ProgressIndicator" destination="w3o-11-fqX" id="Lfz-pm-32Q"/>
+                <outlet property="ProgressIndicatorPreset" destination="Uq5-Aq-80b" id="rzU-W3-VzC"/>
                 <outlet property="ServerTextField" destination="O5r-ex-hBV" id="BJM-6L-HMU"/>
                 <outlet property="UserTextField" destination="xGq-XF-Q0N" id="V2j-vX-6Eo"/>
                 <outlet property="fileMenu" destination="81" id="rcv-iy-bgF"/>
@@ -94,7 +95,7 @@
                             <binding destination="207" name="selectedValue" keyPath="currentlySelectedPort10" previousBinding="5aU-Xk-QFR" id="OWT-Ds-Vk6"/>
                         </connections>
                     </popUpButton>
-                    <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" id="pJm-H0-7Q5" userLabel="Operation mode">
+                    <textField focusRingType="none" horizontalHuggingPriority="251" verticalHuggingPriority="750" id="pJm-H0-7Q5" userLabel="Operation mode">
                         <rect key="frame" x="47" y="20" width="99" height="15"/>
                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                         <textFieldCell key="cell" lineBreakMode="clipping" title="Operation mode:" id="Y4E-Mz-mZA">
@@ -124,7 +125,7 @@
                                     <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                     <imageCell key="cell" selectable="YES" editable="YES" continuous="YES" focusRingType="none" alignment="left" animates="YES" imageScaling="proportionallyDown" imageFrameStyle="grayBezel" id="IxN-Yt-90e"/>
                                 </imageView>
-                                <textField verticalHuggingPriority="750" id="q8Q-c5-4rL" userLabel="Name">
+                                <textField focusRingType="none" verticalHuggingPriority="750" id="q8Q-c5-4rL" userLabel="Name">
                                     <rect key="frame" x="20" y="11" width="642" height="16"/>
                                     <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                     <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" selectable="YES" sendsActionOnEndEditing="YES" alignment="left" placeholderString="Name: No video file selected" id="0yN-dm-TQu">
@@ -133,7 +134,7 @@
                                         <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
                                     </textFieldCell>
                                 </textField>
-                                <textField verticalHuggingPriority="750" id="Mbs-ef-aeU" userLabel="Progress">
+                                <textField focusRingType="none" verticalHuggingPriority="750" id="Mbs-ef-aeU" userLabel="Progress">
                                     <rect key="frame" x="212" y="27" width="44" height="22"/>
                                     <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                     <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" selectable="YES" sendsActionOnEndEditing="YES" alignment="left" placeholderString="0%" id="9Cj-BN-ssp">
@@ -142,7 +143,7 @@
                                         <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
                                     </textFieldCell>
                                 </textField>
-                                <textField verticalHuggingPriority="750" id="Vli-t6-05P" userLabel="FPS">
+                                <textField focusRingType="none" verticalHuggingPriority="750" id="Vli-t6-05P" userLabel="FPS">
                                     <rect key="frame" x="253" y="161" width="229" height="16"/>
                                     <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                     <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="justified" placeholderString="FPS:             --:--:-- --:--:--" id="YIP-xs-7Wv">
@@ -151,7 +152,7 @@
                                         <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
                                     </textFieldCell>
                                 </textField>
-                                <textField verticalHuggingPriority="750" id="b8y-Hs-Yha" userLabel="Size">
+                                <textField focusRingType="none" verticalHuggingPriority="750" id="b8y-Hs-Yha" userLabel="Size">
                                     <rect key="frame" x="253" y="140" width="229" height="16"/>
                                     <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                     <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="justified" placeholderString="Size:             --:--:-- --:--:--" id="Nzt-fW-LZR">
@@ -160,7 +161,7 @@
                                         <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
                                     </textFieldCell>
                                 </textField>
-                                <textField verticalHuggingPriority="750" id="gvA-6q-NqS" userLabel="Duration">
+                                <textField focusRingType="none" verticalHuggingPriority="750" id="gvA-6q-NqS" userLabel="Duration">
                                     <rect key="frame" x="253" y="78" width="229" height="16"/>
                                     <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                     <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="justified" placeholderString="Duration:      --:--:-- --:--:--" id="Dnf-hE-YLE">
@@ -169,7 +170,7 @@
                                         <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
                                     </textFieldCell>
                                 </textField>
-                                <textField verticalHuggingPriority="750" id="sdE-2R-gUM" userLabel="Time">
+                                <textField focusRingType="none" verticalHuggingPriority="750" id="sdE-2R-gUM" userLabel="Time">
                                     <rect key="frame" x="253" y="120" width="229" height="16"/>
                                     <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                     <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="justified" placeholderString="Time:            --:--:-- --:--:--" id="WDm-4h-Hku">
@@ -178,7 +179,7 @@
                                         <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
                                     </textFieldCell>
                                 </textField>
-                                <textField verticalHuggingPriority="750" id="oQo-w7-6cQ" userLabel="Speed">
+                                <textField focusRingType="none" verticalHuggingPriority="750" id="oQo-w7-6cQ" userLabel="Speed">
                                     <rect key="frame" x="253" y="99" width="229" height="16"/>
                                     <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                     <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="justified" placeholderString="Speed:          --:--:-- --:--:--" id="1if-Tc-bqm">
@@ -187,7 +188,7 @@
                                         <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
                                     </textFieldCell>
                                 </textField>
-                                <textField verticalHuggingPriority="750" id="BbA-Cc-feO" userLabel="Info">
+                                <textField focusRingType="none" verticalHuggingPriority="750" id="BbA-Cc-feO" userLabel="Info">
                                     <rect key="frame" x="18" y="209" width="644" height="22"/>
                                     <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                     <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="center" title="Drag video files to process" id="ddc-Jx-WYe">
@@ -196,7 +197,7 @@
                                         <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
                                     </textFieldCell>
                                 </textField>
-                                <textField verticalHuggingPriority="750" id="nmb-Ou-j7j" userLabel="MediaInfo">
+                                <textField focusRingType="none" verticalHuggingPriority="750" id="nmb-Ou-j7j" userLabel="MediaInfo">
                                     <rect key="frame" x="480" y="29" width="199" height="174"/>
                                     <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                     <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="left" id="kJv-JC-KdR">
@@ -315,7 +316,7 @@
                                                 <binding destination="207" name="selectedValue" keyPath="currentlySelectedPort1" previousBinding="MhK-ox-5uw" id="eVg-J4-Vvb"/>
                                             </connections>
                                         </popUpButton>
-                                        <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" id="t2E-Cd-qhC" userLabel="V Encoder">
+                                        <textField focusRingType="none" horizontalHuggingPriority="251" verticalHuggingPriority="750" id="t2E-Cd-qhC" userLabel="V Encoder">
                                             <rect key="frame" x="3" y="210" width="80" height="15"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                             <textFieldCell key="cell" lineBreakMode="clipping" alignment="left" title="Video Codec:" id="GUS-GR-rQ1">
@@ -344,7 +345,7 @@
                                                 <binding destination="207" name="selectedValue" keyPath="currentlySelectedPort3" previousBinding="AVd-bb-x8H" id="7Zj-XG-Ric"/>
                                             </connections>
                                         </popUpButton>
-                                        <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" id="x2w-gE-67Z" userLabel="V Bit Rate">
+                                        <textField focusRingType="none" horizontalHuggingPriority="251" verticalHuggingPriority="750" id="x2w-gE-67Z" userLabel="V Bit Rate">
                                             <rect key="frame" x="3" y="187" width="88" height="15"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                             <textFieldCell key="cell" lineBreakMode="clipping" alignment="left" title="Video Bit Rate:" id="qGp-31-1N8">
@@ -373,7 +374,7 @@
                                                 <binding destination="207" name="selectedValue" keyPath="currentlySelectedPort4" previousBinding="88q-zF-hwa" id="LW2-ia-P4z"/>
                                             </connections>
                                         </popUpButton>
-                                        <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" id="kp7-uX-ob5" userLabel="Resolution">
+                                        <textField focusRingType="none" horizontalHuggingPriority="251" verticalHuggingPriority="750" id="kp7-uX-ob5" userLabel="Resolution">
                                             <rect key="frame" x="3" y="164" width="67" height="15"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                             <textFieldCell key="cell" lineBreakMode="clipping" alignment="left" title="Resolution:" id="xCM-tG-cwL">
@@ -422,7 +423,7 @@
                                                 <binding destination="207" name="selectedValue" keyPath="currentlySelectedPort5" previousBinding="ozR-sH-Nve" id="BgV-Q2-VCS"/>
                                             </connections>
                                         </popUpButton>
-                                        <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" id="E9U-xF-klb" userLabel="Preset">
+                                        <textField focusRingType="none" horizontalHuggingPriority="251" verticalHuggingPriority="750" id="E9U-xF-klb" userLabel="Preset">
                                             <rect key="frame" x="3" y="95" width="44" height="15"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                             <textFieldCell key="cell" lineBreakMode="clipping" alignment="left" title="Preset:" id="sOM-Il-Yn0">
@@ -451,7 +452,7 @@
                                                 <binding destination="207" name="selectedValue" keyPath="currentlySelectedPort6" previousBinding="qe3-y7-pav" id="CT1-zq-l5x"/>
                                             </connections>
                                         </popUpButton>
-                                        <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" id="Rdn-u7-QcP" userLabel="Frame Rate">
+                                        <textField focusRingType="none" horizontalHuggingPriority="251" verticalHuggingPriority="750" id="Rdn-u7-QcP" userLabel="Frame Rate">
                                             <rect key="frame" x="3" y="118" width="72" height="15"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                             <textFieldCell key="cell" lineBreakMode="clipping" alignment="left" title="Frame Rate:" id="R8i-6U-Log">
@@ -480,7 +481,7 @@
                                                 <binding destination="207" name="selectedValue" keyPath="currentlySelectedPort12" previousBinding="awX-ow-7fW" id="qvu-cb-3SE"/>
                                             </connections>
                                         </popUpButton>
-                                        <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" id="65w-vf-gGB" userLabel="Aspect Ratio">
+                                        <textField focusRingType="none" horizontalHuggingPriority="251" verticalHuggingPriority="750" id="65w-vf-gGB" userLabel="Aspect Ratio">
                                             <rect key="frame" x="3" y="141" width="80" height="15"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                             <textFieldCell key="cell" lineBreakMode="clipping" alignment="left" title="Aspect Ratio:" id="Wks-5a-qU7">
@@ -509,7 +510,7 @@
                                                 <binding destination="207" name="selectedValue" keyPath="currentlySelectedPort7" previousBinding="8V5-OM-QQR" id="Jc8-jM-ST5"/>
                                             </connections>
                                         </popUpButton>
-                                        <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" id="5eG-G6-5jb" userLabel="Chroma Subsampling">
+                                        <textField focusRingType="none" horizontalHuggingPriority="251" verticalHuggingPriority="750" id="5eG-G6-5jb" userLabel="Chroma Subsampling">
                                             <rect key="frame" x="199" y="210" width="129" height="15"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                             <textFieldCell key="cell" lineBreakMode="clipping" title="Chroma Subsampling:" id="ivd-dc-8nN">
@@ -538,7 +539,7 @@
                                                 <binding destination="207" name="selectedValue" keyPath="currentlySelectedPort8" previousBinding="tSj-7h-aAJ" id="Tya-me-iac"/>
                                             </connections>
                                         </popUpButton>
-                                        <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" id="0GM-OR-Pw2" userLabel="A Encoder">
+                                        <textField focusRingType="none" horizontalHuggingPriority="251" verticalHuggingPriority="750" id="0GM-OR-Pw2" userLabel="A Encoder">
                                             <rect key="frame" x="199" y="187" width="80" height="15"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                             <textFieldCell key="cell" lineBreakMode="clipping" title="Audio Codec:" id="hEG-zx-F7R">
@@ -547,7 +548,7 @@
                                                 <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
                                             </textFieldCell>
                                         </textField>
-                                        <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" id="WOK-cy-gQQ" userLabel="A Bit Rate">
+                                        <textField focusRingType="none" horizontalHuggingPriority="251" verticalHuggingPriority="750" id="WOK-cy-gQQ" userLabel="A Bit Rate">
                                             <rect key="frame" x="199" y="164" width="88" height="15"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                             <textFieldCell key="cell" lineBreakMode="clipping" title="Audio Bit Rate:" id="hS5-n4-h1S">
@@ -556,7 +557,7 @@
                                                 <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
                                             </textFieldCell>
                                         </textField>
-                                        <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" id="bMX-mc-13U" userLabel="Sample Rate">
+                                        <textField focusRingType="none" horizontalHuggingPriority="251" verticalHuggingPriority="750" id="bMX-mc-13U" userLabel="Sample Rate">
                                             <rect key="frame" x="199" y="141" width="79" height="15"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                             <textFieldCell key="cell" lineBreakMode="clipping" title="Sample Rate:" id="l9O-HX-FFe">
@@ -585,7 +586,7 @@
                                                 <binding destination="207" name="selectedValue" keyPath="currentlySelectedPort9" previousBinding="KwE-Lf-XMD" id="iaZ-bg-Pyh"/>
                                             </connections>
                                         </popUpButton>
-                                        <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" id="nEm-le-SQr" userLabel="Channels">
+                                        <textField focusRingType="none" horizontalHuggingPriority="251" verticalHuggingPriority="750" id="nEm-le-SQr" userLabel="Channels">
                                             <rect key="frame" x="199" y="118" width="84" height="16"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                             <textFieldCell key="cell" lineBreakMode="clipping" title="Channels:" id="P6Z-16-hF6">
@@ -674,7 +675,7 @@
                                             <rect key="frame" x="-5" y="91" width="5" height="121"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                         </box>
-                                        <button verticalHuggingPriority="750" fixedFrame="YES" imageHugsTitle="YES" translatesAutoresizingMaskIntoConstraints="NO" id="BgO-8b-uNJ" userLabel="FolderPicker1">
+                                        <button imageHugsTitle="YES" verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="BgO-8b-uNJ" userLabel="FolderPicker1">
                                             <rect key="frame" x="3" y="50" width="19" height="22"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                             <buttonCell key="cell" type="smallSquare" bezelStyle="smallSquare" image="NSFolder" imagePosition="only" alignment="center" imageScaling="proportionallyUpOrDown" inset="2" id="Lbg-xI-pxe">
@@ -685,7 +686,7 @@
                                                 <action selector="FolderPicker1:" target="207" id="GcI-rP-9Nk"/>
                                             </connections>
                                         </button>
-                                        <textField wantsLayer="YES" horizontalHuggingPriority="251" verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="Qkw-Mb-nPM" userLabel="FoldernameLabel1">
+                                        <textField wantsLayer="YES" focusRingType="none" horizontalHuggingPriority="251" verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="Qkw-Mb-nPM" userLabel="FoldernameLabel1">
                                             <rect key="frame" x="150" y="50" width="519" height="19"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                             <animations>
@@ -710,7 +711,7 @@ AAAAAAEGA
                                                 <binding destination="207" name="value" keyPath="self.Folder1" id="fqN-fe-ORo"/>
                                             </connections>
                                         </textField>
-                                        <button verticalHuggingPriority="750" fixedFrame="YES" imageHugsTitle="YES" translatesAutoresizingMaskIntoConstraints="NO" id="pHb-0U-hrH" userLabel="FolderPicker2">
+                                        <button imageHugsTitle="YES" verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="pHb-0U-hrH" userLabel="FolderPicker2">
                                             <rect key="frame" x="3" y="27" width="19" height="20"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                             <buttonCell key="cell" type="smallSquare" bezelStyle="smallSquare" image="NSFolder" imagePosition="only" alignment="center" imageScaling="proportionallyUpOrDown" inset="2" id="pnK-Nq-Ya3">
@@ -721,7 +722,7 @@ AAAAAAEGA
                                                 <action selector="FolderPicker2:" target="207" id="nVS-X5-opG"/>
                                             </connections>
                                         </button>
-                                        <textField wantsLayer="YES" horizontalHuggingPriority="251" verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="MWe-K4-QzQ" userLabel="FoldernameLabel2">
+                                        <textField wantsLayer="YES" focusRingType="none" horizontalHuggingPriority="251" verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="MWe-K4-QzQ" userLabel="FoldernameLabel2">
                                             <rect key="frame" x="150" y="26" width="519" height="19"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                             <animations>
@@ -770,7 +771,7 @@ AAAAAAEGA
                                                 <action selector="performClick:" target="pHb-0U-hrH" id="7hB-f5-R2h"/>
                                             </connections>
                                         </button>
-                                        <textField hidden="YES" wantsLayer="YES" horizontalHuggingPriority="251" verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="294-I3-5Ux" userLabel="CustomnameLabel1">
+                                        <textField hidden="YES" wantsLayer="YES" focusRingType="none" horizontalHuggingPriority="251" verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="294-I3-5Ux" userLabel="CustomnameLabel1">
                                             <rect key="frame" x="98" y="161" width="75" height="20"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                             <animations>
@@ -807,7 +808,7 @@ AAAAAAEGA
                                                 <action selector="savePlist3:" target="207" id="XNY-16-ZwW"/>
                                             </connections>
                                         </button>
-                                        <textField hidden="YES" wantsLayer="YES" horizontalHuggingPriority="251" verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="8Sv-yw-czG" userLabel="CustomnameLabel2">
+                                        <textField hidden="YES" wantsLayer="YES" focusRingType="none" horizontalHuggingPriority="251" verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="8Sv-yw-czG" userLabel="CustomnameLabel2">
                                             <rect key="frame" x="98" y="183" width="75" height="20"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                             <animations>
@@ -844,6 +845,10 @@ AAAAAAEGA
                                                 <action selector="savePlist4:" target="207" id="beI-NB-Bnj"/>
                                             </connections>
                                         </button>
+                                        <progressIndicator hidden="YES" clipsToBounds="YES" fixedFrame="YES" maxValue="100" indeterminate="YES" controlSize="small" style="spinning" translatesAutoresizingMaskIntoConstraints="NO" id="Uq5-Aq-80b">
+                                            <rect key="frame" x="641" y="6" width="16" height="16"/>
+                                            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                        </progressIndicator>
                                     </subviews>
                                 </view>
                             </tabViewItem>
@@ -852,7 +857,7 @@ AAAAAAEGA
                                     <rect key="frame" x="10" y="33" width="666" height="250"/>
                                     <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                     <subviews>
-                                        <textField verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="O5r-ex-hBV" userLabel="Server">
+                                        <textField focusRingType="none" verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="O5r-ex-hBV" userLabel="Server">
                                             <rect key="frame" x="332" y="154" width="290" height="21"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                             <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" selectable="YES" editable="YES" sendsActionOnEndEditing="YES" borderStyle="bezel" bezelStyle="round" id="7C8-zb-9xo">
@@ -864,7 +869,7 @@ AAAAAAEGA
                                                 <binding destination="207" name="value" keyPath="self.ServerKey" id="O0q-0k-CZC"/>
                                             </connections>
                                         </textField>
-                                        <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" id="zBn-lc-UUZ" userLabel="Server address">
+                                        <textField focusRingType="none" horizontalHuggingPriority="251" verticalHuggingPriority="750" id="zBn-lc-UUZ" userLabel="Server address">
                                             <rect key="frame" x="231" y="158" width="93" height="15"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                             <textFieldCell key="cell" lineBreakMode="clipping" title="Server address:" id="uKQ-j0-YmP">
@@ -873,7 +878,7 @@ AAAAAAEGA
                                                 <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
                                             </textFieldCell>
                                         </textField>
-                                        <textField verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="xGq-XF-Q0N" userLabel="User">
+                                        <textField focusRingType="none" verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="xGq-XF-Q0N" userLabel="User">
                                             <rect key="frame" x="332" y="123" width="290" height="21"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                             <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" selectable="YES" editable="YES" sendsActionOnEndEditing="YES" borderStyle="bezel" bezelStyle="round" id="0Tc-ex-oiq">
@@ -885,7 +890,7 @@ AAAAAAEGA
                                                 <binding destination="207" name="value" keyPath="self.UserKey" id="ooM-IG-hCr"/>
                                             </connections>
                                         </textField>
-                                        <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" id="TS0-Ov-xV6" userLabel="User Name">
+                                        <textField focusRingType="none" horizontalHuggingPriority="251" verticalHuggingPriority="750" id="TS0-Ov-xV6" userLabel="User Name">
                                             <rect key="frame" x="255" y="127" width="71" height="15"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                             <textFieldCell key="cell" lineBreakMode="clipping" title="User Name:" id="XVR-Mu-NcQ">
@@ -894,7 +899,7 @@ AAAAAAEGA
                                                 <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
                                             </textFieldCell>
                                         </textField>
-                                        <secureTextField verticalHuggingPriority="750" fixedFrame="YES" contentType="password" translatesAutoresizingMaskIntoConstraints="NO" id="CQP-bY-A7E">
+                                        <secureTextField focusRingType="none" verticalHuggingPriority="750" fixedFrame="YES" contentType="password" translatesAutoresizingMaskIntoConstraints="NO" id="CQP-bY-A7E">
                                             <rect key="frame" x="332" y="92" width="290" height="21"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                             <secureTextFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" selectable="YES" editable="YES" refusesFirstResponder="YES" sendsActionOnEndEditing="YES" borderStyle="bezel" usesSingleLineMode="YES" bezelStyle="round" id="AbF-su-M8n">
@@ -909,7 +914,7 @@ AAAAAAEGA
                                                 <binding destination="207" name="value" keyPath="self.PassKey" id="LFe-5s-rza"/>
                                             </connections>
                                         </secureTextField>
-                                        <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" id="gsL-1b-ozi" userLabel="Password">
+                                        <textField focusRingType="none" horizontalHuggingPriority="251" verticalHuggingPriority="750" id="gsL-1b-ozi" userLabel="Password">
                                             <rect key="frame" x="264" y="96" width="62" height="15"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                             <textFieldCell key="cell" lineBreakMode="clipping" title="Password:" id="qd1-Ec-mo9">
@@ -930,7 +935,7 @@ AAAAAAEGA
                                                 <binding destination="207" name="value" keyPath="self.XMLfileKey" id="6PF-Mb-D4J"/>
                                             </connections>
                                         </button>
-                                        <progressIndicator hidden="YES" fixedFrame="YES" maxValue="100" indeterminate="YES" controlSize="small" style="spinning" translatesAutoresizingMaskIntoConstraints="NO" id="w3o-11-fqX">
+                                        <progressIndicator hidden="YES" clipsToBounds="YES" fixedFrame="YES" maxValue="100" indeterminate="YES" controlSize="small" style="spinning" translatesAutoresizingMaskIntoConstraints="NO" id="w3o-11-fqX">
                                             <rect key="frame" x="632" y="13" width="16" height="16"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                         </progressIndicator>
@@ -972,7 +977,7 @@ AAAAAAEGA
                             </tabViewItem>
                         </tabViewItems>
                     </tabView>
-                    <button toolTip="Get access to settings" horizontalHuggingPriority="750" verticalHuggingPriority="750" fixedFrame="YES" imageHugsTitle="YES" translatesAutoresizingMaskIntoConstraints="NO" id="W9o-YH-Vk5" userLabel="Settings">
+                    <button toolTip="Get access to settings" imageHugsTitle="YES" horizontalHuggingPriority="750" verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="W9o-YH-Vk5" userLabel="Settings">
                         <rect key="frame" x="18" y="14" width="22" height="23"/>
                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                         <buttonCell key="cell" type="round" bezelStyle="circular" image="NSSmartBadgeTemplate" imagePosition="only" alignment="center" borderStyle="border" inset="2" id="fOZ-6c-V6X">
