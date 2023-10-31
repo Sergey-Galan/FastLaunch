@@ -48,6 +48,7 @@
     IBOutlet NSButton *FolderPicker2;
     IBOutlet NSImageView *myImageView;
     IBOutlet NSProgressIndicator *ProgressIndicator;
+    IBOutlet NSProgressIndicator *ProgressIndicatorPreset;
     IBOutlet id FolderLabel1;
     IBOutlet id FoldernameLabel1;
     IBOutlet id FolderLabel2;
@@ -624,6 +625,19 @@ if (![fileManager fileExistsAtPath:folder]) {
 
 - (IBAction)savePlist2:(id)sender
 {
+    [ProgressIndicatorPreset setHidden:NO];
+    [ProgressIndicatorPreset startAnimation:self];
+        dispatch_queue_t backgroundQueue = dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0);
+        dispatch_async(backgroundQueue, ^{
+            for (NSUInteger i = 0; i < 1; i++) {
+                [NSThread sleepForTimeInterval:0.8f];
+            dispatch_async(dispatch_get_main_queue(), ^{
+                [ProgressIndicatorPreset stopAnimation:self];
+                [ProgressIndicatorPreset setHidden:YES];
+            });
+          }
+      });
+
     NSMutableDictionary *root = [[NSMutableDictionary alloc] initWithContentsOfFile:self.plistFileName];
     [root setObject:_currentlySelectedPort1 forKey:@"VEncoder"];
     [root setObject:_currentlySelectedPort2 forKey:@"AEncoder"];
@@ -667,6 +681,19 @@ if (![fileManager fileExistsAtPath:folder]) {
         [_CustomResolution setHidden:YES];
         if (![self.CustomRes isEqual: self.currentlySelectedPort4] && self.CustomRes != nil)
         {
+            [ProgressIndicatorPreset setHidden:NO];
+            [ProgressIndicatorPreset startAnimation:self];
+            dispatch_queue_t backgroundQueue = dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0);
+            dispatch_async(backgroundQueue, ^{
+                for (NSUInteger i = 0; i < 1; i++) {
+                    [NSThread sleepForTimeInterval:0.8f];
+                    dispatch_async(dispatch_get_main_queue(), ^{
+                        [ProgressIndicatorPreset stopAnimation:self];
+                        [ProgressIndicatorPreset setHidden:YES];
+                    });
+                }
+            });
+
             NSMutableDictionary *root = [[NSMutableDictionary alloc] initWithContentsOfFile:self.plistFileName];
             [root setObject:self.CustomRes forKey:@"Resolution"];
             NSError *error = nil;
@@ -756,6 +783,19 @@ if (![fileManager fileExistsAtPath:folder]) {
         [_CustomVBitRate setHidden:YES];
         if (![self.CustomVBit isEqual: self.currentlySelectedPort3] && self.CustomVBit != nil)
         {
+            [ProgressIndicatorPreset setHidden:NO];
+            [ProgressIndicatorPreset startAnimation:self];
+            dispatch_queue_t backgroundQueue = dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0);
+            dispatch_async(backgroundQueue, ^{
+                for (NSUInteger i = 0; i < 1; i++) {
+                    [NSThread sleepForTimeInterval:0.8f];
+                    dispatch_async(dispatch_get_main_queue(), ^{
+                        [ProgressIndicatorPreset stopAnimation:self];
+                        [ProgressIndicatorPreset setHidden:YES];
+                    });
+                }
+            });
+
             NSMutableDictionary *root = [[NSMutableDictionary alloc] initWithContentsOfFile:self.plistFileName];
             [root setObject:self.CustomVBit forKey:@"VBitRate"];
             NSError *error = nil;

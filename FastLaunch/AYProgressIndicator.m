@@ -34,7 +34,7 @@
 
 - (void)drawRect:(NSRect)dirtyRect
 {
-    [super drawRect:dirtyRect];
+    dirtyRect = NSIntersectionRect(dirtyRect, self.bounds);
     [self setWantsLayer:YES];
     
     // Clear background color
