@@ -1480,14 +1480,7 @@ if (![fileManager fileExistsAtPath:folder]) {
     
     // Parse output looking for commands; if none, append line to output text field
     for (NSString *theLine in lines) {
-        
-        
-        //        if ([theLine length] == 0) {
-        //            [self appendString:@""];
-        //            continue;
-        //        }
-        
-        
+
         //Слайды на экране
         if (![self.SecondsString isEqual: self.SecondsStringOld] && ![_FileString  isEqual: @""]) {
             NSString *urlString = [self.FileString stringByAddingPercentEncodingWithAllowedCharacters:[NSCharacterSet URLFragmentAllowedCharacterSet]]; //декодирование кириллического URL
