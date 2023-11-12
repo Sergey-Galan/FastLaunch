@@ -7,7 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		A54DB86229C3D56600B544FA /* Security.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A5C0ED01269DF03F00A115FF /* Security.framework */; };
+		A50996B72B00045A0092F300 /* Quartz.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A50996B62B00045A0092F300 /* Quartz.framework */; };
 		A54DB86529C3D58400B544FA /* AVFoundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A5DA28F526B4B5CD00B1EC06 /* AVFoundation.framework */; };
 		A5F508642A0BFFC200EB7213 /* FastLaunchJob.m in Sources */ = {isa = PBXBuildFile; fileRef = A5F5085A2A0BFFC000EB7213 /* FastLaunchJob.m */; };
 		A5F508682A0BFFC200EB7213 /* Controller.m in Sources */ = {isa = PBXBuildFile; fileRef = A5F508612A0BFFC200EB7213 /* Controller.m */; };
@@ -20,14 +20,12 @@
 		A5F508962A0C007700EB7213 /* tools in Resources */ = {isa = PBXBuildFile; fileRef = A5F508932A0C007700EB7213 /* tools */; };
 		A5F508972A0C007700EB7213 /* sound in Resources */ = {isa = PBXBuildFile; fileRef = A5F508942A0C007700EB7213 /* sound */; };
 		A5F508982A0C007700EB7213 /* scripts in Resources */ = {isa = PBXBuildFile; fileRef = A5F508952A0C007700EB7213 /* scripts */; };
-		A5F508A22A0C011E00EB7213 /* AYProgressIndicator.m in Sources */ = {isa = PBXBuildFile; fileRef = A5F508A12A0C011E00EB7213 /* AYProgressIndicator.m */; };
 		A5F508A72A0C014F00EB7213 /* DockProgressBarBlue.mm in Sources */ = {isa = PBXBuildFile; fileRef = A5F508A42A0C014F00EB7213 /* DockProgressBarBlue.mm */; };
 		A5F508A82A0C014F00EB7213 /* DockProgressBarRed.mm in Sources */ = {isa = PBXBuildFile; fileRef = A5F508A62A0C014F00EB7213 /* DockProgressBarRed.mm */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
-		A5C0ED01269DF03F00A115FF /* Security.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Security.framework; path = ../../../../System/Library/Frameworks/Security.framework; sourceTree = "<group>"; };
-		A5D8198326B76656008F9D42 /* IOKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = IOKit.framework; path = System/Library/Frameworks/IOKit.framework; sourceTree = SDKROOT; };
+		A50996B62B00045A0092F300 /* Quartz.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Quartz.framework; path = System/Library/Frameworks/Quartz.framework; sourceTree = SDKROOT; };
 		A5DA28F526B4B5CD00B1EC06 /* AVFoundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AVFoundation.framework; path = System/Library/Frameworks/AVFoundation.framework; sourceTree = SDKROOT; };
 		A5F508592A0BFFC000EB7213 /* Controller.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Controller.h; sourceTree = "<group>"; };
 		A5F5085A2A0BFFC000EB7213 /* FastLaunchJob.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = FastLaunchJob.m; sourceTree = "<group>"; };
@@ -42,14 +40,10 @@
 		A5F508932A0C007700EB7213 /* tools */ = {isa = PBXFileReference; lastKnownFileType = folder; path = tools; sourceTree = "<group>"; };
 		A5F508942A0C007700EB7213 /* sound */ = {isa = PBXFileReference; lastKnownFileType = folder; path = sound; sourceTree = "<group>"; };
 		A5F508952A0C007700EB7213 /* scripts */ = {isa = PBXFileReference; lastKnownFileType = folder; path = scripts; sourceTree = "<group>"; };
-		A5F508A02A0C011E00EB7213 /* AYProgressIndicator.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = AYProgressIndicator.h; path = FastLaunch/AYProgressIndicator.h; sourceTree = "<group>"; };
-		A5F508A12A0C011E00EB7213 /* AYProgressIndicator.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = AYProgressIndicator.m; path = FastLaunch/AYProgressIndicator.m; sourceTree = "<group>"; };
 		A5F508A32A0C014F00EB7213 /* DockProgressBarBlue.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = DockProgressBarBlue.h; path = FastLaunch/DockProgressBarBlue.h; sourceTree = "<group>"; };
 		A5F508A42A0C014F00EB7213 /* DockProgressBarBlue.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; name = DockProgressBarBlue.mm; path = FastLaunch/DockProgressBarBlue.mm; sourceTree = "<group>"; };
 		A5F508A52A0C014F00EB7213 /* DockProgressBarRed.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = DockProgressBarRed.h; path = FastLaunch/DockProgressBarRed.h; sourceTree = "<group>"; };
 		A5F508A62A0C014F00EB7213 /* DockProgressBarRed.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; name = DockProgressBarRed.mm; path = FastLaunch/DockProgressBarRed.mm; sourceTree = "<group>"; };
-		F42A93D52178365C00C40D46 /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = System/Library/Frameworks/Foundation.framework; sourceTree = SDKROOT; };
-		F42A93D62178365C00C40D46 /* AppKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AppKit.framework; path = System/Library/Frameworks/AppKit.framework; sourceTree = SDKROOT; };
 		F48B774111F7661C00351575 /* FastLaunch.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = FastLaunch.app; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
@@ -59,7 +53,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				A54DB86529C3D58400B544FA /* AVFoundation.framework in Frameworks */,
-				A54DB86229C3D56600B544FA /* Security.framework in Frameworks */,
+				A50996B72B00045A0092F300 /* Quartz.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -69,7 +63,6 @@
 		080E96DDFE201D6D7F000001 /* Shared */ = {
 			isa = PBXGroup;
 			children = (
-				A5F5089F2A0C00FB00EB7213 /* ProgressIndicator */,
 				A5E8DE5429DC65F600AB204E /* DockProgressBar */,
 			);
 			name = Shared;
@@ -97,11 +90,8 @@
 		29B97323FDCFA39411CA2CEA /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
-				A5D8198326B76656008F9D42 /* IOKit.framework */,
+				A50996B62B00045A0092F300 /* Quartz.framework */,
 				A5DA28F526B4B5CD00B1EC06 /* AVFoundation.framework */,
-				F42A93D62178365C00C40D46 /* AppKit.framework */,
-				F42A93D52178365C00C40D46 /* Foundation.framework */,
-				A5C0ED01269DF03F00A115FF /* Security.framework */,
 			);
 			name = Frameworks;
 			sourceTree = "<group>";
@@ -145,15 +135,6 @@
 			path = Resources;
 			sourceTree = "<group>";
 		};
-		A5F5089F2A0C00FB00EB7213 /* ProgressIndicator */ = {
-			isa = PBXGroup;
-			children = (
-				A5F508A02A0C011E00EB7213 /* AYProgressIndicator.h */,
-				A5F508A12A0C011E00EB7213 /* AYProgressIndicator.m */,
-			);
-			name = ProgressIndicator;
-			sourceTree = "<group>";
-		};
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
@@ -182,7 +163,7 @@
 			isa = PBXProject;
 			attributes = {
 				BuildIndependentTargetsInParallel = YES;
-				LastUpgradeCheck = 1430;
+				LastUpgradeCheck = 1500;
 				ORGANIZATIONNAME = "Sergey Galan";
 				TargetAttributes = {
 					F48B774011F7661C00351575 = {
@@ -253,7 +234,6 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				A5F508A22A0C011E00EB7213 /* AYProgressIndicator.m in Sources */,
 				A5F508A82A0C014F00EB7213 /* DockProgressBarRed.mm in Sources */,
 				A5F508A72A0C014F00EB7213 /* DockProgressBarBlue.mm in Sources */,
 				A5F508642A0BFFC200EB7213 /* FastLaunchJob.m in Sources */,
@@ -293,6 +273,7 @@
 				DEPLOYMENT_POSTPROCESSING = YES;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
 				ENABLE_TESTABILITY = YES;
+				ENABLE_USER_SCRIPT_SANDBOXING = YES;
 				GCC_CW_ASM_SYNTAX = NO;
 				GCC_ENABLE_CPP_EXCEPTIONS = NO;
 				GCC_ENABLE_CPP_RTTI = NO;
@@ -365,6 +346,7 @@
 				DEPLOYMENT_POSTPROCESSING = YES;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
 				ENABLE_TESTABILITY = NO;
+				ENABLE_USER_SCRIPT_SANDBOXING = YES;
 				GCC_CW_ASM_SYNTAX = NO;
 				GCC_ENABLE_CPP_EXCEPTIONS = NO;
 				GCC_ENABLE_CPP_RTTI = NO;
@@ -440,6 +422,7 @@
 				DEPLOYMENT_POSTPROCESSING = YES;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
 				ENABLE_TESTABILITY = NO;
+				ENABLE_USER_SCRIPT_SANDBOXING = YES;
 				GCC_CW_ASM_SYNTAX = NO;
 				GCC_ENABLE_CPP_EXCEPTIONS = NO;
 				GCC_ENABLE_CPP_RTTI = NO;
@@ -495,7 +478,7 @@
 				CODE_SIGN_STYLE = Manual;
 				COMBINE_HIDPI_IMAGES = YES;
 				COPY_PHASE_STRIP = NO;
-				CURRENT_PROJECT_VERSION = 5.4.1;
+				CURRENT_PROJECT_VERSION = 5.4.2;
 				DEAD_CODE_STRIPPING = YES;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				DEVELOPMENT_TEAM = "";
@@ -521,7 +504,7 @@
 					"@executable_path/../Frameworks",
 				);
 				MACOSX_DEPLOYMENT_TARGET = 10.13;
-				MARKETING_VERSION = 5.4.1;
+				MARKETING_VERSION = 5.4.2;
 				ONLY_ACTIVE_ARCH = YES;
 				PLIST_FILE_OUTPUT_FORMAT = xml;
 				PRODUCT_BUNDLE_IDENTIFIER = org.SerhiiHalan.FastLaunch;
@@ -543,7 +526,7 @@
 				CODE_SIGN_STYLE = Manual;
 				COMBINE_HIDPI_IMAGES = YES;
 				COPY_PHASE_STRIP = YES;
-				CURRENT_PROJECT_VERSION = 5.4.1;
+				CURRENT_PROJECT_VERSION = 5.4.2;
 				DEAD_CODE_STRIPPING = YES;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				DEVELOPMENT_TEAM = "";
@@ -568,7 +551,7 @@
 					"@executable_path/../Frameworks",
 				);
 				MACOSX_DEPLOYMENT_TARGET = 10.13;
-				MARKETING_VERSION = 5.4.1;
+				MARKETING_VERSION = 5.4.2;
 				PLIST_FILE_OUTPUT_FORMAT = binary;
 				PRODUCT_BUNDLE_IDENTIFIER = org.SerhiiHalan.FastLaunch;
 				PRODUCT_NAME = FastLaunch;
@@ -588,7 +571,7 @@
 				"CODE_SIGN_IDENTITY[sdk=macosx*]" = "-";
 				CODE_SIGN_STYLE = Manual;
 				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 5.4.1;
+				CURRENT_PROJECT_VERSION = 5.4.2;
 				DEAD_CODE_STRIPPING = YES;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				DEVELOPMENT_TEAM = "";
@@ -610,7 +593,7 @@
 					"@executable_path/../Frameworks",
 				);
 				MACOSX_DEPLOYMENT_TARGET = 10.13;
-				MARKETING_VERSION = 5.4.1;
+				MARKETING_VERSION = 5.4.2;
 				PRODUCT_BUNDLE_IDENTIFIER = org.SerhiiHalan.FastLaunch;
 				PRODUCT_NAME = FastLaunch;
 				PROVISIONING_PROFILE_SPECIFIER = "";

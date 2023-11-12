@@ -26,7 +26,7 @@ echo "Media:Video "$put"\r`./tools/mediainfo --Inform="General;Size.............
 ##################################################################################
 
 
-ScriptVersion=5.4.1
+ScriptVersion=5.4.2
 
 FastLaunchPlist="$HOME/Library/Preferences/org.SerhiiHalan.SettingsFastLaunch.plist" &> /dev/null
 MonitoringFolder="$(/usr/libexec/PlistBuddy -c "Print :MonitoringFolder" "$FastLaunchPlist")"

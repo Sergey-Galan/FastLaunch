@@ -4,7 +4,7 @@
 #import "FastLaunchJob.h"
 #import "DockProgressBarRed.h"
 #import "DockProgressBarBlue.h"
-#import "AYProgressIndicator.h"
+#import <Quartz/Quartz.h>
 
 // Abbreviations. Objective-C is often tediously verbose
 #define FILEMGR     [NSFileManager defaultManager]
@@ -24,7 +24,7 @@
 
 @interface Controller()
 {
-    // Progress bar
+    IBOutlet NSProgressIndicator *progressBarIndicator;
     IBOutlet NSWindow *FastLaunchWindow;
     IBOutlet NSButton *CancelButton;
     IBOutlet NSTextField *MessageTextFieldName;
@@ -159,8 +159,6 @@
 static const NSInteger detailsHeight = 310;
 
 @implementation Controller
-
-AYProgressIndicator *progressView;
 
 - (instancetype)init {
     self = [super init];
@@ -339,7 +337,10 @@ if (![fileManager fileExistsAtPath:folder]) {
     }
      return folder;
 }
+
+
 #pragma mark - App Delegate handlers
+
 
 - (void)applicationDidFinishLaunching:(NSNotification *)aNotification {
     // Insert code here to initialize your application
@@ -552,14 +553,15 @@ if (![fileManager fileExistsAtPath:folder]) {
     
     PLog(@"Application did finish launching");
     hasFinishedLaunching = YES;
-    
-    progressView = [[AYProgressIndicator alloc] initWithFrame:NSMakeRect(19, 37, 192, 5)
-                                                progressColor:[NSColor colorWithSRGBRed:0.0 green:0.0 blue:0.0 alpha:0]
-                                                   emptyColor:[NSColor lightGrayColor]
-                                                     minValue:0
-                                                     maxValue:100
-                                                 currentValue:0];
-    [self.view addSubview:progressView];
+
+    // Create color:progressBar
+    CIColor *color = [[CIColor alloc] initWithColor:[NSColor colorWithSRGBRed:0.8 green:0.8 blue:0.8 alpha:1]];
+    // Create filter:progressBar
+    CIFilter *colorFilter = [CIFilter filterWithName:@"CIFalseColor"
+                                withInputParameters:@{@"inputColor0" : color,
+                                                       @"inputColor1" : color}];
+    // Assign to progressBar
+    progressBarIndicator.contentFilters = @[colorFilter];
     
     /*if (promptForFileOnLaunch && acceptsFiles && [jobQueue count] == 0) {
         [self openFiles:self];
@@ -567,6 +569,9 @@ if (![fileManager fileExistsAtPath:folder]) {
         [self executeScript];
     }*/
 }
+
+
+#pragma mark - Interface actions
 
 
 //Save the plist by adding a key
@@ -991,6 +996,118 @@ if (![fileManager fileExistsAtPath:folder]) {
     }
 }
 
+// Run open panel, made available to apps that accept files
+- (IBAction)openFiles:(id)sender {
+    
+    // Create open panel
+    NSOpenPanel *oPanel = [NSOpenPanel openPanel];
+    [oPanel setAllowsMultipleSelection:YES];
+    [oPanel setCanChooseFiles:YES];
+    [oPanel setCanChooseDirectories:acceptDroppedFolders];
+    
+    if ([oPanel runModal] == NSModalResponseOK) {
+        // Convert URLs to paths
+        NSMutableArray *filePaths = [NSMutableArray array];
+        for (NSURL *url in [oPanel URLs]) {
+            [filePaths addObject:[url path]];
+        }
+        
+        BOOL success = [self addDroppedFilesJob:filePaths];
+        
+        if (!isTaskRunning && success) {
+            [self executeScript];
+            [self executeScript1];
+        }
+        
+    } else {
+        // Canceled in open file dialog
+        if (!remainRunning) {
+            [[NSApplication sharedApplication] terminate:self];
+        }
+    }
+}
+
+// Show / hide the details text field in progress bar2 interface
+- (IBAction)toggleDetails:(id)sender {
+            NSRect winRect = [FastLaunchWindow frame];
+            NSSize minSize = [FastLaunchWindow minSize];
+            NSSize maxSize = [FastLaunchWindow maxSize];
+            
+        if ([sender state] == NSOffState) {
+            winRect.origin.y += detailsHeight;
+            winRect.size.height -= detailsHeight;
+            minSize.height -= detailsHeight;
+            maxSize.height -= detailsHeight;
+
+        }
+        else {
+            winRect.origin.y -= detailsHeight;
+            winRect.size.height += detailsHeight;
+            minSize.height += detailsHeight;
+            maxSize.height += detailsHeight;
+        }
+            
+            [DEFAULTS setBool:([sender state] == NSOnState) forKey:@"UserShowDetails"];
+            [FastLaunchWindow setMinSize:minSize];
+            [FastLaunchWindow setMaxSize:maxSize];
+            [FastLaunchWindow setShowsResizeIndicator:([sender state] == NSOnState)];
+            [FastLaunchWindow setFrame:winRect display:TRUE animate:TRUE];
+    }
+
+// Show the details text field in progress bar2 interface
+- (IBAction)showDetails {
+    if ([DetailsTriangle state] == NSOffState) {
+        [DetailsTriangle performClick:DetailsTriangle];
+    }
+ }
+
+// Hide the details text field in progress bar2 interface
+- (IBAction)hideDetails {
+      if ([DetailsTriangle state] != NSOffState) {
+        [DetailsTriangle performClick:DetailsTriangle];
+    }
+ }
+
+- (BOOL)validateMenuItem:(NSMenuItem *)anItem {
+
+    SEL selector = [anItem action];
+    // Open should only work if it's a droppable app that accepts files
+    if (acceptsFiles && selector == @selector(openFiles:)) {
+        return YES;
+    }
+
+    if ([anItem action] == @selector(savePlist2:)) {
+        return YES;
+    }
+    
+    if ([anItem action] == @selector(buttonDonations:)) {
+        return YES;
+    }
+    
+    if ([anItem action] == @selector(menuItemSelected:)) {
+        return YES;
+    }
+    
+    return NO;
+}
+
+- (IBAction)cancel:(id)sender {
+    if (task != nil && [task isRunning]) {
+        PLog(@"Task cancelled");
+        [task terminate];
+        jobQueue = [NSMutableArray array];
+    }
+
+    if ([[sender title] isEqualToString:@"Quit"]) {
+        [[NSApplication sharedApplication] terminate:self];
+    }
+}
+
+- (IBAction)buttonClick:(id)sender {
+    [self executeScript1];
+    [myImageView setImage:nil];
+}
+
 - (BOOL)userNotificationCenter:(NSUserNotificationCenter *)center shouldPresentNotification:(NSUserNotification *)notification {
     return sendsNotifications;
 }
@@ -1081,13 +1198,15 @@ if (![fileManager fileExistsAtPath:folder]) {
     self.FileString = nil;
     self.SecondsString = nil;
     self.OnlyString = nil;
-    progressView = [[AYProgressIndicator alloc] initWithFrame:NSMakeRect(19, 37, 192, 5)
-                                                progressColor:[NSColor colorWithSRGBRed:0.0 green:0.0 blue:0.0 alpha:0]
-                                                   emptyColor:[NSColor lightGrayColor]
-                                                     minValue:0
-                                                     maxValue:100
-                                                 currentValue:0];
-    [self.view addSubview:progressView];
+    // Create color:progressBar
+    CIColor *color = [[CIColor alloc] initWithColor:[NSColor colorWithSRGBRed:0.8 green:0.8 blue:0.8 alpha:1]];
+    // Create filter:progressBar
+    CIFilter *colorFilter = [CIFilter filterWithName:@"CIFalseColor"
+                                withInputParameters:@{@"inputColor0" : color,
+                                                       @"inputColor1" : color}];
+    // Assign to progressBar
+    progressBarIndicator.contentFilters = @[colorFilter];
+    [progressBarIndicator setDoubleValue:0];
 }
 
 // Adjust controls, windows, etc. once script is done executing
@@ -1223,11 +1342,6 @@ if (![fileManager fileExistsAtPath:folder]) {
         [self executeScriptWithoutPrivileges];
 }
 
-
-- (IBAction)buttonClick:(id)sender {
-    [self executeScript1];
-    [myImageView setImage:nil];
-}
 
 // Launch regular user-privileged process using NSTask
 - (void)executeScriptWithoutPrivileges {
@@ -1368,30 +1482,53 @@ if (![fileManager fileExistsAtPath:folder]) {
     for (NSString *theLine in lines) {
         
         
-//        if ([theLine length] == 0) {
-//            [self appendString:@""];
-//            continue;
-//        }
+        //        if ([theLine length] == 0) {
+        //            [self appendString:@""];
+        //            continue;
+        //        }
         
-        if ([theLine isEqualToString:@"QUITAPP"]) {
-            [[NSApplication sharedApplication] terminate:self];
-            continue;
+        
+        //Слайды на экране
+        if (![self.SecondsString isEqual: self.SecondsStringOld] && ![_FileString  isEqual: @""]) {
+            NSString *urlString = [self.FileString stringByAddingPercentEncodingWithAllowedCharacters:[NSCharacterSet URLFragmentAllowedCharacterSet]]; //декодирование кириллического URL
+            NSURL *videoURL = [NSURL URLWithString:urlString];
+            AVURLAsset *asset = [[AVURLAsset alloc] initWithURL:videoURL options:nil];
+            AVAssetImageGenerator* imgGenerator = [AVAssetImageGenerator assetImageGeneratorWithAsset:asset];
+            
+            imgGenerator.appliesPreferredTrackTransform = YES;
+            imgGenerator.requestedTimeToleranceBefore = kCMTimeZero;
+            imgGenerator.requestedTimeToleranceAfter = kCMTimeZero;
+            imgGenerator.maximumSize = CGSizeMake(340, 192);
+            imgGenerator.apertureMode = AVAssetImageGeneratorApertureModeProductionAperture;
+            
+            Float64 Seconds = [self.SecondsString floatValue];
+            CMTime time = CMTimeMakeWithSeconds(Seconds, 1);
+            //    CMTimeShow(time);
+
+            NSError *error;
+            CGImageRef imageRef = [imgGenerator copyCGImageAtTime:time actualTime:NULL error:NULL];
+            if (!imageRef) {
+                NSLog(@"AVAssetImageGenerator frame generate failed: %@", error);
+                NSImage* thumbnail = [[NSImage alloc]initWithContentsOfFile:@"/private/tmp/img.jpeg"];
+                [myImageView setImage:thumbnail];
+            } else {
+                NSImage* thumbnail = [[NSImage alloc] initWithCGImage:imageRef size:NSMakeSize(340, 192)];
+                [myImageView setImage:thumbnail];
+                _SecondsStringOld = self.SecondsString;
+            }
+        } else{
+            NSLog(@"Skip image building");
+            
         }
         
-
-        if ([theLine isEqualToString:@"REFRESH"]) {
-            [self clearOutputBuffer];
-            continue;
-        }
         
-
         if ([theLine hasPrefix:@"NOTIFICATION:"]) {
             NSString *notificationString = [theLine substringFromIndex:13];
             [self showNotification:notificationString];
             continue;
         }
-
- 
+        
+        
         if ([theLine hasPrefix:@"Name:"]) {
             NSString *NameString = [theLine substringFromIndex:5];
             if ([NameString hasSuffix:@"%"]) {
@@ -1400,8 +1537,18 @@ if (![fileManager fileExistsAtPath:folder]) {
             [MessageTextFieldName setStringValue:NameString];
             continue;
         }
-
- 
+        
+        
+        if ([theLine hasPrefix:@"ONLY:"]) {
+            NSString *OnlyString = [theLine substringFromIndex:5];
+            if ([OnlyString hasSuffix:@"%"]) {
+                OnlyString = [OnlyString substringToIndex:[OnlyString length]-1];
+            }
+            self.OnlyString = OnlyString;
+            continue;
+        }
+        
+        
         if ([theLine hasPrefix:@"Progress:"]) {
             NSString *ProgressString = [theLine substringFromIndex:9];
             if ([ProgressString hasSuffix:@"%"]) {
@@ -1409,7 +1556,6 @@ if (![fileManager fileExistsAtPath:folder]) {
             }
             [MessageTextFieldProgress setStringValue:ProgressString];
             self.ProgressString = ProgressString;
-            Float64 Percent = [ProgressString floatValue];
             if ([self.OnlyString  isEqual: @"RED"]) {
                 if (ProgressString != nil) {
                     double progressRed = [ProgressString intValue]/100.0;
@@ -1418,16 +1564,19 @@ if (![fileManager fileExistsAtPath:folder]) {
                      setProgressRed:(float)progressRed];
                     [[DockProgressBarRed sharedDockProgressBarRed] updateProgressBarRed];
                     [[DockProgressBarBlue sharedDockProgressBarBlue] hideProgressBarBlue];
-                    
-                    progressView = [[AYProgressIndicator alloc] initWithFrame:NSMakeRect(19, 37, 192, 5)
-                                                                progressColor:[NSColor colorWithSRGBRed:1 green:0.1 blue:0.1 alpha:1]
-                                                                   emptyColor:[NSColor lightGrayColor]
-                                                                     minValue:0
-                                                                     maxValue:100
-                                                                 currentValue:Percent];
-                    [self.view addSubview:progressView];
-                    }
+                    // Create color:ProgressBar
+                    CIColor *color = [[CIColor alloc] initWithColor:[NSColor colorWithSRGBRed:1 green:0.1 blue:0.1 alpha:1]];
+                    // Create filter:ProgressBar
+                    CIFilter *colorFilter = [CIFilter filterWithName:@"CIFalseColor"
+                                                withInputParameters:@{@"inputColor0" : color,
+                                                                       @"inputColor1" : color}];
+                    // Assign to ProgressBar
+                    progressBarIndicator.contentFilters = @[colorFilter];
+                    double progressBarRed = [ProgressString intValue];
+                    [progressBarIndicator setIndeterminate:NO];
+                    [progressBarIndicator setDoubleValue:progressBarRed];
                 }
+            }
             else if ([self.OnlyString  isEqual: @"BLUE"]) {
                 if (ProgressString != nil) {
                     double progressBlue = [ProgressString intValue]/100.0;
@@ -1436,14 +1585,17 @@ if (![fileManager fileExistsAtPath:folder]) {
                      setProgressBlue:(float)progressBlue];
                     [[DockProgressBarBlue sharedDockProgressBarBlue] updateProgressBarBlue];
                     [[DockProgressBarRed sharedDockProgressBarRed] hideProgressBarRed];
-                    
-                    progressView = [[AYProgressIndicator alloc] initWithFrame:NSMakeRect(19, 37, 192, 5)
-                                                                progressColor:[NSColor colorWithSRGBRed:0.1 green:0.6 blue:1 alpha:1]
-                                                                   emptyColor:[NSColor lightGrayColor]
-                                                                     minValue:0
-                                                                     maxValue:100
-                                                                 currentValue:Percent];
-                    [self.view addSubview:progressView];
+                    // Create color:ProgressBar
+                    CIColor *color = [[CIColor alloc] initWithColor:[NSColor colorWithSRGBRed:0.1 green:0.6 blue:1 alpha:1]];
+                    // Create filter:ProgressBar
+                    CIFilter *colorFilter = [CIFilter filterWithName:@"CIFalseColor"
+                                                withInputParameters:@{@"inputColor0" : color,
+                                                                       @"inputColor1" : color}];
+                    // Assign to ProgressBar
+                    progressBarIndicator.contentFilters = @[colorFilter];
+                    double progressBarBlue = [ProgressString intValue];
+                    [progressBarIndicator setIndeterminate:NO];
+                    [progressBarIndicator setDoubleValue:progressBarBlue];
                 }
             }
             if ([self.ProgressString  isEqual: @"0% "]) {
@@ -1451,8 +1603,8 @@ if (![fileManager fileExistsAtPath:folder]) {
             }
             continue;
         }
-
-
+        
+        
         if ([theLine hasPrefix:@"FPS:"]) {
             NSString *FPSString = [theLine substringFromIndex:4];
             if ([FPSString hasSuffix:@"%"]) {
@@ -1462,7 +1614,7 @@ if (![fileManager fileExistsAtPath:folder]) {
             continue;
         }
         
-
+        
         if ([theLine hasPrefix:@"Size:"]) {
             NSString *SizeString = [theLine substringFromIndex:5];
             if ([SizeString hasSuffix:@"%"]) {
@@ -1472,7 +1624,7 @@ if (![fileManager fileExistsAtPath:folder]) {
             continue;
         }
         
-
+        
         if ([theLine hasPrefix:@"Duration:"]) {
             NSString *DurationString = [theLine substringFromIndex:9];
             if ([DurationString hasSuffix:@"%"]) {
@@ -1481,8 +1633,8 @@ if (![fileManager fileExistsAtPath:folder]) {
             [MessageTextFieldDuration setStringValue:DurationString];
             continue;
         }
-
-
+        
+        
         if ([theLine hasPrefix:@"Time:"]) {
             NSString *TimeString = [theLine substringFromIndex:5];
             if ([TimeString hasSuffix:@"%"]) {
@@ -1491,8 +1643,8 @@ if (![fileManager fileExistsAtPath:folder]) {
             [MessageTextFieldTime setStringValue:TimeString];
             continue;
         }
-
-
+        
+        
         if ([theLine hasPrefix:@"Speed:"]) {
             NSString *SpeedString = [theLine substringFromIndex:6];
             if ([SpeedString hasSuffix:@"%"]) {
@@ -1501,8 +1653,38 @@ if (![fileManager fileExistsAtPath:folder]) {
             [MessageTextFieldSpeed setStringValue:SpeedString];
             continue;
         }
-
-
+        
+        
+        if ([theLine hasPrefix:@"Media:"]) {
+            NSString *MediaString = [theLine substringFromIndex:6];
+            if ([MediaString hasSuffix:@"%"]) {
+                MediaString = [MediaString substringToIndex:[MediaString length]-1];
+            }
+            [MessageTextFieldMediaInfo setStringValue:MediaString];
+            continue;
+        }
+        
+        
+        if ([theLine hasPrefix:@"Files:"]) {
+            NSString *FileString = [theLine substringFromIndex:6];
+            if ([FileString hasSuffix:@"%"]) {
+                FileString = [FileString substringToIndex:[FileString length]-1];
+            }
+            self.FileString = FileString;
+            continue;
+        }
+        
+        
+        if ([theLine hasPrefix:@"Seconds:"]) {
+            NSString *SecondsString = [theLine substringFromIndex:8];
+            if ([SecondsString hasSuffix:@"%"]) {
+                SecondsString = [SecondsString substringToIndex:[SecondsString length]-1];
+            }
+            self.SecondsString = SecondsString;
+            continue;
+        }
+        
+        
         if ([theLine hasPrefix:@"Info:"]) {
             NSString *InfoString = [theLine substringFromIndex:5];
             if ([InfoString hasSuffix:@"%"]) {
@@ -1512,97 +1694,15 @@ if (![fileManager fileExistsAtPath:folder]) {
             continue;
         }
 
-
-        if ([theLine hasPrefix:@"Media:"]) {
-            NSString *MediaString = [theLine substringFromIndex:6];
-            if ([MediaString hasSuffix:@"%"]) {
-                MediaString = [MediaString substringToIndex:[MediaString length]-1];
-            }
-            [MessageTextFieldMediaInfo setStringValue:MediaString];
-            continue;
-        }
-
-
-        if ([theLine hasPrefix:@"Files:"]) {
-            NSString *FileString = [theLine substringFromIndex:6];
-            if ([FileString hasSuffix:@"%"]) {
-                FileString = [FileString substringToIndex:[FileString length]-1];
-            }
-            self.FileString = FileString;
-            continue;
-        }
-            
-
-        if ([theLine hasPrefix:@"Seconds:"]) {
-            NSString *SecondsString = [theLine substringFromIndex:8];
-            if ([SecondsString hasSuffix:@"%"]) {
-                SecondsString = [SecondsString substringToIndex:[SecondsString length]-1];
-            }
-            self.SecondsString = SecondsString;
-            continue;
-            }
-
         
-        // Toggle visibility of details text field
-        else if ([theLine isEqualToString:@"DETAILS:SHOW"]) {
-            [self showDetails];
+        else if ([self.OnlyString  isEqual: @"RED"]) {
+            [CancelButton setTitle:@"Cancel"];
             continue;
         }
-        else if ([theLine isEqualToString:@"DETAILS:HIDE"]) {
-            [self hideDetails];
+        else if ([self.OnlyString  isEqual: @"BLUE"]) {
+            [CancelButton setTitle:@"Pause"];
             continue;
         }
-
-        if ([theLine hasPrefix:@"ONLY:"]) {
-                NSString *OnlyString = [theLine substringFromIndex:5];
-            if ([OnlyString hasSuffix:@"%"]) {
-                    OnlyString = [OnlyString substringToIndex:[OnlyString length]-1];
-                }
-                self.OnlyString = OnlyString;
-                continue;
-            }
-
-            else if ([self.OnlyString  isEqual: @"RED"]) {
-                [CancelButton setTitle:@"Cancel"];
-            }
-            else if ([self.OnlyString  isEqual: @"BLUE"]) {
-                    [CancelButton setTitle:@"Pause"];
-            }
-    }
-    
-    //Слайды на экране
-    if (![self.SecondsString isEqual: self.SecondsStringOld] && ![_FileString  isEqual: @""]) {
-    NSString *urlString = [self.FileString stringByAddingPercentEncodingWithAllowedCharacters:[NSCharacterSet URLFragmentAllowedCharacterSet]]; //декодирование кириллического URL
-      NSURL *videoURL = [NSURL URLWithString:urlString];
-      AVURLAsset *asset = [[AVURLAsset alloc] initWithURL:videoURL options:nil];
-      AVAssetImageGenerator* imgGenerator = [AVAssetImageGenerator assetImageGeneratorWithAsset:asset];
-
-        imgGenerator.appliesPreferredTrackTransform = YES;
-        imgGenerator.requestedTimeToleranceBefore = kCMTimeZero;
-        imgGenerator.requestedTimeToleranceAfter = kCMTimeZero;
-        imgGenerator.maximumSize = CGSizeMake(340, 192);
-        imgGenerator.apertureMode = AVAssetImageGeneratorApertureModeProductionAperture;
-        imgGenerator.appliesPreferredTrackTransform = YES;
-              
-      Float64 Seconds = [self.SecondsString floatValue];
-      CMTime time = CMTimeMakeWithSeconds(Seconds, 1);
-            //    CMTimeShow(time);
-
-          NSError *error;
-          CGImageRef imageRef = [imgGenerator copyCGImageAtTime:time actualTime:NULL error:NULL];
-              if (!imageRef) {
-                  NSLog(@"AVAssetImageGenerator frame generate failed: %@", error);
-                  NSImage *thumbnail = [[NSImage alloc]initWithContentsOfFile:@"/private/tmp/img.jpeg"];
-                  [myImageView setImage:thumbnail];
-              } else {
-                  NSImage* image = [[NSImage alloc] initWithCGImage:imageRef size:NSMakeSize(340, 192)];
-                  [myImageView setImage:image];
-                  _SecondsStringOld = self.SecondsString;
-        }
-    }
-    else
-    {
-        NSLog(@"Skip image building");
     }
 }
 
@@ -1613,117 +1713,6 @@ if (![fileManager fileExistsAtPath:folder]) {
     [textStorage replaceCharactersInRange:range withString:@""];
     [textStorage endEditing];
 }
-
-#pragma mark - Interface actions
-
-// Run open panel, made available to apps that accept files
-- (IBAction)openFiles:(id)sender {
-    
-    // Create open panel
-    NSOpenPanel *oPanel = [NSOpenPanel openPanel];
-    [oPanel setAllowsMultipleSelection:YES];
-    [oPanel setCanChooseFiles:YES];
-    [oPanel setCanChooseDirectories:acceptDroppedFolders];
-    
-    if ([oPanel runModal] == NSModalResponseOK) {
-        // Convert URLs to paths
-        NSMutableArray *filePaths = [NSMutableArray array];        
-        for (NSURL *url in [oPanel URLs]) {
-            [filePaths addObject:[url path]];
-        }
-        
-        BOOL success = [self addDroppedFilesJob:filePaths];
-        
-        if (!isTaskRunning && success) {
-            [self executeScript];
-            [self executeScript1];
-        }
-        
-    } else {
-        // Canceled in open file dialog
-        if (!remainRunning) {
-            [[NSApplication sharedApplication] terminate:self];
-        }
-    }
-}
-
-// Show / hide the details text field in progress bar2 interface
-- (IBAction)toggleDetails:(id)sender {
-            NSRect winRect = [FastLaunchWindow frame];
-            NSSize minSize = [FastLaunchWindow minSize];
-            NSSize maxSize = [FastLaunchWindow maxSize];
-            
-        if ([sender state] == NSOffState) {
-            winRect.origin.y += detailsHeight;
-            winRect.size.height -= detailsHeight;
-            minSize.height -= detailsHeight;
-            maxSize.height -= detailsHeight;
-
-        }
-        else {
-            winRect.origin.y -= detailsHeight;
-            winRect.size.height += detailsHeight;
-            minSize.height += detailsHeight;
-            maxSize.height += detailsHeight;
-        }
-            
-            [DEFAULTS setBool:([sender state] == NSOnState) forKey:@"UserShowDetails"];
-            [FastLaunchWindow setMinSize:minSize];
-            [FastLaunchWindow setMaxSize:maxSize];
-            [FastLaunchWindow setShowsResizeIndicator:([sender state] == NSOnState)];
-            [FastLaunchWindow setFrame:winRect display:TRUE animate:TRUE];
-    }
-
-// Show the details text field in progress bar2 interface
-- (IBAction)showDetails {
-    if ([DetailsTriangle state] == NSOffState) {
-        [DetailsTriangle performClick:DetailsTriangle];
-    }
- }
-
-// Hide the details text field in progress bar2 interface
-- (IBAction)hideDetails {
-      if ([DetailsTriangle state] != NSOffState) {
-        [DetailsTriangle performClick:DetailsTriangle];
-    }
- }
-
-
-- (BOOL)validateMenuItem:(NSMenuItem *)anItem {
-
-    SEL selector = [anItem action];
-    // Open should only work if it's a droppable app that accepts files
-    if (acceptsFiles && selector == @selector(openFiles:)) {
-        return YES;
-    }
-
-    if ([anItem action] == @selector(savePlist2:)) {
-        return YES;
-    }
-    
-    if ([anItem action] == @selector(buttonDonations:)) {
-        return YES;
-    }
-    
-    if ([anItem action] == @selector(menuItemSelected:)) {
-        return YES;
-    }
-    
-    return NO;
-}
-
-- (IBAction)cancel:(id)sender {
-    if (task != nil && [task isRunning]) {
-        PLog(@"Task cancelled");
-        [task terminate];
-        jobQueue = [NSMutableArray array];
-    }
-
-    if ([[sender title] isEqualToString:@"Quit"]) {
-        [[NSApplication sharedApplication] terminate:self];
-    }
-}
-
 
 
 #pragma mark - Service handling

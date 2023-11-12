@@ -44,6 +44,7 @@
                 <outlet property="UserTextField" destination="xGq-XF-Q0N" id="V2j-vX-6Eo"/>
                 <outlet property="fileMenu" destination="81" id="rcv-iy-bgF"/>
                 <outlet property="myImageView" destination="0vk-fU-6zw" id="CvL-Wa-Yj1"/>
+                <outlet property="progressBarIndicator" destination="DSP-0t-Qzv" id="3rC-uN-DmQ"/>
                 <outlet property="savePlist1" destination="e3o-Tb-pyV" id="dFJ-xq-aGh"/>
                 <outlet property="savePlist1a" destination="1rd-jF-kmG" id="IOY-VQ-Cbo"/>
                 <outlet property="savePlist1b" destination="4GA-54-8Ym" id="Tj0-C1-qxl"/>
@@ -210,6 +211,21 @@
                                     <rect key="frame" x="473" y="35" width="5" height="165"/>
                                     <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                 </box>
+                                <box appearanceType="darkAqua" fixedFrame="YES" boxType="custom" cornerRadius="4" title="Box" translatesAutoresizingMaskIntoConstraints="NO" id="ez6-Jw-HQG">
+                                    <rect key="frame" x="20" y="37" width="187" height="6"/>
+                                    <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                    <view key="contentView" id="ImF-CT-ALZ">
+                                        <rect key="frame" x="1" y="1" width="185" height="4"/>
+                                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                                    </view>
+                                    <color key="borderColor" red="0.70586055520000002" green="0.70559877159999995" blue="0.72474622730000005" alpha="1" colorSpace="custom" customColorSpace="displayP3"/>
+                                    <color key="fillColor" red="0.70454063460000005" green="0.70335222990000001" blue="0.72411070099999997" alpha="1" colorSpace="custom" customColorSpace="displayP3"/>
+                                    <font key="titleFont" size="11" name="HelveticaNeue"/>
+                                </box>
+                                <progressIndicator fixedFrame="YES" maxValue="100" indeterminate="YES" style="bar" translatesAutoresizingMaskIntoConstraints="NO" id="DSP-0t-Qzv">
+                                    <rect key="frame" x="20" y="30" width="186" height="20"/>
+                                    <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                </progressIndicator>
                             </subviews>
                         </view>
                     </box>
@@ -262,7 +278,7 @@
                         <font key="font" metaFont="system"/>
                         <tabViewItems>
                             <tabViewItem label="  FFmpeg  " identifier="" id="Z1j-qm-jCJ">
-                                <view key="view" id="Juj-Ev-EW5">
+                                <view key="view" wantsLayer="YES" id="Juj-Ev-EW5">
                                     <rect key="frame" x="10" y="33" width="666" height="250"/>
                                     <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                     <subviews>
@@ -678,6 +694,16 @@
                                         <button imageHugsTitle="YES" verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="BgO-8b-uNJ" userLabel="FolderPicker1">
                                             <rect key="frame" x="3" y="50" width="19" height="22"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                            <contentFilters>
+                                                <ciFilter name="CIColorControls">
+                                                    <configuration>
+                                                        <real key="inputBrightness" value="0.0"/>
+                                                        <real key="inputContrast" value="1"/>
+                                                        <null key="inputImage"/>
+                                                        <real key="inputSaturation" value="0.0"/>
+                                                    </configuration>
+                                                </ciFilter>
+                                            </contentFilters>
                                             <buttonCell key="cell" type="smallSquare" bezelStyle="smallSquare" image="NSFolder" imagePosition="only" alignment="center" imageScaling="proportionallyUpOrDown" inset="2" id="Lbg-xI-pxe">
                                                 <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                                                 <font key="font" metaFont="system"/>
@@ -714,6 +740,16 @@ AAAAAAEGA
                                         <button imageHugsTitle="YES" verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="pHb-0U-hrH" userLabel="FolderPicker2">
                                             <rect key="frame" x="3" y="27" width="19" height="20"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                            <contentFilters>
+                                                <ciFilter name="CIColorControls">
+                                                    <configuration>
+                                                        <real key="inputBrightness" value="0.0"/>
+                                                        <real key="inputContrast" value="1"/>
+                                                        <null key="inputImage"/>
+                                                        <real key="inputSaturation" value="0.0"/>
+                                                    </configuration>
+                                                </ciFilter>
+                                            </contentFilters>
                                             <buttonCell key="cell" type="smallSquare" bezelStyle="smallSquare" image="NSFolder" imagePosition="only" alignment="center" imageScaling="proportionallyUpOrDown" inset="2" id="pnK-Nq-Ya3">
                                                 <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                                                 <font key="font" metaFont="system"/>
