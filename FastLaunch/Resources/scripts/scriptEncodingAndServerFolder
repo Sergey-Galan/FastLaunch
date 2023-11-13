@@ -487,7 +487,14 @@ if [[ `echo "mov qt mp4 mpg4 mpg mpeg mpe m75 m15 mts mkv mxf 3gp m4v avi wm wmv
    echo "$(date "+%Y-%m-%d %H:%M:%S") $file_end.mp4" >> "$DestinationFolder/report.txt"
     tempfile="${file##*/}"
     file_end="${tempfile%.*}"
-    mv "$MonitoringFolder"/"$file_end.$ext" "$HOME"/.Trash
+
+   if  [[ "$("$MonitoringFolder"  2>&1  | grep 'Volumes')" ]]; then
+   Volumes="$(echo "$MonitoringFolder"  | cut -d '/' -f3)"
+   mv "$MonitoringFolder"/"$file_end.$ext" /Volumes/"$Volumes"/.Trashes/501
+   else
+   mv "$MonitoringFolder"/"$file_end.$ext" "$HOME"/.Trash
+   fi
+   
    sleep 1
 else
    mkdir "$MonitoringFolder/Not video files" &> /dev/null

@@ -300,7 +300,14 @@ startTime=$(date -u "+%s")
     echo "$(date "+%Y-%m-%d %H:%M:%S") $file_end.$ext" >> "$DestinationFolder"/report.txt
     tempfile="${file##*/}"
     file_end="${tempfile%.*}"
-    mv "$MonitoringFolder"/"$file_end.$ext" "$HOME"/.Trash
+
+   if  [[ "$("$MonitoringFolder"  2>&1  | grep 'Volumes')" ]]; then
+   Volumes="$(echo "$MonitoringFolder"  | cut -d '/' -f3)"
+   mv "$MonitoringFolder"/"$file_end.$ext" /Volumes/"$Volumes"/.Trashes/501
+   else
+   mv "$MonitoringFolder"/"$file_end.$ext" "$HOME"/.Trash
+   fi
+   
    sleep 1
 else
    mkdir "$MonitoringFolder/Not video files" &> /dev/null

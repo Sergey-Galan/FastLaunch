@@ -294,7 +294,13 @@ echo "Info:"$file_end.$ext" Not a video file"
 sleep 1
 fi
 
+if  [[ "$("$MonitoringFolder"  2>&1  | grep 'Volumes')" ]]; then
+Volumes="$(echo "$MonitoringFolder"  | cut -d '/' -f3)"
+mv "$file" /Volumes/"$Volumes"/.Trashes/501
+else
 mv "$file" "$HOME"/.Trash
+fi
+
 rm -rf "/private/tmp/img.jpeg"
  
 for file in "$MonitoringFolder"/*.*; do
