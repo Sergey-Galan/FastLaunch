@@ -75,7 +75,7 @@ echo "Info:"$count" Start encoding file... in H.265"
   
 echo "Info:Encoding... done"
 sleep 1
-echo "Progress:0% "
+
 }
 
 

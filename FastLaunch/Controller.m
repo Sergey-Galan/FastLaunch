@@ -554,13 +554,13 @@ if (![fileManager fileExistsAtPath:folder]) {
     PLog(@"Application did finish launching");
     hasFinishedLaunching = YES;
 
-    // Create color:progressBar
+    // Create color:
     CIColor *color = [[CIColor alloc] initWithColor:[NSColor colorWithSRGBRed:0.8 green:0.8 blue:0.8 alpha:1]];
-    // Create filter:progressBar
-    CIFilter *colorFilter = [CIFilter filterWithName:@"CIFalseColor"
-                                withInputParameters:@{@"inputColor0" : color,
-                                                       @"inputColor1" : color}];
-    // Assign to progressBar
+    // Create filter:ProgressBar
+    CIFilter *colorFilter = [CIFilter filterWithName:@"CIColorMonochrome"
+                                withInputParameters:@{@"inputColor" : color,
+                                                      @"inputIntensity" : @1}];
+    // Assign to ProgressBar
     progressBarIndicator.contentFilters = @[colorFilter];
     
     /*if (promptForFileOnLaunch && acceptsFiles && [jobQueue count] == 0) {
@@ -1104,8 +1104,10 @@ if (![fileManager fileExistsAtPath:folder]) {
 }
 
 - (IBAction)buttonClick:(id)sender {
-    [self executeScript1];
-    [myImageView setImage:nil];
+        if (![task isRunning]) {
+        [self executeScript1];
+        [myImageView setImage:nil];
+    }
 }
 
 - (BOOL)userNotificationCenter:(NSUserNotificationCenter *)center shouldPresentNotification:(NSUserNotification *)notification {
@@ -1198,13 +1200,13 @@ if (![fileManager fileExistsAtPath:folder]) {
     self.FileString = nil;
     self.SecondsString = nil;
     self.OnlyString = nil;
-    // Create color:progressBar
+    // Create color:
     CIColor *color = [[CIColor alloc] initWithColor:[NSColor colorWithSRGBRed:0.8 green:0.8 blue:0.8 alpha:1]];
-    // Create filter:progressBar
-    CIFilter *colorFilter = [CIFilter filterWithName:@"CIFalseColor"
-                                withInputParameters:@{@"inputColor0" : color,
-                                                       @"inputColor1" : color}];
-    // Assign to progressBar
+    // Create filter:ProgressBar
+    CIFilter *colorFilter = [CIFilter filterWithName:@"CIColorMonochrome"
+                                withInputParameters:@{@"inputColor" : color,
+                                                      @"inputIntensity" : @1}];
+    // Assign to ProgressBar
     progressBarIndicator.contentFilters = @[colorFilter];
     [progressBarIndicator setDoubleValue:0];
 }
@@ -1557,12 +1559,9 @@ if (![fileManager fileExistsAtPath:folder]) {
                      setProgressRed:(float)progressRed];
                     [[DockProgressBarRed sharedDockProgressBarRed] updateProgressBarRed];
                     [[DockProgressBarBlue sharedDockProgressBarBlue] hideProgressBarBlue];
-                    // Create color:ProgressBar
-                    CIColor *color = [[CIColor alloc] initWithColor:[NSColor colorWithSRGBRed:1 green:0.1 blue:0.1 alpha:1]];
                     // Create filter:ProgressBar
-                    CIFilter *colorFilter = [CIFilter filterWithName:@"CIFalseColor"
-                                                withInputParameters:@{@"inputColor0" : color,
-                                                                       @"inputColor1" : color}];
+                    CIFilter *colorFilter = [CIFilter filterWithName:@"CIHueAdjust"
+                                                withInputParameters:@{@"inputAngle" : @8.5}];
                     // Assign to ProgressBar
                     progressBarIndicator.contentFilters = @[colorFilter];
                     double progressBarRed = [ProgressString intValue];
@@ -1578,12 +1577,9 @@ if (![fileManager fileExistsAtPath:folder]) {
                      setProgressBlue:(float)progressBlue];
                     [[DockProgressBarBlue sharedDockProgressBarBlue] updateProgressBarBlue];
                     [[DockProgressBarRed sharedDockProgressBarRed] hideProgressBarRed];
-                    // Create color:ProgressBar
-                    CIColor *color = [[CIColor alloc] initWithColor:[NSColor colorWithSRGBRed:0.1 green:0.6 blue:1 alpha:1]];
                     // Create filter:ProgressBar
-                    CIFilter *colorFilter = [CIFilter filterWithName:@"CIFalseColor"
-                                                withInputParameters:@{@"inputColor0" : color,
-                                                                       @"inputColor1" : color}];
+                    CIFilter *colorFilter = [CIFilter filterWithName:@"CIHueAdjust"
+                                                withInputParameters:@{@"inputAngle" : @0}];
                     // Assign to ProgressBar
                     progressBarIndicator.contentFilters = @[colorFilter];
                     double progressBarBlue = [ProgressString intValue];

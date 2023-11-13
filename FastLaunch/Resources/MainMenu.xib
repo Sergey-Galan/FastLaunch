@@ -138,7 +138,7 @@
                                 <textField focusRingType="none" verticalHuggingPriority="750" id="Mbs-ef-aeU" userLabel="Progress">
                                     <rect key="frame" x="212" y="27" width="44" height="22"/>
                                     <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                                    <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" selectable="YES" sendsActionOnEndEditing="YES" alignment="left" placeholderString="0%" id="9Cj-BN-ssp">
+                                    <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" selectable="YES" sendsActionOnEndEditing="YES" alignment="left" title="0%" id="9Cj-BN-ssp">
                                         <font key="font" metaFont="cellTitle"/>
                                         <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
                                         <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
@@ -210,17 +210,6 @@
                                 <box horizontalHuggingPriority="750" boxType="separator" id="Heu-06-nmZ">
                                     <rect key="frame" x="473" y="35" width="5" height="165"/>
                                     <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                                </box>
-                                <box appearanceType="darkAqua" fixedFrame="YES" boxType="custom" cornerRadius="4" title="Box" translatesAutoresizingMaskIntoConstraints="NO" id="ez6-Jw-HQG">
-                                    <rect key="frame" x="20" y="37" width="187" height="6"/>
-                                    <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                                    <view key="contentView" id="ImF-CT-ALZ">
-                                        <rect key="frame" x="1" y="1" width="185" height="4"/>
-                                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
-                                    </view>
-                                    <color key="borderColor" red="0.70586055520000002" green="0.70559877159999995" blue="0.72474622730000005" alpha="1" colorSpace="custom" customColorSpace="displayP3"/>
-                                    <color key="fillColor" red="0.70454063460000005" green="0.70335222990000001" blue="0.72411070099999997" alpha="1" colorSpace="custom" customColorSpace="displayP3"/>
-                                    <font key="titleFont" size="11" name="HelveticaNeue"/>
                                 </box>
                                 <progressIndicator fixedFrame="YES" maxValue="100" indeterminate="YES" style="bar" translatesAutoresizingMaskIntoConstraints="NO" id="DSP-0t-Qzv">
                                     <rect key="frame" x="20" y="30" width="186" height="20"/>
