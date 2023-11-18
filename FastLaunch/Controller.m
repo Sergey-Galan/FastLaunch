@@ -189,7 +189,7 @@ static const NSInteger detailsHeight = 310;
         [NSApp setServicesProvider:self];
         NSMutableArray *sendTypes = [NSMutableArray array];
         if (acceptsFiles) {
-            [sendTypes addObject:NSFilenamesPboardType];
+            [sendTypes addObject:NSPasteboardTypeFileURL];
         }
         [NSApp registerServicesMenuSendTypes:sendTypes returnTypes:@[]];
     }
@@ -682,7 +682,7 @@ if (![fileManager fileExistsAtPath:folder]) {
 }
 
 - (IBAction)savePlist3:(id)sender {
-    if ([sender state] == NSOffState) {
+    if ([sender state] == NSControlStateValueOff) {
         [_CustomResolution setHidden:YES];
         if (![self.CustomRes isEqual: self.currentlySelectedPort4] && self.CustomRes != nil)
         {
@@ -784,7 +784,7 @@ if (![fileManager fileExistsAtPath:folder]) {
 }
 
 - (IBAction)savePlist4:(id)sender {
-    if ([sender state] == NSOffState) {
+    if ([sender state] == NSControlStateValueOff) {
         [_CustomVBitRate setHidden:YES];
         if (![self.CustomVBit isEqual: self.currentlySelectedPort3] && self.CustomVBit != nil)
         {
@@ -886,12 +886,10 @@ if (![fileManager fileExistsAtPath:folder]) {
 }
 
 - (IBAction)FolderPicker1:(id)sender{
-    NSString *path = NSTemporaryDirectory();
-    NSArray *directoryContents = [NSFileManager.defaultManager subpathsOfDirectoryAtPath:path error:nil];
     NSOpenPanel *openPanel = [NSOpenPanel openPanel];
-    [openPanel setTitle:@"Choose a Folder"];
-    [openPanel setAllowedFileTypes:directoryContents];
-    [openPanel setCanChooseDirectories:YES];    
+    [openPanel setCanChooseDirectories:YES];
+    [openPanel setCanCreateDirectories:YES];
+    [openPanel setCanChooseFiles:NO];
     if ([openPanel runModal] == NSModalResponseOK){
         NSString *FolderPath = [[openPanel URLs][0] path];
         [FoldernameLabel1 setStringValue:FolderPath];
@@ -942,12 +940,10 @@ if (![fileManager fileExistsAtPath:folder]) {
 }
 
 - (IBAction)FolderPicker2:(id)sender{
-    NSString *path = NSTemporaryDirectory();
-    NSArray *directoryContents = [NSFileManager.defaultManager subpathsOfDirectoryAtPath:path error:nil];
     NSOpenPanel *openPanel = [NSOpenPanel openPanel];
-    [openPanel setTitle:@"Choose a Folder"];
-    [openPanel setAllowedFileTypes:directoryContents];
     [openPanel setCanChooseDirectories:YES];
+    [openPanel setCanCreateDirectories:YES];
+    [openPanel setCanChooseFiles:NO];
     if ([openPanel runModal] == NSModalResponseOK){
         NSString *FolderPath = [[openPanel URLs][0] path];
         [FoldernameLabel2 setStringValue:FolderPath];
@@ -1033,7 +1029,7 @@ if (![fileManager fileExistsAtPath:folder]) {
             NSSize minSize = [FastLaunchWindow minSize];
             NSSize maxSize = [FastLaunchWindow maxSize];
             
-        if ([sender state] == NSOffState) {
+    if ([sender state] == NSControlStateValueOff) {
             winRect.origin.y += detailsHeight;
             winRect.size.height -= detailsHeight;
             minSize.height -= detailsHeight;
@@ -1047,23 +1043,23 @@ if (![fileManager fileExistsAtPath:folder]) {
             maxSize.height += detailsHeight;
         }
             
-            [DEFAULTS setBool:([sender state] == NSOnState) forKey:@"UserShowDetails"];
+    [DEFAULTS setBool:([sender state] == NSControlStateValueOn) forKey:@"UserShowDetails"];
             [FastLaunchWindow setMinSize:minSize];
             [FastLaunchWindow setMaxSize:maxSize];
-            [FastLaunchWindow setShowsResizeIndicator:([sender state] == NSOnState)];
+    [FastLaunchWindow setShowsResizeIndicator:([sender state] == NSControlStateValueOn)];
             [FastLaunchWindow setFrame:winRect display:TRUE animate:TRUE];
     }
 
 // Show the details text field in progress bar2 interface
 - (IBAction)showDetails {
-    if ([DetailsTriangle state] == NSOffState) {
+    if ([DetailsTriangle state] == NSControlStateValueOff) {
         [DetailsTriangle performClick:DetailsTriangle];
     }
  }
 
 // Hide the details text field in progress bar2 interface
 - (IBAction)hideDetails {
-      if ([DetailsTriangle state] != NSOffState) {
+    if ([DetailsTriangle state] != NSControlStateValueOff) {
         [DetailsTriangle performClick:DetailsTriangle];
     }
  }
@@ -1166,7 +1162,7 @@ if (![fileManager fileExistsAtPath:folder]) {
     }
     
                 if (isDroppable) {
-                    [FastLaunchWindow registerForDraggedTypes:@[NSFilenamesPboardType, NSStringPboardType]];
+                    [FastLaunchWindow registerForDraggedTypes:@[NSPasteboardTypeFileURL, NSPasteboardTypeString]];
                 }
                 
                 if ([DEFAULTS boolForKey:@"UserShowDetails"]) {
@@ -1712,7 +1708,7 @@ if (![fileManager fileExistsAtPath:folder]) {
     BOOL ret = 0;
     id data = nil;
     
-    if (acceptsFiles && [types containsObject:NSFilenamesPboardType] && (data = [pb propertyListForType:NSFilenamesPboardType])) {
+    if (acceptsFiles && [types containsObject:NSPasteboardTypeFileURL] && (data = [pb propertyListForType:NSPasteboardTypeFileURL])) {
         ret = [self addDroppedFilesJob:data];  // Files
     } else {
         // Unknown
@@ -1796,15 +1792,19 @@ if (![fileManager fileExistsAtPath:folder]) {
     NSPasteboard *pboard = [sender draggingPasteboard];
     
     // String dragged
-    if ([[pboard types] containsObject:NSStringPboardType] && acceptsText) {
+    if ([[pboard types] containsObject:NSPasteboardTypeString] && acceptsText) {
         acceptDrag = YES;
     }
     // File dragged
-    else if ([[pboard types] containsObject:NSFilenamesPboardType] && acceptsFiles) {
+    else if ([[pboard types] containsObject:NSPasteboardTypeFileURL] && acceptsFiles) {
         // Loop through files, see if any of the dragged files are acceptable
-        NSArray *files = [pboard propertyListForType:NSFilenamesPboardType];
+        NSArray<Class> *classes = @[[NSURL class]];
+        NSDictionary *options = @{};
+        NSArray<NSURL*> *files = [pboard readObjectsForClasses:classes options:options];
+
         
-        for (NSString *file in files) {
+        for (NSURL *url in files) {
+            NSString *file = [url path];
             if ([self isAcceptableFileType:file]) {
                 acceptDrag = YES;
                 break;
@@ -1829,8 +1829,8 @@ if (![fileManager fileExistsAtPath:folder]) {
     NSPasteboard *pboard = [sender draggingPasteboard];
     
     // Determine drag data type and dispatch to job queue
-    if ([[pboard types] containsObject:NSFilenamesPboardType]) {
-        return [self addDroppedFilesJob:[pboard propertyListForType:NSFilenamesPboardType]];
+    if ([[pboard types] containsObject:NSPasteboardTypeFileURL]) {
+        return [self addDroppedFilesJob:[pboard propertyListForType:@"NSFilenamesPboardType"]];
     }
     return NO;
 }
@@ -1841,7 +1841,6 @@ if (![fileManager fileExistsAtPath:folder]) {
     // Fire off the job queue if nothing is running
     if (!isTaskRunning && [jobQueue count] > 0) {
         [NSTimer scheduledTimerWithTimeInterval:0.0f target:self selector:@selector(executeScript) userInfo:nil repeats:NO];
-        [NSTimer scheduledTimerWithTimeInterval:0.0f target:self selector:@selector(executeScript1) userInfo:nil repeats:NO];
     }
 }
 

@@ -1,6 +1,6 @@
 # FastLaunch
 
-Compatible with Mac OS X 10.13 and up.
+Compatible with Mac OS X 10.15 and up.
 
 The program converts video and sends to the FTP-server, checks comparing the size in bytes, generates a XML metadata file, in case of a breakaway of connection with the Internet there is an opportunity to resume transmission of the file to the server.
 

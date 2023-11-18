@@ -74,7 +74,13 @@ rm -rf "/private/tmp/img.jpeg" &> /dev/null
 echo "Name:"
 
 for file in "$MonitoringFolder"/*.*; do
-break
+#Если в названии папки есть точка, нам она не нужна
+if [[ -d "$file" ]]; then
+   mkdir "$MonitoringFolder/Not video files" &> /dev/null
+   mv "$file" "$MonitoringFolder/Not video files/"
+echo "Info:"$file" Not a video file"
+sleep 1
+fi
 done
 
 if [[ $StartType = 'Encoding and Server' ]]; then

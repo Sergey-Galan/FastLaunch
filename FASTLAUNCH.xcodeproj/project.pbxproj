@@ -9,6 +9,9 @@
 /* Begin PBXBuildFile section */
 		A50996B72B00045A0092F300 /* Quartz.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A50996B62B00045A0092F300 /* Quartz.framework */; };
 		A54DB86529C3D58400B544FA /* AVFoundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A5DA28F526B4B5CD00B1EC06 /* AVFoundation.framework */; };
+		A5CCBE932B051C9E00DE98EB /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A5CCBE922B051C9E00DE98EB /* Cocoa.framework */; };
+		A5CCBE952B051FE800DE98EB /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A5CCBE942B051FE800DE98EB /* Foundation.framework */; };
+		A5CCBE9B2B05215E00DE98EB /* IOKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A5CCBE9A2B05215E00DE98EB /* IOKit.framework */; };
 		A5F508642A0BFFC200EB7213 /* FastLaunchJob.m in Sources */ = {isa = PBXBuildFile; fileRef = A5F5085A2A0BFFC000EB7213 /* FastLaunchJob.m */; };
 		A5F508682A0BFFC200EB7213 /* Controller.m in Sources */ = {isa = PBXBuildFile; fileRef = A5F508612A0BFFC200EB7213 /* Controller.m */; };
 		A5F508692A0BFFC200EB7213 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = A5F508632A0BFFC200EB7213 /* main.m */; };
@@ -26,6 +29,9 @@
 
 /* Begin PBXFileReference section */
 		A50996B62B00045A0092F300 /* Quartz.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Quartz.framework; path = System/Library/Frameworks/Quartz.framework; sourceTree = SDKROOT; };
+		A5CCBE922B051C9E00DE98EB /* Cocoa.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Cocoa.framework; path = System/Library/Frameworks/Cocoa.framework; sourceTree = SDKROOT; };
+		A5CCBE942B051FE800DE98EB /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = System/Library/Frameworks/Foundation.framework; sourceTree = SDKROOT; };
+		A5CCBE9A2B05215E00DE98EB /* IOKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = IOKit.framework; path = System/Library/Frameworks/IOKit.framework; sourceTree = SDKROOT; };
 		A5DA28F526B4B5CD00B1EC06 /* AVFoundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AVFoundation.framework; path = System/Library/Frameworks/AVFoundation.framework; sourceTree = SDKROOT; };
 		A5F508592A0BFFC000EB7213 /* Controller.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Controller.h; sourceTree = "<group>"; };
 		A5F5085A2A0BFFC000EB7213 /* FastLaunchJob.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = FastLaunchJob.m; sourceTree = "<group>"; };
@@ -52,8 +58,11 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				A5CCBE932B051C9E00DE98EB /* Cocoa.framework in Frameworks */,
 				A54DB86529C3D58400B544FA /* AVFoundation.framework in Frameworks */,
 				A50996B72B00045A0092F300 /* Quartz.framework in Frameworks */,
+				A5CCBE9B2B05215E00DE98EB /* IOKit.framework in Frameworks */,
+				A5CCBE952B051FE800DE98EB /* Foundation.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -90,6 +99,9 @@
 		29B97323FDCFA39411CA2CEA /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				A5CCBE9A2B05215E00DE98EB /* IOKit.framework */,
+				A5CCBE942B051FE800DE98EB /* Foundation.framework */,
+				A5CCBE922B051C9E00DE98EB /* Cocoa.framework */,
 				A50996B62B00045A0092F300 /* Quartz.framework */,
 				A5DA28F526B4B5CD00B1EC06 /* AVFoundation.framework */,
 			);
@@ -303,7 +315,7 @@
 				INFOPLIST_EXPAND_BUILD_SETTINGS = NO;
 				INFOPLIST_OUTPUT_FORMAT = binary;
 				INFOPLIST_PREPROCESS = NO;
-				MACOSX_DEPLOYMENT_TARGET = 10.13;
+				MACOSX_DEPLOYMENT_TARGET = 10.15;
 				ONLY_ACTIVE_ARCH = YES;
 				OTHER_LDFLAGS = "";
 				PLIST_FILE_OUTPUT_FORMAT = XML;
@@ -378,7 +390,7 @@
 				INFOPLIST_OUTPUT_FORMAT = binary;
 				INFOPLIST_PREPROCESS = NO;
 				LINKER_DISPLAYS_MANGLED_NAMES = NO;
-				MACOSX_DEPLOYMENT_TARGET = 10.13;
+				MACOSX_DEPLOYMENT_TARGET = 10.15;
 				ONLY_ACTIVE_ARCH = NO;
 				OTHER_LDFLAGS = "";
 				PLIST_FILE_OUTPUT_FORMAT = binary;
@@ -451,7 +463,7 @@
 				INFOPLIST_EXPAND_BUILD_SETTINGS = NO;
 				INFOPLIST_OUTPUT_FORMAT = binary;
 				INFOPLIST_PREPROCESS = NO;
-				MACOSX_DEPLOYMENT_TARGET = 10.13;
+				MACOSX_DEPLOYMENT_TARGET = 10.15;
 				ONLY_ACTIVE_ARCH = NO;
 				OTHER_LDFLAGS = "";
 				PLIST_FILE_OUTPUT_FORMAT = binary;
@@ -478,7 +490,7 @@
 				CODE_SIGN_STYLE = Manual;
 				COMBINE_HIDPI_IMAGES = YES;
 				COPY_PHASE_STRIP = NO;
-				CURRENT_PROJECT_VERSION = 5.4.3;
+				CURRENT_PROJECT_VERSION = 001;
 				DEAD_CODE_STRIPPING = YES;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				DEVELOPMENT_TEAM = "";
@@ -503,7 +515,7 @@
 					"$(inherited)",
 					"@executable_path/../Frameworks",
 				);
-				MACOSX_DEPLOYMENT_TARGET = 10.13;
+				MACOSX_DEPLOYMENT_TARGET = 10.15;
 				MARKETING_VERSION = 5.4.3;
 				ONLY_ACTIVE_ARCH = YES;
 				PLIST_FILE_OUTPUT_FORMAT = xml;
@@ -526,7 +538,7 @@
 				CODE_SIGN_STYLE = Manual;
 				COMBINE_HIDPI_IMAGES = YES;
 				COPY_PHASE_STRIP = YES;
-				CURRENT_PROJECT_VERSION = 5.4.3;
+				CURRENT_PROJECT_VERSION = 001;
 				DEAD_CODE_STRIPPING = YES;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				DEVELOPMENT_TEAM = "";
@@ -550,7 +562,7 @@
 					"$(inherited)",
 					"@executable_path/../Frameworks",
 				);
-				MACOSX_DEPLOYMENT_TARGET = 10.13;
+				MACOSX_DEPLOYMENT_TARGET = 10.15;
 				MARKETING_VERSION = 5.4.3;
 				PLIST_FILE_OUTPUT_FORMAT = binary;
 				PRODUCT_BUNDLE_IDENTIFIER = org.SerhiiHalan.FastLaunch;
@@ -571,7 +583,7 @@
 				"CODE_SIGN_IDENTITY[sdk=macosx*]" = "-";
 				CODE_SIGN_STYLE = Manual;
 				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 5.4.3;
+				CURRENT_PROJECT_VERSION = 001;
 				DEAD_CODE_STRIPPING = YES;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				DEVELOPMENT_TEAM = "";
@@ -592,7 +604,7 @@
 					"$(inherited)",
 					"@executable_path/../Frameworks",
 				);
-				MACOSX_DEPLOYMENT_TARGET = 10.13;
+				MACOSX_DEPLOYMENT_TARGET = 10.15;
 				MARKETING_VERSION = 5.4.3;
 				PRODUCT_BUNDLE_IDENTIFIER = org.SerhiiHalan.FastLaunch;
 				PRODUCT_NAME = FastLaunch;

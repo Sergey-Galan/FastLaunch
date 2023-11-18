@@ -8,7 +8,7 @@
   if (!progress_bar) {
     progress_bar = [[DockProgressBarRed alloc] initWithFrame:
                      NSMakeRect(0.0f, 0.0f, dock_tile.size.width, 15.0f)];
-    [progress_bar setStyle:NSProgressIndicatorBarStyle];
+    [progress_bar setStyle:NSProgressIndicatorStyleBar];
     [progress_bar setIndeterminate:NO];
     [progress_bar setBezeled:YES];
     [progress_bar setMinValue:0];
