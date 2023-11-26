@@ -113,7 +113,7 @@ fi
 
 OutputFFmpeg()
 {
-echo y | ./tools/ffmpeg -ss 00:00:02 -i "$file" -s 340x190 -frames:v 1 -q:v 5 /private/tmp/img.jpeg 2>/dev/null &
+echo y | ./tools/ffmpeg -ss 00:00:02 -i "$file" -s 320x180 -frames:v 1 -q:v 5 /private/tmp/img.jpg 2>/dev/null &
 echo "ONLY:RED"
 echo "Progress:0% " &
 echo "Files:file://"$file"" &
@@ -158,7 +158,7 @@ tl=$(echo 'scale = 0 ; '$tl' / '$speed'' | bc 2>/dev/null);
     ((tlm=(${tl}%3600)/60)) 2>/dev/null
     ((tls=${tl}%60)) 2>/dev/null
 tl=$(printf "%02d:%02d:%02d\n" $tlh $tlm $tls)
-echo "Seconds:$prtt"
+echo "Seconds:$prtt.$mss"
 
 if [[ -n "$pr" ]] && [[ "$pr" -ge 0 ]]; then
 
@@ -378,11 +378,11 @@ else
 afplay sound/Cartoon1.mp3 &> /dev/null &
 echo "Info:😡 Complete: Video file Error!!!  Total processed: $processedTime Time: $(date "+%Y-%m-%d %H:%M:%S %z")"
 echo "NOTIFICATION:"$file_end.mp4" Error!!! 😡 \r"Duration... $videoduration Size... $size""
-#rm -rf "/private/tmp/img.jpeg" &> /dev/null
+#rm -rf "/private/tmp/img.jpg" &> /dev/null
 rm -rf "/private/tmp/FastLaunch/"* &> /dev/null
 exit
 fi
-#rm -rf "/private/tmp/img.jpeg" &> /dev/null
+#rm -rf "/private/tmp/img.jpg" &> /dev/null
 rm -rf "/private/tmp/FastLaunch/"* &> /dev/null
 }
 
@@ -503,7 +503,7 @@ echo "Info:"$file_end.$ext" Not a video file"
 sleep 1
 fi
 
-    #rm -rf "/private/tmp/img.jpeg"
+    #rm -rf "/private/tmp/img.jpg"
 for file in "$MonitoringFolder"/*.*; do
 break
 done

@@ -169,7 +169,7 @@ echo "Duration: "
   prth=$(expr $h \* 3600 2>/dev/null);
   prtm=$(expr $m \* 60 2>/dev/null);
   prt=$(expr $prth + $prtm + $s 2>/dev/null)
-echo y | ./tools/ffmpeg -ss 00:00:02 -i "$files" -s 340x190 -frames:v 1 -q:v 5 /private/tmp/img.jpeg 2>/dev/null &
+echo y | ./tools/ffmpeg -ss 00:00:02 -i "$files" -s 320x180 -frames:v 1 -q:v 5 /private/tmp/img.jpg 2>/dev/null &
 echo "Info:Start sending file to FTP-server... "
 echo "Files:file://"$files"" &
 
@@ -247,11 +247,11 @@ else
 afplay sound/Cartoon1.mp3 &> /dev/null &
 echo "Info:😡 Complete: Video file Error!!!  Total processed: $processedTime Time: $(date "+%Y-%m-%d %H:%M:%S %z")"
 echo "NOTIFICATION:"$file_end.$ext" Error!!! 😡 \r"Duration... $videoduration Size... $size""
-#rm -rf "/private/tmp/img.jpeg" &> /dev/null
+#rm -rf "/private/tmp/img.jpg" &> /dev/null
 rm -rf "/private/tmp/FastLaunch/"* &> /dev/null
 exit
 fi
-#rm -rf "/private/tmp/img.jpeg" &> /dev/null
+#rm -rf "/private/tmp/img.jpg" &> /dev/null
 rm -rf "/private/tmp/FastLaunch/"* &> /dev/null
 }
 
@@ -311,7 +311,7 @@ exit
 
 elif [[ "$@" ]]; then
 for file in "$@"; do
-rm -rf "/private/tmp/img.jpeg" &> /dev/null
+rm -rf "/private/tmp/img.jpg" &> /dev/null
 echo "Files:file://"
 echo "Name:"
 echo "Seconds:"

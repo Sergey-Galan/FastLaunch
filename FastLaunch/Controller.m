@@ -151,6 +151,7 @@
 @property (retain) NSString *SecondsString;
 @property (retain) NSString *SecondsStringOld;
 @property (retain) NSString *ProgressString;
+@property (retain) NSString *ProgressStringOld;
 @property (retain) NSString *FileString;
 @property (retain) NSString *OnlyString;
 @property (assign) IBOutlet NSView *view;
@@ -249,14 +250,14 @@ static const NSInteger detailsHeight = 310;
 - (NSString *) PathForDeleteFile
 {
 NSError *error;
-    NSString *path = @"/private/tmp/img.jpeg";
+    NSString *path = @"/private/tmp/img.jpg";
     if ([[NSFileManager defaultManager] isDeletableFileAtPath:path]) {
     BOOL success = [[NSFileManager defaultManager] removeItemAtPath:path error:&error];
     if (!success) {
         NSLog(@"%@", error.localizedDescription);
     }
  }
-    return @"/private/tmp/img.jpeg";
+    return @"/private/tmp/img.jpg";
 }
 
 
@@ -429,6 +430,8 @@ if (![fileManager fileExistsAtPath:folder]) {
     [self.testArray3 addObject:@{ @"name" : @"25000k" }];
     [self.testArray3 addObject:@{ @"name" : @"30000k" }];
     [self.testArray3 addObject:@{ @"name" : @"50000k" }];
+    [self.testArray3 addObject:@{ @"name" : @"70000k" }];
+    [self.testArray3 addObject:@{ @"name" : @"100000k" }];
     
     _currentlySelectedPort4 = ((void)(@"%@"), [plist objectForKey:@"Resolution"]);
     [self.testArray4 addObject:@{ @"name" : @"Source" }];
@@ -1478,39 +1481,12 @@ if (![fileManager fileExistsAtPath:folder]) {
     
     // Parse output looking for commands; if none, append line to output text field
     for (NSString *theLine in lines) {
-
-        //Слайды на экране
-        if (![self.SecondsString isEqual: self.SecondsStringOld] && ![_FileString  isEqual: @""]) {
-            NSString *urlString = [self.FileString stringByAddingPercentEncodingWithAllowedCharacters:[NSCharacterSet URLFragmentAllowedCharacterSet]]; //декодирование кириллического URL
-            NSURL *videoURL = [NSURL URLWithString:urlString];
-            AVURLAsset *asset = [[AVURLAsset alloc] initWithURL:videoURL options:nil];
-            AVAssetImageGenerator* imgGenerator = [AVAssetImageGenerator assetImageGeneratorWithAsset:asset];
-            
-            imgGenerator.appliesPreferredTrackTransform = YES;
-            imgGenerator.requestedTimeToleranceBefore = kCMTimeZero;
-            imgGenerator.requestedTimeToleranceAfter = kCMTimeZero;
-            imgGenerator.maximumSize = CGSizeMake(340, 192);
-            imgGenerator.apertureMode = AVAssetImageGeneratorApertureModeProductionAperture;
-            
-            Float64 Seconds = [self.SecondsString floatValue];
-            CMTime time = CMTimeMakeWithSeconds(Seconds, 1);
-            //    CMTimeShow(time);
-
-            NSError *error;
-            CGImageRef imageRef = [imgGenerator copyCGImageAtTime:time actualTime:NULL error:NULL];
-            if (!imageRef) {
-                NSLog(@"AVAssetImageGenerator frame generate failed: %@", error);
-                NSImage* thumbnail = [[NSImage alloc]initWithContentsOfFile:@"/private/tmp/img.jpeg"];
-                [myImageView setImage:thumbnail];
-            } else {
-                NSImage* thumbnail = [[NSImage alloc] initWithCGImage:imageRef size:NSMakeSize(340, 192)];
-                [myImageView setImage:thumbnail];
-                _SecondsStringOld = self.SecondsString;
-            }
-        } else{
-            NSLog(@"Skip image building");
-            
-        }
+        
+        
+        //        if ([theLine length] == 0) {
+        //            [self appendString:@""];
+        //            continue;
+        //        }
         
         
         if ([theLine hasPrefix:@"NOTIFICATION:"]) {
@@ -1547,45 +1523,12 @@ if (![fileManager fileExistsAtPath:folder]) {
             }
             [MessageTextFieldProgress setStringValue:ProgressString];
             self.ProgressString = ProgressString;
-            if ([self.OnlyString  isEqual: @"RED"]) {
-                if (ProgressString != nil) {
-                    double progressRed = [ProgressString intValue]/100.0;
-                    // Make sure the previous ProgressBar is clear before update.
-                    [[DockProgressBarRed sharedDockProgressBarRed]
-                     setProgressRed:(float)progressRed];
-                    [[DockProgressBarRed sharedDockProgressBarRed] updateProgressBarRed];
-                    [[DockProgressBarBlue sharedDockProgressBarBlue] hideProgressBarBlue];
-                    // Create filter:ProgressBar
-                    CIFilter *colorFilter = [CIFilter filterWithName:@"CIHueAdjust"
-                                                withInputParameters:@{@"inputAngle" : @8.5}];
-                    // Assign to ProgressBar
-                    progressBarIndicator.contentFilters = @[colorFilter];
-                    double progressBarRed = [ProgressString intValue];
-                    [progressBarIndicator setIndeterminate:NO];
-                    [progressBarIndicator setDoubleValue:progressBarRed];
-                }
+            if (![_ProgressString isEqual: _ProgressStringOld] && ![_ProgressString isEqual: @""]) {
+                [self progressBarProgram];
+            } else{
+                NSLog(@"Skip Progress");
             }
-            else if ([self.OnlyString  isEqual: @"BLUE"]) {
-                if (ProgressString != nil) {
-                    double progressBlue = [ProgressString intValue]/100.0;
-                    // Make sure the previous ProgressBar is clear before update.
-                    [[DockProgressBarBlue sharedDockProgressBarBlue]
-                     setProgressBlue:(float)progressBlue];
-                    [[DockProgressBarBlue sharedDockProgressBarBlue] updateProgressBarBlue];
-                    [[DockProgressBarRed sharedDockProgressBarRed] hideProgressBarRed];
-                    // Create filter:ProgressBar
-                    CIFilter *colorFilter = [CIFilter filterWithName:@"CIHueAdjust"
-                                                withInputParameters:@{@"inputAngle" : @0}];
-                    // Assign to ProgressBar
-                    progressBarIndicator.contentFilters = @[colorFilter];
-                    double progressBarBlue = [ProgressString intValue];
-                    [progressBarIndicator setIndeterminate:NO];
-                    [progressBarIndicator setDoubleValue:progressBarBlue];
-                }
-            }
-            if ([self.ProgressString  isEqual: @"0% "]) {
-                [[DockProgressBarRed sharedDockProgressBarRed] clearRed];
-            }
+            _ProgressStringOld = _ProgressString;
             continue;
         }
         
@@ -1666,6 +1609,12 @@ if (![fileManager fileExistsAtPath:folder]) {
                 SecondsString = [SecondsString substringToIndex:[SecondsString length]-1];
             }
             self.SecondsString = SecondsString;
+            if (![_SecondsString isEqual: _SecondsStringOld] && ![_FileString  isEqual: @""]) {
+                [self videoSlides];
+            } else{
+                NSLog(@"Skip image building");
+            }
+            _SecondsStringOld = _SecondsString;
             continue;
         }
         
@@ -1678,26 +1627,90 @@ if (![fileManager fileExistsAtPath:folder]) {
             [MessageTextFieldInfo setStringValue:InfoString];
             continue;
         }
-
-        
-        else if ([self.OnlyString  isEqual: @"RED"]) {
-            [CancelButton setTitle:@"Cancel"];
-            continue;
-        }
-        else if ([self.OnlyString  isEqual: @"BLUE"]) {
-            [CancelButton setTitle:@"Pause"];
-            continue;
-        }
     }
 }
 
-- (void)clearOutputBuffer {
-    NSTextStorage *textStorage = [outputTextView textStorage];
-    NSRange range = NSMakeRange(0, [textStorage length]-1);
-    [textStorage beginEditing];
-    [textStorage replaceCharactersInRange:range withString:@""];
-    [textStorage endEditing];
-}
+    - (void)videoSlides {
+     //Slides on screen
+        NSString *urlString = [_FileString stringByAddingPercentEncodingWithAllowedCharacters:[NSCharacterSet URLFragmentAllowedCharacterSet]]; //декодирование кириллического URL
+        NSURL *videoURL = [NSURL URLWithString:urlString];
+        AVURLAsset *asset = [[AVURLAsset alloc] initWithURL:videoURL options:nil];
+        AVAssetImageGenerator* imgGenerator = [AVAssetImageGenerator assetImageGeneratorWithAsset:asset];
+        
+        imgGenerator.appliesPreferredTrackTransform = YES;
+        imgGenerator.requestedTimeToleranceBefore = kCMTimeZero;
+        imgGenerator.requestedTimeToleranceAfter = kCMTimeZero;
+        imgGenerator.maximumSize = CGSizeMake(320, 180);
+        imgGenerator.apertureMode = AVAssetImageGeneratorApertureModeProductionAperture;
+        
+        Float64 Seconds = [_SecondsString floatValue];
+        CMTime time = CMTimeMakeWithSeconds(Seconds, 100);
+        //    CMTimeShow(time);
+
+        NSError *error;
+        CGImageRef imageRef = [imgGenerator copyCGImageAtTime:time actualTime:NULL error:NULL];
+        if (!imageRef) {
+            NSLog(@"AVAssetImageGenerator frame generate failed: %@", error);
+            NSImage* thumbnail = [[NSImage alloc]initWithContentsOfFile:@"/private/tmp/img.jpg"];
+            [myImageView setImage:thumbnail];
+        } else {
+            NSImage* thumbnail = [[NSImage alloc] initWithCGImage:imageRef size:NSMakeSize(320, 180)];
+            [myImageView setImage:thumbnail];
+
+            NSBitmapImageRep *jpgImageRep = [[NSBitmapImageRep alloc]initWithData:[thumbnail TIFFRepresentation]];
+            //add the NSBitmapImage to the representation list of the target
+            [thumbnail addRepresentation:jpgImageRep];
+            //get the data from the representation
+            NSData *jpgData = [jpgImageRep representationUsingType: NSBitmapImageFileTypeJPEG properties:@{}];
+            //write the data to a file
+            [jpgData writeToFile: @"/private/tmp/img.jpg" atomically:NO];
+        }
+    }
+
+- (void)progressBarProgram {
+    //Progress in the program and on the dock icon
+        if ([_OnlyString  isEqual: @"RED"]) {
+            [CancelButton setTitle:@"Cancel"];
+            if (_ProgressString != nil) {
+                double progressRed = [_ProgressString intValue]/100.0;
+                // Make sure the previous ProgressBar is clear before update.
+                [[DockProgressBarRed sharedDockProgressBarRed]
+                 setProgressRed:(float)progressRed];
+                [[DockProgressBarRed sharedDockProgressBarRed] updateProgressBarRed];
+                [[DockProgressBarBlue sharedDockProgressBarBlue] hideProgressBarBlue];
+                // Create filter:ProgressBar
+                CIFilter *colorFilter = [CIFilter filterWithName:@"CIHueAdjust"
+                                             withInputParameters:@{@"inputAngle" : @8.5}];
+                // Assign to ProgressBar
+                progressBarIndicator.contentFilters = @[colorFilter];
+                double progressBarRed = [_ProgressString intValue];
+                [progressBarIndicator setIndeterminate:NO];
+                [progressBarIndicator setDoubleValue:progressBarRed];
+            }
+        }
+        else if ([_OnlyString  isEqual: @"BLUE"]) {
+            if (_ProgressString != nil) {
+                [CancelButton setTitle:@"Pause"];
+                double progressBlue = [_ProgressString intValue]/100.0;
+                // Make sure the previous ProgressBar is clear before update.
+                [[DockProgressBarBlue sharedDockProgressBarBlue]
+                 setProgressBlue:(float)progressBlue];
+                [[DockProgressBarBlue sharedDockProgressBarBlue] updateProgressBarBlue];
+                [[DockProgressBarRed sharedDockProgressBarRed] hideProgressBarRed];
+                // Create filter:ProgressBar
+                CIFilter *colorFilter = [CIFilter filterWithName:@"CIHueAdjust"
+                                             withInputParameters:@{@"inputAngle" : @0}];
+                // Assign to ProgressBar
+                progressBarIndicator.contentFilters = @[colorFilter];
+                double progressBarBlue = [_ProgressString intValue];
+                [progressBarIndicator setIndeterminate:NO];
+                [progressBarIndicator setDoubleValue:progressBarBlue];
+            }
+        }
+        if ([_ProgressString  isEqual: @"0% "]) {
+            [[DockProgressBarRed sharedDockProgressBarRed] clearRed];
+        }
+    }
 
 
 #pragma mark - Service handling

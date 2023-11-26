@@ -26,7 +26,7 @@ echo "Media:Video "$put"\r`./tools/mediainfo --Inform="General;Size.............
 ##################################################################################
 
 
-ScriptVersion=5.4.3
+ScriptVersion=5.4.4
 
 FastLaunchPlist="$HOME/Library/Preferences/org.SerhiiHalan.SettingsFastLaunch.plist" &> /dev/null
 MonitoringFolder="$(/usr/libexec/PlistBuddy -c "Print :MonitoringFolder" "$FastLaunchPlist")"
@@ -67,7 +67,7 @@ source scripts/scriptOnlyFTPserver
 fi
 done
 
-rm -rf "/private/tmp/img.jpeg" &> /dev/null
+rm -rf "/private/tmp/img.jpg" &> /dev/null
 
 if [[ $StartType = 'Encoding and Server' ]]; then
 source scripts/scriptEncodingAndServer

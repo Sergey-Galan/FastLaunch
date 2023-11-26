@@ -516,7 +516,7 @@
 					"@executable_path/../Frameworks",
 				);
 				MACOSX_DEPLOYMENT_TARGET = 10.15;
-				MARKETING_VERSION = 5.4.3;
+				MARKETING_VERSION = 5.4.4;
 				ONLY_ACTIVE_ARCH = YES;
 				PLIST_FILE_OUTPUT_FORMAT = xml;
 				PRODUCT_BUNDLE_IDENTIFIER = org.SerhiiHalan.FastLaunch;
@@ -563,7 +563,7 @@
 					"@executable_path/../Frameworks",
 				);
 				MACOSX_DEPLOYMENT_TARGET = 10.15;
-				MARKETING_VERSION = 5.4.3;
+				MARKETING_VERSION = 5.4.4;
 				PLIST_FILE_OUTPUT_FORMAT = binary;
 				PRODUCT_BUNDLE_IDENTIFIER = org.SerhiiHalan.FastLaunch;
 				PRODUCT_NAME = FastLaunch;
@@ -605,7 +605,7 @@
 					"@executable_path/../Frameworks",
 				);
 				MACOSX_DEPLOYMENT_TARGET = 10.15;
-				MARKETING_VERSION = 5.4.3;
+				MARKETING_VERSION = 5.4.4;
 				PRODUCT_BUNDLE_IDENTIFIER = org.SerhiiHalan.FastLaunch;
 				PRODUCT_NAME = FastLaunch;
 				PROVISIONING_PROFILE_SPECIFIER = "";
