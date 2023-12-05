@@ -18,3 +18,4 @@ The password is stored in "Bunch of keys"
 
 
 Many thanks to the FFmpeg https://ffmpeg.org and MediaInfo https://mediaarea.net/ru/MediaInfo projects.
+And special thanks to the project Platypus, where I took a lot of code. https://github.com/sveinbjornt/Platypus
