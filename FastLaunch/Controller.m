@@ -1053,14 +1053,14 @@ if (![fileManager fileExistsAtPath:folder]) {
             [FastLaunchWindow setFrame:winRect display:TRUE animate:TRUE];
     }
 
-// Show the details text field in progress bar2 interface
+// Show the details
 - (IBAction)showDetails {
     if ([DetailsTriangle state] == NSControlStateValueOff) {
         [DetailsTriangle performClick:DetailsTriangle];
     }
  }
 
-// Hide the details text field in progress bar2 interface
+// Hide the details
 - (IBAction)hideDetails {
     if ([DetailsTriangle state] != NSControlStateValueOff) {
         [DetailsTriangle performClick:DetailsTriangle];
@@ -1289,20 +1289,6 @@ if (![fileManager fileExistsAtPath:folder]) {
     if (commandLineArguments && [commandLineArguments count]) {
         [arguments addObjectsFromArray:commandLineArguments];
         commandLineArguments = nil;
-    }
-    
-    // Finally, dequeue job and add arguments
-    if ([jobQueue count] > 0) {
-        FastLaunchJob *job = jobQueue[0];
-
-        // We have files in the queue, to append as arguments
-        // We take the first job's arguments and put them into the arg list
-        if ([job arguments]) {
-            [arguments addObjectsFromArray:[job arguments]];
-        }
-        stdinString = [[job standardInputString] copy];
-        
-        [jobQueue removeObjectAtIndex:0];
     }
 }
 
