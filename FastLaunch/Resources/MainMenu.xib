@@ -62,13 +62,13 @@
                 <outlet property="windowMenu" destination="24" id="328"/>
             </connections>
         </customObject>
-        <window title="FastLaunch" allowsToolTipsWhenApplicationIsInactive="NO" autorecalculatesKeyViewLoop="NO" releasedWhenClosed="NO" visibleAtLaunch="NO" frameAutosaveName="FastLaunchWindow" animationBehavior="default" titlebarAppearsTransparent="YES" id="Vll-7R-0Ba" userLabel="FastLaunchWindow">
+        <window title="FastLaunch" allowsToolTipsWhenApplicationIsInactive="NO" autorecalculatesKeyViewLoop="NO" releasedWhenClosed="NO" visibleAtLaunch="NO" frameAutosaveName="FastLaunchWindow" animationBehavior="default" id="Vll-7R-0Ba" userLabel="FastLaunchWindow">
             <windowStyleMask key="styleMask" titled="YES" closable="YES" miniaturizable="YES"/>
             <windowPositionMask key="initialPositionMask" leftStrut="YES" topStrut="YES"/>
             <rect key="contentRect" x="860" y="690" width="711" height="312"/>
             <rect key="screenRect" x="0.0" y="0.0" width="2560" height="1415"/>
             <value key="minSize" type="size" width="711" height="312"/>
-            <view key="contentView" focusRingType="none" id="e8s-U8-pTE">
+            <view key="contentView" wantsLayer="YES" focusRingType="none" id="e8s-U8-pTE">
                 <rect key="frame" x="0.0" y="0.0" width="711" height="312"/>
                 <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                 <subviews>
@@ -215,14 +215,14 @@
                         </view>
                     </box>
                     <box borderType="line" titlePosition="noTitle" id="9fw-o9-Lhf">
-                        <rect key="frame" x="499" y="7" width="197" height="34"/>
+                        <rect key="frame" x="499" y="5" width="197" height="40"/>
                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                         <view key="contentView" id="1VK-lU-TZZ">
-                            <rect key="frame" x="4" y="5" width="189" height="26"/>
+                            <rect key="frame" x="4" y="5" width="189" height="32"/>
                             <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                             <subviews>
                                 <button verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="xTJ-ab-Yle">
-                                    <rect key="frame" x="121" y="-4" width="67" height="32"/>
+                                    <rect key="frame" x="121" y="-1" width="67" height="32"/>
                                     <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMinY="YES"/>
                                     <buttonCell key="cell" type="push" title="Quit" bezelStyle="rounded" alignment="center" borderStyle="border" inset="2" id="wHR-Tk-LSI">
                                         <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
@@ -233,7 +233,7 @@
                                     </connections>
                                 </button>
                                 <button verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="7qu-fa-f1x">
-                                    <rect key="frame" x="61" y="-4" width="67" height="32"/>
+                                    <rect key="frame" x="61" y="-1" width="67" height="32"/>
                                     <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                     <buttonCell key="cell" type="push" title="Open" bezelStyle="rounded" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="8rp-Vb-3f1">
                                         <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
@@ -244,7 +244,7 @@
                                     </connections>
                                 </button>
                                 <button verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="BL1-Jl-drm" userLabel="Start">
-                                    <rect key="frame" x="1" y="-4" width="67" height="32"/>
+                                    <rect key="frame" x="1" y="-1" width="67" height="32"/>
                                     <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                     <buttonCell key="cell" type="push" title="Start" bezelStyle="rounded" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="FLj-5N-5ra">
                                         <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
@@ -980,6 +980,15 @@ AAAAAAEGA
                         </connections>
                     </button>
                 </subviews>
+                <backgroundFilters>
+                    <ciFilter name="CIColorMonochrome">
+                        <configuration>
+                            <ciColor key="inputColor" red="1" green="1" blue="1" alpha="1"/>
+                            <null key="inputImage"/>
+                            <real key="inputIntensity" value="1"/>
+                        </configuration>
+                    </ciFilter>
+                </backgroundFilters>
             </view>
             <connections>
                 <outlet property="delegate" destination="207" id="NzS-E7-NR6"/>
