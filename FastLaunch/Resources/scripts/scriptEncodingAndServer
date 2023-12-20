@@ -56,7 +56,8 @@ Transcoding()
   s="$(./tools/ffmpeg -i "$file" 2>&1 | grep Duration | cut -d ' ' -f4 | sed s/,// | cut -c7,8)"
   ms="$(./tools/ffmpeg -i "$file" 2>&1 | grep Duration | cut -d ' ' -f4 | sed s/,// | cut -c10,11)"
 
-  if [[ "H.264" = "$VEncoder" ]]; then
+
+  if [[ "H.264 (x264)" = "$VEncoder" ]]; then
   cod2="H.264"
   cod="H.264 AVC"
 #  aspect=`./tools/mediainfo --Inform="Video;%DisplayAspectRatio/String%" "$file"`
@@ -64,12 +65,28 @@ echo "Info:"$count" Start encoding file... to H.264"
   TranscodingH264 2>&1 |
   OutputFFmpeg
   fi
-  if [[ "H.265" = "$VEncoder" ]]; then
+  if [[ "H.264 Hardware" = "$VEncoder" ]]; then
+  cod2="H.264"
+  cod="H.264 AVC (VideoToolbox)"
+#  aspect=`./tools/mediainfo --Inform="Video;%DisplayAspectRatio/String%" "$file"`
+echo "Info:"$count" Start encoding file... to H.264 Hardware (VideoToolbox)"
+  TranscodingH264Hardware 2>&1 |
+  OutputFFmpeg
+  fi
+  if [[ "H.265 (x265)" = "$VEncoder" ]]; then
   cod2="H.265"
   cod="H.265 HEVC"
 #  aspect=`./tools/mediainfo --Inform="Video;%DisplayAspectRatio/String%" "$file"`
 echo "Info:"$count" Start encoding file... in H.265"
   TranscodingH265 2>&1 |
+  OutputFFmpeg
+  fi
+  if [[ "H.265 Hardware" = "$VEncoder" ]]; then
+  cod2="H.265"
+  cod="H.265 HEVC (VideoToolbox)"
+#  aspect=`./tools/mediainfo --Inform="Video;%DisplayAspectRatio/String%" "$file"`
+echo "Info:"$count" Start encoding file... to H.265 Hardware (VideoToolbox)"
+  TranscodingH265Hardware 2>&1 |
   OutputFFmpeg
   fi
   
@@ -96,6 +113,23 @@ fi
 }
 
 
+TranscodingH264Hardware()
+{
+
+if  [[ "$(./tools/ffmpeg -i "$file" -hide_banner 2>&1 | grep -e 'Guessed Channel Layout for Input Stream #0.1 : mono')" ]]; then
+    echo "Guessed Channel Layout for Input Stream #0.1"
+  ./tools/ffmpeg -v error -hide_banner -stats -i "$file" -map 0:0 -alternate_scan 1 -f mp4 $FrameRate -c:v h264_videotoolbox -allow_sw 1 $Resolution $VBitRate -aspect $AspectRatio -c:a $AEncoder -ar $SampleRate -filter_complex "[0:1][0:2]amerge=inputs="$Channels"[aout]" -map "[aout]" -b:a $ABitRate "$DestinationFolder/$file_end.part"
+elif [[ "$(./tools/ffmpeg -i "$file" -hide_banner 2>&1 | grep -e 'Guessed Channel Layout for Input Stream #0.2 : mono')" ]]; then
+    echo "Guessed Channel Layout for Input Stream #0.2"
+  ./tools/ffmpeg -v error -hide_banner -stats -i "$file" -map 0:0 -alternate_scan 1 -f mp4 $FrameRate -c:v h264_videotoolbox -allow_sw 1 $Resolution $VBitRate -aspect $AspectRatio -c:a $AEncoder -ar $SampleRate -filter_complex "[0:2][0:3]amerge=inputs="$Channels"[aout]" -map "[aout]" -b:a $ABitRate "$DestinationFolder/$file_end.part"
+    else
+    echo "audio map... OK"
+  ./tools/ffmpeg -v error -hide_banner -stats -i "$file" -alternate_scan 1 -f mp4 $FrameRate -c:v h264_videotoolbox -allow_sw 1 $Resolution $VBitRate -aspect $AspectRatio -c:a $AEncoder -ar $SampleRate -ac $Channels -b:a $ABitRate "$DestinationFolder/$file_end.part"
+fi
+
+}
+
+
 TranscodingH265()
 {
 if  [[ "$(./tools/ffmpeg -i "$file" -hide_banner 2>&1 | grep -e 'Guessed Channel Layout for Input Stream #0.1 : mono')" ]]; then
@@ -107,6 +141,22 @@ elif [[ "$(./tools/ffmpeg -i "$file" -hide_banner 2>&1 | grep -e 'Guessed Channe
     else
     echo "audio map... OK"
   ./tools/ffmpeg -v error -hide_banner -stats -i "$file" -f mp4 $FrameRate -c:v libx265 -tag:v hvc1 -preset $Preset -pix_fmt $Chroma $Resolution $VBitRate -aspect $AspectRatio -x265-params log-level=error -c:a $AEncoder -ar $SampleRate -ac $Channels -b:a $ABitRate "$DestinationFolder/$file_end.part"
+fi
+
+}
+
+
+TranscodingH265Hardware()
+{
+if  [[ "$(./tools/ffmpeg -i "$file" -hide_banner 2>&1 | grep -e 'Guessed Channel Layout for Input Stream #0.1 : mono')" ]]; then
+    echo "Guessed Channel Layout for Input Stream #0.1"
+  ./tools/ffmpeg -v error -hide_banner -stats -i "$file" -map 0:0 -f mp4 $FrameRate -c:v hevc_videotoolbox -allow_sw 1 -tag:v hvc1 -pix_fmt $Chroma $Resolution $VBitRate -aspect $AspectRatio -x265-params log-level=error -c:a $AEncoder -ar $SampleRate -filter_complex "[0:1][0:2]amerge=inputs="$Channels"[aout]" -map "[aout]" -b:a $ABitRate "$DestinationFolder/$file_end.part"
+elif [[ "$(./tools/ffmpeg -i "$file" -hide_banner 2>&1 | grep -e 'Guessed Channel Layout for Input Stream #0.2 : mono')" ]]; then
+    echo "Guessed Channel Layout for Input Stream #0.2"
+  ./tools/ffmpeg -v error -hide_banner -stats -i "$file" -map 0:0 -f mp4 $FrameRate -c:v hevc_videotoolbox -allow_sw 1 -tag:v hvc1 -pix_fmt $Chroma $Resolution $VBitRate -aspect $AspectRatio -x265-params log-level=error -c:a $AEncoder -ar $SampleRate -filter_complex "[0:2][0:3]amerge=inputs="$Channels"[aout]" -map "[aout]" -b:a $ABitRate "$DestinationFolder/$file_end.part"
+    else
+    echo "audio map... OK"
+  ./tools/ffmpeg -v error -hide_banner -stats -i "$file" -f mp4 $FrameRate -c:v hevc_videotoolbox -allow_sw 1 -tag:v hvc1 -pix_fmt $Chroma $Resolution $VBitRate -aspect $AspectRatio -x265-params log-level=error -c:a $AEncoder -ar $SampleRate -ac $Channels -b:a $ABitRate "$DestinationFolder/$file_end.part"
 fi
 
 }
@@ -291,9 +341,9 @@ fi
 StartFTP()
 {
 
-echo "ONLY:BLUE"
-files="/private/tmp/FastLaunch/$file_end.mp4"
+echo "ONLY:GREY"
 echo "Progress:0% "
+files="/private/tmp/FastLaunch/$file_end.mp4"
   size="$(./tools/mediainfo --Inform="General;%FileSize/String%" "$files")"
   size=${size/' '/}
   size=${size/' '/}
@@ -305,6 +355,7 @@ echo "Progress:0% "
   prth=$(expr $h \* 3600 2>/dev/null);
   prtm=$(expr $m \* 60 2>/dev/null);
   prt=$(expr $prth + $prtm + $s 2>/dev/null)
+  echo "ONLY:BLUE"
   
 until curl -C - -T "$files" "$sr" --user "$un":"$ps"; do
 sleep 1
@@ -385,6 +436,7 @@ exit
 fi
 #rm -rf "/private/tmp/img.jpg" &> /dev/null
 rm -rf "/private/tmp/FastLaunch/"* &> /dev/null
+echo "ONLY:GREY"
 }
 
 

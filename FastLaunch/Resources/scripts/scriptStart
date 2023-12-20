@@ -17,7 +17,7 @@ fi
 
 Minfo()
 {
-echo "Media:Video "$put"\r`./tools/mediainfo --Inform="General;Size...............: %FileSize/String%" "$Mfile" &`\r`./tools/mediainfo --Inform="General;Duration.........: %Duration/String2%" "$Mfile" &`\r`./tools/mediainfo --Inform="Video;Format...........: %Format%" "$Mfile" &`\r`./tools/mediainfo --Inform="Video;Profile............: %Format_Profile%" "$Mfile" &`\r`./tools/mediainfo --Inform="Video;Codec ID........: %CodecID%" "$Mfile" &`\r`./tools/mediainfo --Inform="Video;Bit Rate..........: %BitRate/String%" "$Mfile" &`\r`./tools/mediainfo --Inform="Video;Resolution......: %Width%x%Height%" "$Mfile" &`\r`./tools/mediainfo --Inform="Video;Aspect Ratio...: %DisplayAspectRatio/String%" "$Mfile"`\r`./tools/mediainfo --Inform="Video;Frame Rate.....: %FrameRate% fps" "$Mfile"`\r`./tools/mediainfo --Inform="Video;Color Space....: %ColorSpace% %ChromaSubsampling%" "$Mfile" &`\r`./tools/mediainfo --Inform="Video;Bit Depth........: %BitDepth/String%" "$Mfile" &`\r`./tools/mediainfo --Inform="Video;Scan Type.......: %ScanType%" "$Mfile" &`\rAudio\r`./tools/mediainfo --Inform="Audio;%Format% %BitRate/String% %BitRate_Mode% %Channel(s)%ch %Codec/String% %SamplingRate/String%" "$Mfile"`"
+echo "Media:Video "$put"\r`./tools/mediainfo --Inform="General;Size...............: %FileSize/String%" "$Mfile" &`\r`./tools/mediainfo --Inform="General;Duration.........: %Duration/String2%" "$Mfile" &`\r`./tools/mediainfo --Inform="Video;Format...........: %Format%" "$Mfile" &`\r`./tools/mediainfo --Inform="Video;Profile............: %Format_Profile%" "$Mfile" &`\r`./tools/mediainfo --Inform="Video;Codec ID........: %CodecID%" "$Mfile" &`\r`./tools/mediainfo --Inform="Video;Bit Rate..........: %BitRate/String%" "$Mfile" &`\r`./tools/mediainfo --Inform="Video;Resolution......: %Width%x%Height%" "$Mfile" &`\r`./tools/mediainfo --Inform="Video;Aspect Ratio...: %DisplayAspectRatio/String%" "$Mfile"`\r`./tools/mediainfo --Inform="Video;Frame Rate.....: %FrameRate% fps" "$Mfile"`\r`./tools/mediainfo --Inform="Video;Color Space....: %ColorSpace% %ChromaSubsampling%" "$Mfile" &`\r`./tools/mediainfo --Inform="Video;Bit Depth........: %BitDepth/String%" "$Mfile" &`\r`./tools/mediainfo --Inform="Video;Scan Type.......: %ScanType%" "$Mfile" &`\rAudio "$put"\r`./tools/mediainfo --Inform="Audio;%Format% %BitRate/String% %BitRate_Mode% %Channel(s)%ch %Codec/String% %SamplingRate/String%" "$Mfile"`"
 }
 
 
@@ -25,7 +25,7 @@ echo "Media:Video "$put"\r`./tools/mediainfo --Inform="General;Size.............
 ###### Start script execution routine ############################################
 ##################################################################################
 
-ScriptVersion=5.4.4
+ScriptVersion=5.5.0
 
 FastLaunchPlist="$HOME/Library/Preferences/org.SerhiiHalan.SettingsFastLaunch.plist" &> /dev/null
 MonitoringFolder="$(/usr/libexec/PlistBuddy -c "Print :MonitoringFolder" "$FastLaunchPlist")"
@@ -61,6 +61,7 @@ source scripts/scriptOnlyFTPserver
 fi
 done
 
+echo "ONLY:GREY"
 echo "Seconds:"
 echo "Info:"
 echo "Progress:0% "

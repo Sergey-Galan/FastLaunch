@@ -46,6 +46,8 @@
     IBOutlet NSButton *savePlist4;
     IBOutlet NSButton *FolderPicker1;
     IBOutlet NSButton *FolderPicker2;
+    IBOutlet NSButton *Interlaced;
+    IBOutlet NSButton *Preset;
     IBOutlet NSImageView *myImageView;
     IBOutlet NSProgressIndicator *ProgressIndicator;
     IBOutlet NSProgressIndicator *ProgressIndicatorPreset;
@@ -355,7 +357,7 @@ if (![fileManager fileExistsAtPath:folder]) {
     if (!plistTest)
     {
         NSMutableDictionary *root = [NSMutableDictionary dictionary];
-        [root setObject:@"H.264" forKey:@"VEncoder"];
+        [root setObject:@"H.264 (x264)" forKey:@"VEncoder"];
         [root setObject:@"aac" forKey:@"AEncoder"];
         [root setObject:@"15000k" forKey:@"VBitRate"];
         [root setObject:@"1920x1080" forKey:@"Resolution"];
@@ -402,8 +404,10 @@ if (![fileManager fileExistsAtPath:folder]) {
     }
     
     _currentlySelectedPort1 = ((void)(@"%@"), [plist objectForKey:@"VEncoder"]);
-    [self.testArray1 addObject:@{ @"name" : @"H.264" }];
-    [self.testArray1 addObject:@{ @"name" : @"H.265" }];
+    [self.testArray1 addObject:@{ @"name" : @"H.264 (x264)" }];
+    [self.testArray1 addObject:@{ @"name" : @"H.264 Hardware" }];
+    [self.testArray1 addObject:@{ @"name" : @"H.265 (x265)" }];
+    [self.testArray1 addObject:@{ @"name" : @"H.265 Hardware" }];
     
     _currentlySelectedPort2 = ((void)(@"%@"), [plist objectForKey:@"AEncoder"]);
     [self.testArray2 addObject:@{ @"name" : @"aac" }];
@@ -566,6 +570,33 @@ if (![fileManager fileExistsAtPath:folder]) {
     // Assign to ProgressBar
     progressBarIndicator.contentFilters = @[colorFilter];
     
+    if ([_currentlySelectedPort1 isEqual:@"H.265 (x265)"]) {
+        [Interlaced setEnabled:NO];
+    }
+    else if ([_currentlySelectedPort1 isEqual:@"H.264 Hardware"]) {
+        [self.testArray7 remove:@{ @"name" : @"yuv420p" }];
+        [self.testArray7 remove:@{ @"name" : @"yuv420p10le" }];
+        [self.testArray7 remove:@{ @"name" : @"yuv422p" }];
+        [self.testArray7 remove:@{ @"name" : @"yuv422p10le" }];
+        [self.testArray7 remove:@{ @"name" : @"yuv444p" }];
+        [self.testArray7 remove:@{ @"name" : @"yuv444p10le" }];
+        [self.testArray7 addObject:@{ @"name" : @"yuv420p" }];
+        [Interlaced setEnabled:NO];
+        [Preset setEnabled:NO];
+    }
+    else if ([_currentlySelectedPort1 isEqual:@"H.265 Hardware"]) {
+        [self.testArray7 remove:@{ @"name" : @"yuv420p" }];
+        [self.testArray7 remove:@{ @"name" : @"yuv420p10le" }];
+        [self.testArray7 remove:@{ @"name" : @"yuv422p" }];
+        [self.testArray7 remove:@{ @"name" : @"yuv422p10le" }];
+        [self.testArray7 remove:@{ @"name" : @"yuv444p" }];
+        [self.testArray7 remove:@{ @"name" : @"yuv444p10le" }];
+        [self.testArray7 addObject:@{ @"name" : @"yuv420p" }];
+        [self.testArray7 addObject:@{ @"name" : @"yuv420p10le" }];
+        [Interlaced setEnabled:NO];
+        [Preset setEnabled:NO];
+    }
+    
     /*if (promptForFileOnLaunch && acceptsFiles && [jobQueue count] == 0) {
         [self openFiles:self];
     } else {
@@ -635,17 +666,30 @@ if (![fileManager fileExistsAtPath:folder]) {
 {
     [ProgressIndicatorPreset setHidden:NO];
     [ProgressIndicatorPreset startAnimation:self];
-        dispatch_queue_t backgroundQueue = dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0);
-        dispatch_async(backgroundQueue, ^{
-            for (NSUInteger i = 0; i < 1; i++) {
-                [NSThread sleepForTimeInterval:0.8f];
+    dispatch_queue_t backgroundQueue = dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0);
+    dispatch_async(backgroundQueue, ^{
+        for (NSUInteger i = 0; i < 1; i++) {
+            [NSThread sleepForTimeInterval:0.8f];
             dispatch_async(dispatch_get_main_queue(), ^{
                 [ProgressIndicatorPreset stopAnimation:self];
                 [ProgressIndicatorPreset setHidden:YES];
             });
-          }
-      });
-
+        }
+    });
+    
+    [self.testArray7 remove:@{ @"name" : @"yuv420p" }];
+    [self.testArray7 remove:@{ @"name" : @"yuv420p10le" }];
+    [self.testArray7 remove:@{ @"name" : @"yuv422p" }];
+    [self.testArray7 remove:@{ @"name" : @"yuv422p10le" }];
+    [self.testArray7 remove:@{ @"name" : @"yuv444p" }];
+    [self.testArray7 remove:@{ @"name" : @"yuv444p10le" }];
+    [self.testArray7 addObject:@{ @"name" : @"yuv420p" }];
+    [self.testArray7 addObject:@{ @"name" : @"yuv420p10le" }];
+    [self.testArray7 addObject:@{ @"name" : @"yuv422p" }];
+    [self.testArray7 addObject:@{ @"name" : @"yuv422p10le" }];
+    [self.testArray7 addObject:@{ @"name" : @"yuv444p" }];
+    [self.testArray7 addObject:@{ @"name" : @"yuv444p10le" }];
+    
     NSMutableDictionary *root = [[NSMutableDictionary alloc] initWithContentsOfFile:self.plistFileName];
     [root setObject:_currentlySelectedPort1 forKey:@"VEncoder"];
     [root setObject:_currentlySelectedPort2 forKey:@"AEncoder"];
@@ -653,15 +697,60 @@ if (![fileManager fileExistsAtPath:folder]) {
     [root setObject:_currentlySelectedPort4 forKey:@"Resolution"];
     [root setObject:_currentlySelectedPort5 forKey:@"Preset"];
     [root setObject:_currentlySelectedPort6 forKey:@"FrameRate"];
-    [root setObject:_currentlySelectedPort7 forKey:@"Chroma"];
     [root setObject:_currentlySelectedPort8 forKey:@"ABitRate"];
     [root setObject:_currentlySelectedPort9 forKey:@"SampleRate"];
     [root setObject:_currentlySelectedPort10 forKey:@"Mode"];
     [root setObject:_currentlySelectedPort11 forKey:@"Channels"];
     [root setObject:_currentlySelectedPort12 forKey:@"AspectRatio"];
-    [root setObject:self.InterlacedKey forKey:@"Interlaced"];
     [root setObject:self.WaitKey forKey:@"Wait"];
     [root setObject:self.XMLfileKey forKey:@"XMLfile"];
+
+    if ([_currentlySelectedPort1 isEqual:@"H.264 (x264)"]) {
+        [root setObject:self.InterlacedKey forKey:@"Interlaced"];
+        [root setObject:_currentlySelectedPort7 forKey:@"Chroma"];
+        [Interlaced setEnabled:YES];
+        [Preset setEnabled:YES];
+    }
+    else if ([_currentlySelectedPort1 isEqual:@"H.265 (x265)"]) {
+        self.InterlacedKey = @"0";
+        [root setObject:self.InterlacedKey forKey:@"Interlaced"];
+        [root setObject:_currentlySelectedPort7 forKey:@"Chroma"];
+        [Interlaced setEnabled:NO];
+        [Preset setEnabled:YES];
+    }
+    else if ([_currentlySelectedPort1 isEqual:@"H.264 Hardware"]) {
+        self.InterlacedKey = @"0";
+        [root setObject:self.InterlacedKey forKey:@"Interlaced"];
+        self.currentlySelectedPort7 = @"yuv420p";
+        [self.testArray7 remove:@{ @"name" : @"yuv420p" }];
+        [self.testArray7 remove:@{ @"name" : @"yuv420p10le" }];
+        [self.testArray7 remove:@{ @"name" : @"yuv422p" }];
+        [self.testArray7 remove:@{ @"name" : @"yuv422p10le" }];
+        [self.testArray7 remove:@{ @"name" : @"yuv444p" }];
+        [self.testArray7 remove:@{ @"name" : @"yuv444p10le" }];
+        [self.testArray7 addObject:@{ @"name" : @"yuv420p" }];
+        [root setObject:_currentlySelectedPort7 forKey:@"Chroma"];
+        [Interlaced setEnabled:NO];
+        [Preset setEnabled:NO];
+    }
+    else if ([_currentlySelectedPort1 isEqual:@"H.265 Hardware"]) {
+        if (![_currentlySelectedPort7 isEqual:@"yuv420p"] && ![_currentlySelectedPort7 isEqual:@"yuv420p10le"]) {
+            self.currentlySelectedPort7 = @"yuv420p";
+        }
+        [self.testArray7 remove:@{ @"name" : @"yuv420p" }];
+        [self.testArray7 remove:@{ @"name" : @"yuv420p10le" }];
+        [self.testArray7 remove:@{ @"name" : @"yuv422p" }];
+        [self.testArray7 remove:@{ @"name" : @"yuv422p10le" }];
+        [self.testArray7 remove:@{ @"name" : @"yuv444p" }];
+        [self.testArray7 remove:@{ @"name" : @"yuv444p10le" }];
+        [self.testArray7 addObject:@{ @"name" : @"yuv420p" }];
+        [self.testArray7 addObject:@{ @"name" : @"yuv420p10le" }];
+        [root setObject:_currentlySelectedPort7 forKey:@"Chroma"];
+        self.InterlacedKey = @"0";
+        [root setObject:self.InterlacedKey forKey:@"Interlaced"];
+        [Interlaced setEnabled:NO];
+        [Preset setEnabled:NO];
+    }
 
     NSLog(@"saving data:\n%@", root);
     NSError *error = nil;
@@ -1692,6 +1781,17 @@ if (![fileManager fileExistsAtPath:folder]) {
                 [progressBarIndicator setIndeterminate:NO];
                 [progressBarIndicator setDoubleValue:progressBarBlue];
             }
+        }
+        else if ([_OnlyString  isEqual: @"GREY"]) {
+            // Create color:
+            CIColor *color = [[CIColor alloc] initWithColor:[NSColor colorWithSRGBRed:0.8 green:0.8 blue:0.8 alpha:1]];
+            // Create filter:ProgressBar
+            CIFilter *colorFilter = [CIFilter filterWithName:@"CIColorMonochrome"
+                                        withInputParameters:@{@"inputColor" : color,
+                                                              @"inputIntensity" : @1}];
+            // Assign to ProgressBar
+            progressBarIndicator.contentFilters = @[colorFilter];
+            [progressBarIndicator setDoubleValue:0];
         }
         if ([_ProgressString  isEqual: @"0% "]) {
             [[DockProgressBarRed sharedDockProgressBarRed] clearRed];
