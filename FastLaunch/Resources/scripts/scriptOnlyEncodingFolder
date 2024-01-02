@@ -67,10 +67,10 @@ sleep 1
 TranscodingH264()
 {
 
-if  [[ "$(./tools/ffmpeg -i "$file" -hide_banner 2>&1 | grep -e 'Guessed Channel Layout for Input Stream #0.1 : mono')" ]]; then
+if  [[ "$(./tools/ffmpeg -i "$file" -hide_banner 2>&1 | grep -e 'aist#0:1')" ]]; then
     echo "Guessed Channel Layout for Input Stream #0.1"
   ./tools/ffmpeg -v error -hide_banner -stats -i "$file" -map 0:0 $Interlaced -alternate_scan 1 -f mp4 $FrameRate -c:v libx264 -preset $Preset -pix_fmt $Chroma $Resolution $VBitRate -aspect $AspectRatio -c:a $AEncoder -ar $SampleRate -filter_complex "[0:1][0:2]amerge=inputs="$Channels"[aout]" -map "[aout]" -b:a $ABitRate "$DestinationFolder/$file_end.part"
-elif [[ "$(./tools/ffmpeg -i "$file" -hide_banner 2>&1 | grep -e 'Guessed Channel Layout for Input Stream #0.2 : mono')" ]]; then
+elif [[ "$(./tools/ffmpeg -i "$file" -hide_banner 2>&1 | grep -e 'aist#0:2')" ]]; then
     echo "Guessed Channel Layout for Input Stream #0.2"
   ./tools/ffmpeg -v error -hide_banner -stats -i "$file" -map 0:0 $Interlaced -alternate_scan 1 -f mp4 $FrameRate -c:v libx264 -preset $Preset -pix_fmt $Chroma $Resolution $VBitRate -aspect $AspectRatio -c:a $AEncoder -ar $SampleRate -filter_complex "[0:2][0:3]amerge=inputs="$Channels"[aout]" -map "[aout]" -b:a $ABitRate "$DestinationFolder/$file_end.part"
     else
@@ -84,10 +84,10 @@ fi
 TranscodingH264Hardware()
 {
 
-if  [[ "$(./tools/ffmpeg -i "$file" -hide_banner 2>&1 | grep -e 'Guessed Channel Layout for Input Stream #0.1 : mono')" ]]; then
+if  [[ "$(./tools/ffmpeg -i "$file" -hide_banner 2>&1 | grep -e 'aist#0:1')" ]]; then
     echo "Guessed Channel Layout for Input Stream #0.1"
   ./tools/ffmpeg -v error -hide_banner -stats -i "$file" -map 0:0 -alternate_scan 1 -f mp4 $FrameRate -c:v h264_videotoolbox -allow_sw 1 $Resolution $VBitRate -aspect $AspectRatio -c:a $AEncoder -ar $SampleRate -filter_complex "[0:1][0:2]amerge=inputs="$Channels"[aout]" -map "[aout]" -b:a $ABitRate "$DestinationFolder/$file_end.part"
-elif [[ "$(./tools/ffmpeg -i "$file" -hide_banner 2>&1 | grep -e 'Guessed Channel Layout for Input Stream #0.2 : mono')" ]]; then
+elif [[ "$(./tools/ffmpeg -i "$file" -hide_banner 2>&1 | grep -e 'aist#0:2')" ]]; then
     echo "Guessed Channel Layout for Input Stream #0.2"
   ./tools/ffmpeg -v error -hide_banner -stats -i "$file" -map 0:0 -alternate_scan 1 -f mp4 $FrameRate -c:v h264_videotoolbox -allow_sw 1 $Resolution $VBitRate -aspect $AspectRatio -c:a $AEncoder -ar $SampleRate -filter_complex "[0:2][0:3]amerge=inputs="$Channels"[aout]" -map "[aout]" -b:a $ABitRate "$DestinationFolder/$file_end.part"
     else
@@ -100,10 +100,10 @@ fi
 
 TranscodingH265()
 {
-if  [[ "$(./tools/ffmpeg -i "$file" -hide_banner 2>&1 | grep -e 'Guessed Channel Layout for Input Stream #0.1 : mono')" ]]; then
+if  [[ "$(./tools/ffmpeg -i "$file" -hide_banner 2>&1 | grep -e 'aist#0:1')" ]]; then
     echo "Guessed Channel Layout for Input Stream #0.1"
   ./tools/ffmpeg -v error -hide_banner -stats -i "$file" -map 0:0 -f mp4 $FrameRate -c:v libx265 -tag:v hvc1 -preset $Preset -pix_fmt $Chroma $Resolution $VBitRate -aspect $AspectRatio -x265-params log-level=error -c:a $AEncoder -ar $SampleRate -filter_complex "[0:1][0:2]amerge=inputs="$Channels"[aout]" -map "[aout]" -b:a $ABitRate "$DestinationFolder/$file_end.part"
-elif [[ "$(./tools/ffmpeg -i "$file" -hide_banner 2>&1 | grep -e 'Guessed Channel Layout for Input Stream #0.2 : mono')" ]]; then
+elif [[ "$(./tools/ffmpeg -i "$file" -hide_banner 2>&1 | grep -e 'aist#0:2')" ]]; then
     echo "Guessed Channel Layout for Input Stream #0.2"
   ./tools/ffmpeg -v error -hide_banner -stats -i "$file" -map 0:0 -f mp4 $FrameRate -c:v libx265 -tag:v hvc1 -preset $Preset -pix_fmt $Chroma $Resolution $VBitRate -aspect $AspectRatio -x265-params log-level=error -c:a $AEncoder -ar $SampleRate -filter_complex "[0:2][0:3]amerge=inputs="$Channels"[aout]" -map "[aout]" -b:a $ABitRate "$DestinationFolder/$file_end.part"
     else
@@ -116,10 +116,10 @@ fi
 
 TranscodingH265Hardware()
 {
-if  [[ "$(./tools/ffmpeg -i "$file" -hide_banner 2>&1 | grep -e 'Guessed Channel Layout for Input Stream #0.1 : mono')" ]]; then
+if  [[ "$(./tools/ffmpeg -i "$file" -hide_banner 2>&1 | grep -e 'aist#0:1')" ]]; then
     echo "Guessed Channel Layout for Input Stream #0.1"
   ./tools/ffmpeg -v error -hide_banner -stats -i "$file" -map 0:0 -f mp4 $FrameRate -c:v hevc_videotoolbox -allow_sw 1 -tag:v hvc1 -pix_fmt $Chroma $Resolution $VBitRate -aspect $AspectRatio -x265-params log-level=error -c:a $AEncoder -ar $SampleRate -filter_complex "[0:1][0:2]amerge=inputs="$Channels"[aout]" -map "[aout]" -b:a $ABitRate "$DestinationFolder/$file_end.part"
-elif [[ "$(./tools/ffmpeg -i "$file" -hide_banner 2>&1 | grep -e 'Guessed Channel Layout for Input Stream #0.2 : mono')" ]]; then
+elif [[ "$(./tools/ffmpeg -i "$file" -hide_banner 2>&1 | grep -e 'aist#0:2')" ]]; then
     echo "Guessed Channel Layout for Input Stream #0.2"
   ./tools/ffmpeg -v error -hide_banner -stats -i "$file" -map 0:0 -f mp4 $FrameRate -c:v hevc_videotoolbox -allow_sw 1 -tag:v hvc1 -pix_fmt $Chroma $Resolution $VBitRate -aspect $AspectRatio -x265-params log-level=error -c:a $AEncoder -ar $SampleRate -filter_complex "[0:2][0:3]amerge=inputs="$Channels"[aout]" -map "[aout]" -b:a $ABitRate "$DestinationFolder/$file_end.part"
     else

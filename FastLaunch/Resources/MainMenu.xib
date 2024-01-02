@@ -985,6 +985,13 @@ AAAAAAEGA
                 <backgroundFilters>
                     <ciFilter name="CIColorMonochrome">
                         <configuration>
+                            <ciColor key="inputColor" red="0.62197848194439087" green="0.62092934133094291" blue="0.63925521459776102" alpha="1"/>
+                            <null key="inputImage"/>
+                            <real key="inputIntensity" value="2"/>
+                        </configuration>
+                    </ciFilter>
+                    <ciFilter name="CIColorMonochrome">
+                        <configuration>
                             <ciColor key="inputColor" red="1" green="1" blue="1" alpha="1"/>
                             <null key="inputImage"/>
                             <real key="inputIntensity" value="1"/>
