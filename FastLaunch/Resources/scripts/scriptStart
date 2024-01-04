@@ -25,6 +25,7 @@ echo "Media:Video "$put"\r`./tools/mediainfo --Inform="General;Size.............
 ###### Start script execution routine ############################################
 ##################################################################################
 
+
 ScriptVersion=5.5.1
 
 FastLaunchPlist="$HOME/Library/Preferences/org.SerhiiHalan.SettingsFastLaunch.plist" &> /dev/null

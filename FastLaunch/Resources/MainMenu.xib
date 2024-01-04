@@ -924,7 +924,7 @@ AAAAAAEGA
                                                 <font key="font" metaFont="cellTitle"/>
                                             </buttonCell>
                                             <connections>
-                                                <action selector="savePlist2:" target="207" id="ct0-Y4-p5A"/>
+                                                <action selector="savePlist1:" target="207" id="dgS-hL-ONo"/>
                                                 <binding destination="207" name="value" keyPath="self.XMLfileKey" id="6PF-Mb-D4J"/>
                                             </connections>
                                         </button>

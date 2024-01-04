@@ -640,7 +640,8 @@ if (![fileManager fileExistsAtPath:folder]) {
     NSMutableDictionary *root = [[NSMutableDictionary alloc] initWithContentsOfFile:self.plistFileName];
     [root setObject:self.ServerKey forKey:@"sr"];
     [root setObject:self.UserKey forKey:@"un"];
-
+    [root setObject:self.XMLfileKey forKey:@"XMLfile"];
+    
     NSLog(@"saving data:\n%@", root);
     NSError *error = nil;
     NSData *representation = [NSPropertyListSerialization dataWithPropertyList:root format:NSPropertyListBinaryFormat_v1_0 options:0 error:&error];
@@ -703,7 +704,6 @@ if (![fileManager fileExistsAtPath:folder]) {
     [root setObject:_currentlySelectedPort11 forKey:@"Channels"];
     [root setObject:_currentlySelectedPort12 forKey:@"AspectRatio"];
     [root setObject:self.WaitKey forKey:@"Wait"];
-    [root setObject:self.XMLfileKey forKey:@"XMLfile"];
 
     if ([_currentlySelectedPort1 isEqual:@"H.264 (x264)"]) {
         [root setObject:self.InterlacedKey forKey:@"Interlaced"];
