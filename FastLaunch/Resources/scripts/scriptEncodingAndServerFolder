@@ -505,7 +505,10 @@ error=""
    fi
 
    if [[ "$AspectRatio" = "Source" ]]; then
-   AspectRatio=`./tools/mediainfo --Inform="Video;%DisplayAspectRatio/String%" "$file"`
+   AspectRatio="$(./tools/ffmpeg -i "$file" 2>&1 | grep -m1 DAR)"
+   AspectRatio=${AspectRatio/*" DAR "/}
+   AspectRatio=${AspectRatio/]*/}
+   AspectRatio=${AspectRatio/,*/}
    fi
    
 tempfile="${file##*/}"

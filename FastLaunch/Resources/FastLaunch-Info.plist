@@ -20,7 +20,7 @@
 	<key>CFBundleExecutable</key>
 	<string>FastLaunch</string>
 	<key>CFBundleGetInfoString</key>
-	<string>© 2020-2023 Serhii Halaniuk</string>
+	<string>© 2020-2024 Serhii Halaniuk</string>
 	<key>CFBundleIconFile</key>
 	<string>appIcon.icns</string>
 	<key>CFBundleIdentifier</key>
@@ -76,7 +76,7 @@
 		<true/>
 	</dict>
 	<key>NSHumanReadableCopyright</key>
-	<string>© 2020-2023 Serhii Halaniuk</string>
+	<string>© 2020-2024 Serhii Halaniuk</string>
 	<key>NSMainNibFile</key>
 	<string>MainMenu</string>
 	<key>NSPrincipalClass</key>

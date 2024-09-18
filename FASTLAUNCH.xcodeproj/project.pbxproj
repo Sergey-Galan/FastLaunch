@@ -12,6 +12,8 @@
 		A5CCBE932B051C9E00DE98EB /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A5CCBE922B051C9E00DE98EB /* Cocoa.framework */; };
 		A5CCBE952B051FE800DE98EB /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A5CCBE942B051FE800DE98EB /* Foundation.framework */; };
 		A5CCBE9B2B05215E00DE98EB /* IOKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A5CCBE9A2B05215E00DE98EB /* IOKit.framework */; };
+		A5F0295F2C9B593700517D83 /* Metal.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A5F0295E2C9B593700517D83 /* Metal.framework */; };
+		A5F18BA32C9B941400155595 /* LICENSE.txt in Resources */ = {isa = PBXBuildFile; fileRef = A5F18BA22C9B941400155595 /* LICENSE.txt */; };
 		A5F508642A0BFFC200EB7213 /* FastLaunchJob.m in Sources */ = {isa = PBXBuildFile; fileRef = A5F5085A2A0BFFC000EB7213 /* FastLaunchJob.m */; };
 		A5F508682A0BFFC200EB7213 /* Controller.m in Sources */ = {isa = PBXBuildFile; fileRef = A5F508612A0BFFC200EB7213 /* Controller.m */; };
 		A5F508692A0BFFC200EB7213 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = A5F508632A0BFFC200EB7213 /* main.m */; };
@@ -29,10 +31,13 @@
 
 /* Begin PBXFileReference section */
 		A50996B62B00045A0092F300 /* Quartz.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Quartz.framework; path = System/Library/Frameworks/Quartz.framework; sourceTree = SDKROOT; };
+		A5875AAD2C4ECCD40018A892 /* FastLaunch.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = FastLaunch.entitlements; sourceTree = "<group>"; };
 		A5CCBE922B051C9E00DE98EB /* Cocoa.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Cocoa.framework; path = System/Library/Frameworks/Cocoa.framework; sourceTree = SDKROOT; };
 		A5CCBE942B051FE800DE98EB /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = System/Library/Frameworks/Foundation.framework; sourceTree = SDKROOT; };
 		A5CCBE9A2B05215E00DE98EB /* IOKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = IOKit.framework; path = System/Library/Frameworks/IOKit.framework; sourceTree = SDKROOT; };
 		A5DA28F526B4B5CD00B1EC06 /* AVFoundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AVFoundation.framework; path = System/Library/Frameworks/AVFoundation.framework; sourceTree = SDKROOT; };
+		A5F0295E2C9B593700517D83 /* Metal.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Metal.framework; path = System/Library/Frameworks/Metal.framework; sourceTree = SDKROOT; };
+		A5F18BA22C9B941400155595 /* LICENSE.txt */ = {isa = PBXFileReference; lastKnownFileType = text; path = LICENSE.txt; sourceTree = "<group>"; };
 		A5F508592A0BFFC000EB7213 /* Controller.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Controller.h; sourceTree = "<group>"; };
 		A5F5085A2A0BFFC000EB7213 /* FastLaunchJob.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = FastLaunchJob.m; sourceTree = "<group>"; };
 		A5F508612A0BFFC200EB7213 /* Controller.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Controller.m; sourceTree = "<group>"; };
@@ -62,6 +67,7 @@
 				A54DB86529C3D58400B544FA /* AVFoundation.framework in Frameworks */,
 				A50996B72B00045A0092F300 /* Quartz.framework in Frameworks */,
 				A5CCBE9B2B05215E00DE98EB /* IOKit.framework in Frameworks */,
+				A5F0295F2C9B593700517D83 /* Metal.framework in Frameworks */,
 				A5CCBE952B051FE800DE98EB /* Foundation.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -88,6 +94,7 @@
 		29B97314FDCFA39411CA2CEA /* FastLaunch */ = {
 			isa = PBXGroup;
 			children = (
+				A5F18BA22C9B941400155595 /* LICENSE.txt */,
 				A5F508352A0BFEE700EB7213 /* FastLaunch */,
 				080E96DDFE201D6D7F000001 /* Shared */,
 				29B97323FDCFA39411CA2CEA /* Frameworks */,
@@ -99,6 +106,7 @@
 		29B97323FDCFA39411CA2CEA /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				A5F0295E2C9B593700517D83 /* Metal.framework */,
 				A5CCBE9A2B05215E00DE98EB /* IOKit.framework */,
 				A5CCBE942B051FE800DE98EB /* Foundation.framework */,
 				A5CCBE922B051C9E00DE98EB /* Cocoa.framework */,
@@ -122,6 +130,7 @@
 		A5F508352A0BFEE700EB7213 /* FastLaunch */ = {
 			isa = PBXGroup;
 			children = (
+				A5875AAD2C4ECCD40018A892 /* FastLaunch.entitlements */,
 				A5F508592A0BFFC000EB7213 /* Controller.h */,
 				A5F508612A0BFFC200EB7213 /* Controller.m */,
 				A5F508622A0BFFC200EB7213 /* FastLaunchJob.h */,
@@ -157,7 +166,6 @@
 				F48B773D11F7661C00351575 /* Resources */,
 				F48B773E11F7661C00351575 /* Sources */,
 				F48B773F11F7661C00351575 /* Frameworks */,
-				F4302B7B21C5A04A001C8BEC /* ShellScript */,
 			);
 			buildRules = (
 			);
@@ -175,11 +183,10 @@
 			isa = PBXProject;
 			attributes = {
 				BuildIndependentTargetsInParallel = YES;
-				LastUpgradeCheck = 1510;
+				LastUpgradeCheck = 1600;
 				ORGANIZATIONNAME = "Sergey Galan";
 				TargetAttributes = {
 					F48B774011F7661C00351575 = {
-						DevelopmentTeam = WSC9LR5SDP;
 						ProvisioningStyle = Manual;
 					};
 				};
@@ -212,6 +219,7 @@
 				A5F508962A0C007700EB7213 /* tools in Resources */,
 				A5F508912A0C001A00EB7213 /* Credits.html in Resources */,
 				A5F5088E2A0C001A00EB7213 /* MainMenu.xib in Resources */,
+				A5F18BA32C9B941400155595 /* LICENSE.txt in Resources */,
 				A5F508822A0C001A00EB7213 /* pencil.png in Resources */,
 				A5F508922A0C001A00EB7213 /* video.png in Resources */,
 				A5F508832A0C001A00EB7213 /* appIcon.icns in Resources */,
@@ -221,25 +229,6 @@
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXResourcesBuildPhase section */
-
-/* Begin PBXShellScriptBuildPhase section */
-		F4302B7B21C5A04A001C8BEC /* ShellScript */ = {
-			isa = PBXShellScriptBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			inputFileListPaths = (
-			);
-			inputPaths = (
-			);
-			outputFileListPaths = (
-			);
-			outputPaths = (
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-			shellPath = /bin/sh;
-		};
-/* End PBXShellScriptBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
 		F48B773E11F7661C00351575 /* Sources */ = {
@@ -488,6 +477,7 @@
 				CLANG_ALLOW_NON_MODULAR_INCLUDES_IN_FRAMEWORK_MODULES = YES;
 				CLANG_ENABLE_MODULES = YES;
 				CLANG_ENABLE_OBJC_ARC = YES;
+				CODE_SIGN_ENTITLEMENTS = FastLaunch/FastLaunch.entitlements;
 				CODE_SIGN_IDENTITY = "Apple Development";
 				"CODE_SIGN_IDENTITY[sdk=macosx*]" = "-";
 				CODE_SIGN_STYLE = Manual;
@@ -497,7 +487,7 @@
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				DEVELOPMENT_TEAM = "";
 				"DEVELOPMENT_TEAM[sdk=macosx*]" = WSC9LR5SDP;
-				ENABLE_HARDENED_RUNTIME = YES;
+				ENABLE_HARDENED_RUNTIME = NO;
 				EXCLUDED_SOURCE_FILE_NAMES = "";
 				GCC_CW_ASM_SYNTAX = NO;
 				GCC_DYNAMIC_NO_PIC = NO;
@@ -535,6 +525,7 @@
 				CLANG_ALLOW_NON_MODULAR_INCLUDES_IN_FRAMEWORK_MODULES = YES;
 				CLANG_ENABLE_MODULES = YES;
 				CLANG_ENABLE_OBJC_ARC = YES;
+				CODE_SIGN_ENTITLEMENTS = FastLaunch/FastLaunch.entitlements;
 				CODE_SIGN_IDENTITY = "Apple Development";
 				"CODE_SIGN_IDENTITY[sdk=macosx*]" = "-";
 				CODE_SIGN_STYLE = Manual;
@@ -544,7 +535,7 @@
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				DEVELOPMENT_TEAM = "";
 				"DEVELOPMENT_TEAM[sdk=macosx*]" = WSC9LR5SDP;
-				ENABLE_HARDENED_RUNTIME = YES;
+				ENABLE_HARDENED_RUNTIME = NO;
 				EXCLUDED_SOURCE_FILE_NAMES = "";
 				GCC_CW_ASM_SYNTAX = NO;
 				GCC_DYNAMIC_NO_PIC = NO;
@@ -580,6 +571,7 @@
 				CLANG_ALLOW_NON_MODULAR_INCLUDES_IN_FRAMEWORK_MODULES = YES;
 				CLANG_ENABLE_MODULES = YES;
 				CLANG_ENABLE_OBJC_ARC = YES;
+				CODE_SIGN_ENTITLEMENTS = FastLaunch/FastLaunch.entitlements;
 				CODE_SIGN_IDENTITY = "Apple Development";
 				"CODE_SIGN_IDENTITY[sdk=macosx*]" = "-";
 				CODE_SIGN_STYLE = Manual;
@@ -588,7 +580,7 @@
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				DEVELOPMENT_TEAM = "";
 				"DEVELOPMENT_TEAM[sdk=macosx*]" = WSC9LR5SDP;
-				ENABLE_HARDENED_RUNTIME = YES;
+				ENABLE_HARDENED_RUNTIME = NO;
 				EXCLUDED_SOURCE_FILE_NAMES = "";
 				GCC_CW_ASM_SYNTAX = NO;
 				GCC_ENABLE_PASCAL_STRINGS = YES;
