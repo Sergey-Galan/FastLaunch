@@ -773,6 +773,7 @@ if (![fileManager fileExistsAtPath:folder]) {
     }
 }
 
+
 - (IBAction)savePlist3:(id)sender {
     if ([sender state] == NSControlStateValueOff) {
         [_CustomResolution setHidden:YES];
