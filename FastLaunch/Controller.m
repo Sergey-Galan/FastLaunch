@@ -1530,6 +1530,20 @@ if (![fileManager fileExistsAtPath:folder]) {
     // Create string from output data
     NSMutableString *outputString = [[NSMutableString alloc] initWithData:data encoding:NSUTF8StringEncoding];
     
+    if (![_SecondsString isEqual: _SecondsStringOld] && ![_FileString  isEqual: @""]) {
+        [self videoSlides];
+    } else{
+        NSLog(@"Skip image building");
+    }
+    _SecondsStringOld = _SecondsString;
+    
+    if (![_ProgressString isEqual: _ProgressStringOld] && ![_ProgressString isEqual: @""]) {
+        [self progressBarProgram];
+    } else{
+        NSLog(@"Skip Progress");
+    }
+    _ProgressStringOld = _ProgressString;
+    
     if (outputString == nil) {
         PLog(@"Warning: Output string is nil");
         return;
@@ -1599,12 +1613,6 @@ if (![fileManager fileExistsAtPath:folder]) {
             }
             [MessageTextFieldProgress setStringValue:ProgressString];
             self.ProgressString = ProgressString;
-            if (![_ProgressString isEqual: _ProgressStringOld] && ![_ProgressString isEqual: @""]) {
-                [self progressBarProgram];
-            } else{
-                NSLog(@"Skip Progress");
-            }
-            _ProgressStringOld = _ProgressString;
             continue;
         }
         
@@ -1685,12 +1693,6 @@ if (![fileManager fileExistsAtPath:folder]) {
                 SecondsString = [SecondsString substringToIndex:[SecondsString length]-1];
             }
             self.SecondsString = SecondsString;
-            if (![_SecondsString isEqual: _SecondsStringOld] && ![_FileString  isEqual: @""]) {
-                [self videoSlides];
-            } else{
-                NSLog(@"Skip image building");
-            }
-            _SecondsStringOld = _SecondsString;
             continue;
         }
         

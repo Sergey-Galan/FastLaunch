@@ -320,6 +320,9 @@ VBitRate="$(defaults read $FastLaunchPlist VBitRate)"
    AspectRatio=${AspectRatio/*" DAR "/}
    AspectRatio=${AspectRatio/]*/}
    AspectRatio=${AspectRatio/,*/}
+   if [[ -z "$AspectRatio" ]]; then
+   AspectRatio=`./tools/mediainfo --Inform="Video;%DisplayAspectRatio/String%" "$file"`
+   fi
    fi
 
 rm -rf "/private/tmp/img.jpg" &> /dev/null
