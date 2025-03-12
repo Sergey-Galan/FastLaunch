@@ -73,10 +73,7 @@
     NSFileHandle *outputReadFileHandle;
     
     NSMutableArray <NSString *> *arguments;
-    NSArray <NSString *> *commandLineArguments;
     NSArray <NSString *> *interpreterArgs;
-    NSArray <NSString *> *scriptArgs;
-    NSArray <NSString *> *script1Args;
     NSString *stdinString;
     
     NSString *interpreterPath;
@@ -346,262 +343,15 @@ if (![fileManager fileExistsAtPath:folder]) {
 
 
 - (void)applicationDidFinishLaunching:(NSNotification *)aNotification {
-    // Insert code here to initialize your application
-    NSString *rootPath = [NSSearchPathForDirectoriesInDomains(NSLibraryDirectory, NSUserDomainMask, YES) objectAtIndex:0];
-    NSString *plistPath = [rootPath stringByAppendingPathComponent:@"/Preferences/org.SerhiiHalan.SettingsFastLaunch.plist"];
-    self.plistFileName = plistPath;
-    NSLog(@"plist file path: %@", plistPath);
-    
-    //If there is no plist, a default one is created
-    NSData *plistTest = [NSData dataWithContentsOfFile:self.plistFileName];
-    if (!plistTest)
-    {
-        NSMutableDictionary *root = [NSMutableDictionary dictionary];
-        [root setObject:@"H.264 (x264)" forKey:@"VEncoder"];
-        [root setObject:@"aac" forKey:@"AEncoder"];
-        [root setObject:@"15000k" forKey:@"VBitRate"];
-        [root setObject:@"1920x1080" forKey:@"Resolution"];
-        [root setObject:@"medium" forKey:@"Preset"];
-        [root setObject:@"25" forKey:@"FrameRate"];
-        [root setObject:@"16:9" forKey:@"AspectRatio"];
-        [root setObject:@"yuv420p" forKey:@"Chroma"];
-        [root setObject:@"192k" forKey:@"ABitRate"];
-        [root setObject:@"Encoding and Server" forKey:@"Mode"];
-        [root setObject:@"2" forKey:@"Channels"];
-        [root setObject:@"48000" forKey:@"SampleRate"];
-        [root setObject:@NO forKey:@"Interlaced"];
-        [root setObject:@NO forKey:@"Wait"];
-        [root setObject:@NO forKey:@"XMLfile"];
-        [root setObject:@"" forKey:@"sr"];
-        [root setObject:@"" forKey:@"un"];
-        [root setObject:self.pathForDatafolderDefault1 forKey:@"DestinationFolder"];
-        [root setObject:self.pathForDatafolderDefault2 forKey:@"MonitoringFolder"];
-        NSLog(@"Default settings saving data:\n%@", root);
-        NSError *error = nil;
-        NSData *representation = [NSPropertyListSerialization dataWithPropertyList:root format:NSPropertyListBinaryFormat_v1_0 options:0 error:&error];
-        [representation writeToFile:self.plistFileName atomically:YES];
-        [self pathForDatafolderDefault1];
-        [self pathForDatafolderDefault2];
-    }
-    
-    //Get the keys from the plist
-    NSData *plistData = [NSData dataWithContentsOfFile:self.plistFileName];
-    if (!plistData)
-    {
-        NSLog(@"error reading from file: %@", self.plistFileName);
-    }
-    NSPropertyListFormat format;
-    NSError *error = nil;
-    id plist = [NSPropertyListSerialization propertyListWithData:plistData options:NSPropertyListMutableContainersAndLeaves format:&format error:&error];
-    if (!error)
-    {
-        NSMutableDictionary *root = plist;
-        NSLog(@"loaded data:\n%@", root);
-    }
-    else
-    {
-        NSLog(@"error: %@", error);
-    }
-    
-    _currentlySelectedPort1 = ((void)(@"%@"), [plist objectForKey:@"VEncoder"]);
-    [self.testArray1 addObject:@{ @"name" : @"H.264 (x264)" }];
-    [self.testArray1 addObject:@{ @"name" : @"H.264 Hardware" }];
-    [self.testArray1 addObject:@{ @"name" : @"H.265 (x265)" }];
-    [self.testArray1 addObject:@{ @"name" : @"H.265 Hardware" }];
-    
-    _currentlySelectedPort2 = ((void)(@"%@"), [plist objectForKey:@"AEncoder"]);
-    [self.testArray2 addObject:@{ @"name" : @"aac" }];
-    [self.testArray2 addObject:@{ @"name" : @"ac3" }];
-    [self.testArray2 addObject:@{ @"name" : @"mp3" }];
-    
-    _currentlySelectedPort3 = ((void)(@"%@"), [plist objectForKey:@"VBitRate"]);
-    [self.testArray3 addObject:@{ @"name" : @"Auto" }];
-    [self.testArray3 addObject:@{ @"name" : @"Source" }];
-    [self.testArray3 addObject:@{ @"name" : @"1000k" }];
-    [self.testArray3 addObject:@{ @"name" : @"2000k" }];
-    [self.testArray3 addObject:@{ @"name" : @"3000k" }];
-    [self.testArray3 addObject:@{ @"name" : @"6000k" }];
-    [self.testArray3 addObject:@{ @"name" : @"7000k" }];
-    [self.testArray3 addObject:@{ @"name" : @"8000k" }];
-    [self.testArray3 addObject:@{ @"name" : @"9000k" }];
-    [self.testArray3 addObject:@{ @"name" : @"10000k" }];
-    [self.testArray3 addObject:@{ @"name" : @"11000k" }];
-    [self.testArray3 addObject:@{ @"name" : @"12000k" }];
-    [self.testArray3 addObject:@{ @"name" : @"13000k" }];
-    [self.testArray3 addObject:@{ @"name" : @"14000k" }];
-    [self.testArray3 addObject:@{ @"name" : @"15000k" }];
-    [self.testArray3 addObject:@{ @"name" : @"20000k" }];
-    [self.testArray3 addObject:@{ @"name" : @"25000k" }];
-    [self.testArray3 addObject:@{ @"name" : @"30000k" }];
-    [self.testArray3 addObject:@{ @"name" : @"50000k" }];
-    [self.testArray3 addObject:@{ @"name" : @"70000k" }];
-    [self.testArray3 addObject:@{ @"name" : @"100000k" }];
-    
-    _currentlySelectedPort4 = ((void)(@"%@"), [plist objectForKey:@"Resolution"]);
-    [self.testArray4 addObject:@{ @"name" : @"Source" }];
-    [self.testArray4 addObject:@{ @"name" : @"480x320" }];
-    [self.testArray4 addObject:@{ @"name" : @"640x480" }];
-    [self.testArray4 addObject:@{ @"name" : @"720x480" }];
-    [self.testArray4 addObject:@{ @"name" : @"960x640" }];
-    [self.testArray4 addObject:@{ @"name" : @"1280x720" }];
-    [self.testArray4 addObject:@{ @"name" : @"1920x1080" }];
-    [self.testArray4 addObject:@{ @"name" : @"2560x1440" }];
-    [self.testArray4 addObject:@{ @"name" : @"3840x2160" }];
-    
-    _currentlySelectedPort5 = ((void)(@"%@"), [plist objectForKey:@"Preset"]);
-    [self.testArray5 addObject:@{ @"name" : @"ultrafast" }];
-    [self.testArray5 addObject:@{ @"name" : @"superfast" }];
-    [self.testArray5 addObject:@{ @"name" : @"veryfast" }];
-    [self.testArray5 addObject:@{ @"name" : @"faster" }];
-    [self.testArray5 addObject:@{ @"name" : @"fast" }];
-    [self.testArray5 addObject:@{ @"name" : @"medium" }];
-    [self.testArray5 addObject:@{ @"name" : @"slow" }];
-    [self.testArray5 addObject:@{ @"name" : @"slower" }];
-    
-    _currentlySelectedPort6 = ((void)(@"%@"), [plist objectForKey:@"FrameRate"]);
-    [self.testArray6 addObject:@{ @"name" : @"Source" }];
-    [self.testArray6 addObject:@{ @"name" : @"23.976" }];
-    [self.testArray6 addObject:@{ @"name" : @"24" }];
-    [self.testArray6 addObject:@{ @"name" : @"25" }];
-    [self.testArray6 addObject:@{ @"name" : @"29.97" }];
-    [self.testArray6 addObject:@{ @"name" : @"30" }];
-    [self.testArray6 addObject:@{ @"name" : @"50" }];
-    [self.testArray6 addObject:@{ @"name" : @"59.94" }];
-    [self.testArray6 addObject:@{ @"name" : @"60" }];
-    
-    _currentlySelectedPort7 = ((void)(@"%@"), [plist objectForKey:@"Chroma"]);
-    [self.testArray7 addObject:@{ @"name" : @"yuv420p" }];
-    [self.testArray7 addObject:@{ @"name" : @"yuv420p10le" }];
-    [self.testArray7 addObject:@{ @"name" : @"yuv422p" }];
-    [self.testArray7 addObject:@{ @"name" : @"yuv422p10le" }];
-    [self.testArray7 addObject:@{ @"name" : @"yuv444p" }];
-    [self.testArray7 addObject:@{ @"name" : @"yuv444p10le" }];
-    
-    _currentlySelectedPort8 = ((void)(@"%@"), [plist objectForKey:@"ABitRate"]);
-    [self.testArray8 addObject:@{ @"name" : @"64k" }];
-    [self.testArray8 addObject:@{ @"name" : @"96k" }];
-    [self.testArray8 addObject:@{ @"name" : @"112k" }];
-    [self.testArray8 addObject:@{ @"name" : @"128k" }];
-    [self.testArray8 addObject:@{ @"name" : @"160k" }];
-    [self.testArray8 addObject:@{ @"name" : @"192k" }];
-    [self.testArray8 addObject:@{ @"name" : @"224k" }];
-    [self.testArray8 addObject:@{ @"name" : @"256k" }];
-    [self.testArray8 addObject:@{ @"name" : @"320k" }];
-    [self.testArray8 addObject:@{ @"name" : @"384k" }];
-    [self.testArray8 addObject:@{ @"name" : @"448k" }];
-    
-    _currentlySelectedPort9 = ((void)(@"%@"), [plist objectForKey:@"SampleRate"]);
-    [self.testArray9 addObject:@{ @"name" : @"48000" }];
-    [self.testArray9 addObject:@{ @"name" : @"44100" }];
-    [self.testArray9 addObject:@{ @"name" : @"32000" }];
-    [self.testArray9 addObject:@{ @"name" : @"22050" }];
-    
-    _currentlySelectedPort10 = ((void)(@"%@"), [plist objectForKey:@"Mode"]);
-    [self.testArray10 addObject:@{ @"name" : @"Encoding and Server" }];
-    [self.testArray10 addObject:@{ @"name" : @"Only FTP-server" }];
-    [self.testArray10 addObject:@{ @"name" : @"Only Encoding" }];
-    
-    _currentlySelectedPort11 = ((void)(@"%@"), [plist objectForKey:@"Channels"]);
-    [self.testArray11 addObject:@{ @"name" : @"1" }];
-    [self.testArray11 addObject:@{ @"name" : @"2" }];
-    [self.testArray11 addObject:@{ @"name" : @"4" }];
-    [self.testArray11 addObject:@{ @"name" : @"5" }];
-    [self.testArray11 addObject:@{ @"name" : @"6" }];
-    
-    _currentlySelectedPort12 = ((void)(@"%@"), [plist objectForKey:@"AspectRatio"]);
-    [self.testArray12 addObject:@{ @"name" : @"Source" }];
-    [self.testArray12 addObject:@{ @"name" : @"16:10" }];
-    [self.testArray12 addObject:@{ @"name" : @"16:9" }];
-    [self.testArray12 addObject:@{ @"name" : @"4:3" }];
-    [self.testArray12 addObject:@{ @"name" : @"3:2" }];
-    [self.testArray12 addObject:@{ @"name" : @"5:4" }];
-    [self.testArray12 addObject:@{ @"name" : @"5:3" }];
-    
-    _InterlacedKey = ((void)(@"%@"), [plist objectForKey:@"Interlaced"]);
-    self.InterlacedKey = _InterlacedKey;
-    
-    _WaitKey = ((void)(@"%@"), [plist objectForKey:@"Wait"]);
-    self.WaitKey = _WaitKey;
-    
-    _XMLfileKey = ((void)(@"%@"), [plist objectForKey:@"XMLfile"]);
-    self.XMLfileKey = _XMLfileKey;
-    
-    _ServerKey = ((void)(@"%@"), [plist objectForKey:@"sr"]);
-    self.ServerKey = _ServerKey;
-    
-    _UserKey = ((void)(@"%@"), [plist objectForKey:@"un"]);
-    self.UserKey = _UserKey;
-    
-    _Folder1 = ((void)(@"%@"), [plist objectForKey:@"MonitoringFolder"]);
-    self.Folder1 = _Folder1;
-    
-    _Folder2 = ((void)(@"%@"), [plist objectForKey:@"DestinationFolder"]);
-    self.Folder2 = _Folder2;
-    
-    NSTask *taskPass = [[NSTask alloc] init];
-    [taskPass setLaunchPath:@"/bin/bash"];
-    [taskPass setArguments:[NSArray arrayWithObjects: @"-c", @"/usr/bin/security find-generic-password -a ${USER} -s postftp -w | tr -d '\n' 2>/dev/null", nil]];
-    NSPipe *Pipe;
-    Pipe = [NSPipe pipe];
-    [taskPass setStandardOutput: Pipe];
-    [taskPass setStandardInput:[NSPipe pipe]];
-    NSFileHandle *file;
-    file = [Pipe fileHandleForReading];
-    [taskPass launch];
-    NSData *data;
-    data = [file readDataToEndOfFile];
-    _PassKey = [[NSString alloc] initWithData: data encoding: NSUTF8StringEncoding];
-    //  NSLog(@"%@",_PassKey);
-    self.PassKey = _PassKey;
-    [self PathForDeleteFile];
-    [self pathForDataFile];
-    [self pathForDatafolder1];
-    [self pathForDatafolder2];
-    
+
+    /*if (promptForFileOnLaunch && acceptsFiles && [jobQueue count] == 0) {
+     [self openFiles:self];
+     } else {
+     [self executeScript];
+     }*/
+
     PLog(@"Application did finish launching");
     hasFinishedLaunching = YES;
-
-    // Create color:
-    CIColor *color = [[CIColor alloc] initWithColor:[NSColor colorWithSRGBRed:0.8 green:0.8 blue:0.8 alpha:1]];
-    // Create filter:ProgressBar
-    CIFilter *colorFilter = [CIFilter filterWithName:@"CIColorMonochrome"
-                                withInputParameters:@{@"inputColor" : color,
-                                                      @"inputIntensity" : @1}];
-    // Assign to ProgressBar
-    progressBarIndicator.contentFilters = @[colorFilter];
-    
-    if ([_currentlySelectedPort1 isEqual:@"H.265 (x265)"]) {
-        [Interlaced setEnabled:NO];
-    }
-    else if ([_currentlySelectedPort1 isEqual:@"H.264 Hardware"]) {
-        [self.testArray7 remove:@{ @"name" : @"yuv420p" }];
-        [self.testArray7 remove:@{ @"name" : @"yuv420p10le" }];
-        [self.testArray7 remove:@{ @"name" : @"yuv422p" }];
-        [self.testArray7 remove:@{ @"name" : @"yuv422p10le" }];
-        [self.testArray7 remove:@{ @"name" : @"yuv444p" }];
-        [self.testArray7 remove:@{ @"name" : @"yuv444p10le" }];
-        [self.testArray7 addObject:@{ @"name" : @"yuv420p" }];
-        [Interlaced setEnabled:NO];
-        [Preset setEnabled:NO];
-    }
-    else if ([_currentlySelectedPort1 isEqual:@"H.265 Hardware"]) {
-        [self.testArray7 remove:@{ @"name" : @"yuv420p" }];
-        [self.testArray7 remove:@{ @"name" : @"yuv420p10le" }];
-        [self.testArray7 remove:@{ @"name" : @"yuv422p" }];
-        [self.testArray7 remove:@{ @"name" : @"yuv422p10le" }];
-        [self.testArray7 remove:@{ @"name" : @"yuv444p" }];
-        [self.testArray7 remove:@{ @"name" : @"yuv444p10le" }];
-        [self.testArray7 addObject:@{ @"name" : @"yuv420p" }];
-        [self.testArray7 addObject:@{ @"name" : @"yuv420p10le" }];
-        [Interlaced setEnabled:NO];
-        [Preset setEnabled:NO];
-    }
-    
-    /*if (promptForFileOnLaunch && acceptsFiles && [jobQueue count] == 0) {
-        [self openFiles:self];
-    } else {
-        [self executeScript];
-    }*/
 }
 
 
@@ -631,7 +381,8 @@ if (![fileManager fileExistsAtPath:folder]) {
 
     self.PassKey = [_PassTextField stringValue];
 
-    NSString * command = [NSString stringWithFormat:@"/usr/bin/security delete-generic-password -a ${USER} -s postftp 2>/dev/null | /usr/bin/security add-generic-password -a ${USER} -s postftp -w %@ 2>/dev/null", self.PassKey];
+    NSString * command = [NSString stringWithFormat:@"/usr/bin/security delete-generic-password -a ${USER} -s postftp 2>/dev/null; \
+    /usr/bin/security add-generic-password -a ${USER} -s postftp -w %@ 2>/dev/null", self.PassKey];
     NSTask *taskPass = [[NSTask alloc] init];
     [taskPass setLaunchPath:@"/bin/bash"];
     [taskPass setArguments:[NSArray arrayWithObjects: @"-c", command, nil]];
@@ -1105,7 +856,6 @@ if (![fileManager fileExistsAtPath:folder]) {
         
         if (!isTaskRunning && success) {
             [self executeScript];
-            [self executeScript1];
         }
         
     } else {
@@ -1206,14 +956,6 @@ if (![fileManager fileExistsAtPath:folder]) {
 - (void)application:(NSApplication *)theApplication openFiles:(NSArray *)filenames {
     PLog(@"Received openFiles event for files: %@", [filenames description]);
     
-    if (hasTaskRun == FALSE && commandLineArguments != nil) {
-        for (NSString *filePath in filenames) {
-            if ([commandLineArguments containsObject:filePath]) {
-                return;
-            }
-        }
-    }
-    
     // Add the dropped files as a job for processing
     BOOL success = [self addDroppedFilesJob:filenames];
     [NSApp replyToOpenOrPrint:success ? NSApplicationDelegateReplySuccess : NSApplicationDelegateReplyFailure];
@@ -1239,6 +981,254 @@ if (![fileManager fileExistsAtPath:folder]) {
 
 // Set up any menu items, windows, controls at application launch
 - (void)initialiseInterface {
+    // Insert code here to initialize your application
+    NSString *rootPath = [NSSearchPathForDirectoriesInDomains(NSLibraryDirectory, NSUserDomainMask, YES) objectAtIndex:0];
+    NSString *plistPath = [rootPath stringByAppendingPathComponent:@"/Preferences/org.SerhiiHalan.SettingsFastLaunch.plist"];
+    self.plistFileName = plistPath;
+    NSLog(@"plist file path: %@", plistPath);
+    
+    //If there is no plist, a default one is created
+    NSData *plistTest = [NSData dataWithContentsOfFile:self.plistFileName];
+    if (!plistTest)
+    {
+        NSMutableDictionary *root = [NSMutableDictionary dictionary];
+        [root setObject:@"H.264 (x264)" forKey:@"VEncoder"];
+        [root setObject:@"aac" forKey:@"AEncoder"];
+        [root setObject:@"15000k" forKey:@"VBitRate"];
+        [root setObject:@"1920x1080" forKey:@"Resolution"];
+        [root setObject:@"medium" forKey:@"Preset"];
+        [root setObject:@"25" forKey:@"FrameRate"];
+        [root setObject:@"16:9" forKey:@"AspectRatio"];
+        [root setObject:@"yuv420p" forKey:@"Chroma"];
+        [root setObject:@"192k" forKey:@"ABitRate"];
+        [root setObject:@"Encoding and Server" forKey:@"Mode"];
+        [root setObject:@"2" forKey:@"Channels"];
+        [root setObject:@"48000" forKey:@"SampleRate"];
+        [root setObject:@NO forKey:@"Interlaced"];
+        [root setObject:@NO forKey:@"Wait"];
+        [root setObject:@NO forKey:@"XMLfile"];
+        [root setObject:@"" forKey:@"sr"];
+        [root setObject:@"" forKey:@"un"];
+        [root setObject:self.pathForDatafolderDefault1 forKey:@"DestinationFolder"];
+        [root setObject:self.pathForDatafolderDefault2 forKey:@"MonitoringFolder"];
+        NSLog(@"Default settings saving data:\n%@", root);
+        NSError *error = nil;
+        NSData *representation = [NSPropertyListSerialization dataWithPropertyList:root format:NSPropertyListBinaryFormat_v1_0 options:0 error:&error];
+        [representation writeToFile:self.plistFileName atomically:YES];
+        [self pathForDatafolderDefault1];
+        [self pathForDatafolderDefault2];
+    }
+    
+    //Get the keys from the plist
+    NSData *plistData = [NSData dataWithContentsOfFile:self.plistFileName];
+    if (!plistData)
+    {
+        NSLog(@"error reading from file: %@", self.plistFileName);
+    }
+    NSPropertyListFormat format;
+    NSError *error = nil;
+    id plist = [NSPropertyListSerialization propertyListWithData:plistData options:NSPropertyListMutableContainersAndLeaves format:&format error:&error];
+    if (!error)
+    {
+        NSMutableDictionary *root = plist;
+        NSLog(@"loaded data:\n%@", root);
+    }
+    else
+    {
+        NSLog(@"error: %@", error);
+    }
+    
+    _currentlySelectedPort1 = ((void)(@"%@"), [plist objectForKey:@"VEncoder"]);
+    [self.testArray1 addObject:@{ @"name" : @"H.264 (x264)" }];
+    [self.testArray1 addObject:@{ @"name" : @"H.264 Hardware" }];
+    [self.testArray1 addObject:@{ @"name" : @"H.265 (x265)" }];
+    [self.testArray1 addObject:@{ @"name" : @"H.265 Hardware" }];
+    
+    _currentlySelectedPort2 = ((void)(@"%@"), [plist objectForKey:@"AEncoder"]);
+    [self.testArray2 addObject:@{ @"name" : @"aac" }];
+    [self.testArray2 addObject:@{ @"name" : @"ac3" }];
+    [self.testArray2 addObject:@{ @"name" : @"mp3" }];
+    
+    _currentlySelectedPort3 = ((void)(@"%@"), [plist objectForKey:@"VBitRate"]);
+    [self.testArray3 addObject:@{ @"name" : @"Auto" }];
+    [self.testArray3 addObject:@{ @"name" : @"Source" }];
+    [self.testArray3 addObject:@{ @"name" : @"1000k" }];
+    [self.testArray3 addObject:@{ @"name" : @"2000k" }];
+    [self.testArray3 addObject:@{ @"name" : @"3000k" }];
+    [self.testArray3 addObject:@{ @"name" : @"6000k" }];
+    [self.testArray3 addObject:@{ @"name" : @"7000k" }];
+    [self.testArray3 addObject:@{ @"name" : @"8000k" }];
+    [self.testArray3 addObject:@{ @"name" : @"9000k" }];
+    [self.testArray3 addObject:@{ @"name" : @"10000k" }];
+    [self.testArray3 addObject:@{ @"name" : @"11000k" }];
+    [self.testArray3 addObject:@{ @"name" : @"12000k" }];
+    [self.testArray3 addObject:@{ @"name" : @"13000k" }];
+    [self.testArray3 addObject:@{ @"name" : @"14000k" }];
+    [self.testArray3 addObject:@{ @"name" : @"15000k" }];
+    [self.testArray3 addObject:@{ @"name" : @"20000k" }];
+    [self.testArray3 addObject:@{ @"name" : @"25000k" }];
+    [self.testArray3 addObject:@{ @"name" : @"30000k" }];
+    [self.testArray3 addObject:@{ @"name" : @"50000k" }];
+    [self.testArray3 addObject:@{ @"name" : @"70000k" }];
+    [self.testArray3 addObject:@{ @"name" : @"100000k" }];
+    
+    _currentlySelectedPort4 = ((void)(@"%@"), [plist objectForKey:@"Resolution"]);
+    [self.testArray4 addObject:@{ @"name" : @"Source" }];
+    [self.testArray4 addObject:@{ @"name" : @"480x320" }];
+    [self.testArray4 addObject:@{ @"name" : @"640x480" }];
+    [self.testArray4 addObject:@{ @"name" : @"720x480" }];
+    [self.testArray4 addObject:@{ @"name" : @"960x640" }];
+    [self.testArray4 addObject:@{ @"name" : @"1280x720" }];
+    [self.testArray4 addObject:@{ @"name" : @"1920x1080" }];
+    [self.testArray4 addObject:@{ @"name" : @"2560x1440" }];
+    [self.testArray4 addObject:@{ @"name" : @"3840x2160" }];
+    
+    _currentlySelectedPort5 = ((void)(@"%@"), [plist objectForKey:@"Preset"]);
+    [self.testArray5 addObject:@{ @"name" : @"ultrafast" }];
+    [self.testArray5 addObject:@{ @"name" : @"superfast" }];
+    [self.testArray5 addObject:@{ @"name" : @"veryfast" }];
+    [self.testArray5 addObject:@{ @"name" : @"faster" }];
+    [self.testArray5 addObject:@{ @"name" : @"fast" }];
+    [self.testArray5 addObject:@{ @"name" : @"medium" }];
+    [self.testArray5 addObject:@{ @"name" : @"slow" }];
+    [self.testArray5 addObject:@{ @"name" : @"slower" }];
+    
+    _currentlySelectedPort6 = ((void)(@"%@"), [plist objectForKey:@"FrameRate"]);
+    [self.testArray6 addObject:@{ @"name" : @"Source" }];
+    [self.testArray6 addObject:@{ @"name" : @"23.976" }];
+    [self.testArray6 addObject:@{ @"name" : @"24" }];
+    [self.testArray6 addObject:@{ @"name" : @"25" }];
+    [self.testArray6 addObject:@{ @"name" : @"29.97" }];
+    [self.testArray6 addObject:@{ @"name" : @"30" }];
+    [self.testArray6 addObject:@{ @"name" : @"50" }];
+    [self.testArray6 addObject:@{ @"name" : @"59.94" }];
+    [self.testArray6 addObject:@{ @"name" : @"60" }];
+    
+    _currentlySelectedPort7 = ((void)(@"%@"), [plist objectForKey:@"Chroma"]);
+    [self.testArray7 addObject:@{ @"name" : @"yuv420p" }];
+    [self.testArray7 addObject:@{ @"name" : @"yuv420p10le" }];
+    [self.testArray7 addObject:@{ @"name" : @"yuv422p" }];
+    [self.testArray7 addObject:@{ @"name" : @"yuv422p10le" }];
+    [self.testArray7 addObject:@{ @"name" : @"yuv444p" }];
+    [self.testArray7 addObject:@{ @"name" : @"yuv444p10le" }];
+    
+    _currentlySelectedPort8 = ((void)(@"%@"), [plist objectForKey:@"ABitRate"]);
+    [self.testArray8 addObject:@{ @"name" : @"64k" }];
+    [self.testArray8 addObject:@{ @"name" : @"96k" }];
+    [self.testArray8 addObject:@{ @"name" : @"112k" }];
+    [self.testArray8 addObject:@{ @"name" : @"128k" }];
+    [self.testArray8 addObject:@{ @"name" : @"160k" }];
+    [self.testArray8 addObject:@{ @"name" : @"192k" }];
+    [self.testArray8 addObject:@{ @"name" : @"224k" }];
+    [self.testArray8 addObject:@{ @"name" : @"256k" }];
+    [self.testArray8 addObject:@{ @"name" : @"320k" }];
+    [self.testArray8 addObject:@{ @"name" : @"384k" }];
+    [self.testArray8 addObject:@{ @"name" : @"448k" }];
+    
+    _currentlySelectedPort9 = ((void)(@"%@"), [plist objectForKey:@"SampleRate"]);
+    [self.testArray9 addObject:@{ @"name" : @"48000" }];
+    [self.testArray9 addObject:@{ @"name" : @"44100" }];
+    [self.testArray9 addObject:@{ @"name" : @"32000" }];
+    [self.testArray9 addObject:@{ @"name" : @"22050" }];
+    
+    _currentlySelectedPort10 = ((void)(@"%@"), [plist objectForKey:@"Mode"]);
+    [self.testArray10 addObject:@{ @"name" : @"Encoding and Server" }];
+    [self.testArray10 addObject:@{ @"name" : @"Only FTP-server" }];
+    [self.testArray10 addObject:@{ @"name" : @"Only Encoding" }];
+    
+    _currentlySelectedPort11 = ((void)(@"%@"), [plist objectForKey:@"Channels"]);
+    [self.testArray11 addObject:@{ @"name" : @"1" }];
+    [self.testArray11 addObject:@{ @"name" : @"2" }];
+    [self.testArray11 addObject:@{ @"name" : @"4" }];
+    [self.testArray11 addObject:@{ @"name" : @"5" }];
+    [self.testArray11 addObject:@{ @"name" : @"6" }];
+    
+    _currentlySelectedPort12 = ((void)(@"%@"), [plist objectForKey:@"AspectRatio"]);
+    [self.testArray12 addObject:@{ @"name" : @"Source" }];
+    [self.testArray12 addObject:@{ @"name" : @"16:10" }];
+    [self.testArray12 addObject:@{ @"name" : @"16:9" }];
+    [self.testArray12 addObject:@{ @"name" : @"4:3" }];
+    [self.testArray12 addObject:@{ @"name" : @"3:2" }];
+    [self.testArray12 addObject:@{ @"name" : @"5:4" }];
+    [self.testArray12 addObject:@{ @"name" : @"5:3" }];
+    
+    _InterlacedKey = ((void)(@"%@"), [plist objectForKey:@"Interlaced"]);
+    self.InterlacedKey = _InterlacedKey;
+    
+    _WaitKey = ((void)(@"%@"), [plist objectForKey:@"Wait"]);
+    self.WaitKey = _WaitKey;
+    
+    _XMLfileKey = ((void)(@"%@"), [plist objectForKey:@"XMLfile"]);
+    self.XMLfileKey = _XMLfileKey;
+    
+    _ServerKey = ((void)(@"%@"), [plist objectForKey:@"sr"]);
+    self.ServerKey = _ServerKey;
+    
+    _UserKey = ((void)(@"%@"), [plist objectForKey:@"un"]);
+    self.UserKey = _UserKey;
+    
+    _Folder1 = ((void)(@"%@"), [plist objectForKey:@"MonitoringFolder"]);
+    self.Folder1 = _Folder1;
+    
+    _Folder2 = ((void)(@"%@"), [plist objectForKey:@"DestinationFolder"]);
+    self.Folder2 = _Folder2;
+    
+    NSTask *taskPass = [[NSTask alloc] init];
+    [taskPass setLaunchPath:@"/bin/bash"];
+    [taskPass setArguments:[NSArray arrayWithObjects: @"-c", @"/usr/bin/security find-generic-password -a ${USER} -s postftp -w | tr -d '\n' 2>/dev/null", nil]];
+    NSPipe *Pipe;
+    Pipe = [NSPipe pipe];
+    [taskPass setStandardOutput: Pipe];
+    [taskPass setStandardInput:[NSPipe pipe]];
+    NSFileHandle *file;
+    file = [Pipe fileHandleForReading];
+    [taskPass launch];
+    NSData *data;
+    data = [file readDataToEndOfFile];
+    _PassKey = [[NSString alloc] initWithData: data encoding: NSUTF8StringEncoding];
+    //  NSLog(@"%@",_PassKey);
+    self.PassKey = _PassKey;
+    [self PathForDeleteFile];
+    [self pathForDataFile];
+    [self pathForDatafolder1];
+    [self pathForDatafolder2];
+
+    // Create color:
+    CIColor *color = [[CIColor alloc] initWithColor:[NSColor colorWithSRGBRed:0.8 green:0.8 blue:0.8 alpha:1]];
+    // Create filter:ProgressBar
+    CIFilter *colorFilter = [CIFilter filterWithName:@"CIColorMonochrome"
+                                withInputParameters:@{@"inputColor" : color,
+                                                      @"inputIntensity" : @1}];
+    // Assign to ProgressBar
+    progressBarIndicator.contentFilters = @[colorFilter];
+    
+    if ([_currentlySelectedPort1 isEqual:@"H.265 (x265)"]) {
+        [Interlaced setEnabled:NO];
+    }
+    else if ([_currentlySelectedPort1 isEqual:@"H.264 Hardware"]) {
+        [self.testArray7 remove:@{ @"name" : @"yuv420p" }];
+        [self.testArray7 remove:@{ @"name" : @"yuv420p10le" }];
+        [self.testArray7 remove:@{ @"name" : @"yuv422p" }];
+        [self.testArray7 remove:@{ @"name" : @"yuv422p10le" }];
+        [self.testArray7 remove:@{ @"name" : @"yuv444p" }];
+        [self.testArray7 remove:@{ @"name" : @"yuv444p10le" }];
+        [self.testArray7 addObject:@{ @"name" : @"yuv420p" }];
+        [Interlaced setEnabled:NO];
+        [Preset setEnabled:NO];
+    }
+    else if ([_currentlySelectedPort1 isEqual:@"H.265 Hardware"]) {
+        [self.testArray7 remove:@{ @"name" : @"yuv420p" }];
+        [self.testArray7 remove:@{ @"name" : @"yuv420p10le" }];
+        [self.testArray7 remove:@{ @"name" : @"yuv422p" }];
+        [self.testArray7 remove:@{ @"name" : @"yuv422p10le" }];
+        [self.testArray7 remove:@{ @"name" : @"yuv444p" }];
+        [self.testArray7 remove:@{ @"name" : @"yuv444p10le" }];
+        [self.testArray7 addObject:@{ @"name" : @"yuv420p" }];
+        [self.testArray7 addObject:@{ @"name" : @"yuv420p10le" }];
+        [Interlaced setEnabled:NO];
+        [Preset setEnabled:NO];
+    }
+    
     [openRecentMenuItem setEnabled:acceptsFiles];
     if (!acceptsFiles) {
         [fileMenu removeItemAtIndex:0]; // Open
@@ -1330,17 +1320,6 @@ if (![fileManager fileExistsAtPath:folder]) {
     }
     [arguments addObject:scriptDropPath];
     
-    // Add arguments for script
-    [arguments addObjectsFromArray:scriptArgs];
-    
-    // If initial run of app, add any arguments passed in via the command line (argv)
-    // Q: Why CLI args for GUI app typically launched from Finder?
-    // A: Apparently helpful for certain use cases such as Firefox protocol handlers etc.
-    if (commandLineArguments && [commandLineArguments count]) {
-        [arguments addObjectsFromArray:commandLineArguments];
-        commandLineArguments = nil;
-    }
-    
     // Finally, dequeue job and add arguments
     if ([jobQueue count] > 0) {
         FastLaunchJob *job = jobQueue[0];
@@ -1369,17 +1348,6 @@ if (![fileManager fileExistsAtPath:folder]) {
         NSLog(@"Script missing at execution path %@", scriptStartPath);
     }
     [arguments addObject:scriptStartPath];
-    
-    // Add arguments for script1
-    [arguments addObjectsFromArray:script1Args];
-    
-    // If initial run of app, add any arguments passed in via the command line (argv)
-    // Q: Why CLI args for GUI app typically launched from Finder?
-    // A: Apparently helpful for certain use cases such as Firefox protocol handlers etc.
-    if (commandLineArguments && [commandLineArguments count]) {
-        [arguments addObjectsFromArray:commandLineArguments];
-        commandLineArguments = nil;
-    }
 }
 
 
@@ -1956,7 +1924,6 @@ if (![fileManager fileExistsAtPath:folder]) {
     [self addMenuItemSelectedJob:[sender title]];
     if (!isTaskRunning && [jobQueue count] > 0) {
         [NSTimer scheduledTimerWithTimeInterval:0.01 target:self selector:@selector(executeScript) userInfo:nil repeats:NO];
-        [NSTimer scheduledTimerWithTimeInterval:0.01 target:self selector:@selector(executeScript1) userInfo:nil repeats:NO];
     }
 }
 
