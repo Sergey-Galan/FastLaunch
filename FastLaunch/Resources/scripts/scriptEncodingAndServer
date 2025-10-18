@@ -50,11 +50,11 @@ fi
 
 Transcoding()
 {
-  duration2="$(./tools/ffmpeg -i "$file" 2>&1 | grep Duration | cut -d ' ' -f4 | sed s/,// | cut -d '.' -f1)"
-  h="$(./tools/ffmpeg -i "$file" 2>&1 | grep Duration | cut -d ' ' -f4 | sed s/,// | cut -c1,2)"
-  m="$(./tools/ffmpeg -i "$file" 2>&1 | grep Duration | cut -d ' ' -f4 | sed s/,// | cut -c4,5)"
-  s="$(./tools/ffmpeg -i "$file" 2>&1 | grep Duration | cut -d ' ' -f4 | sed s/,// | cut -c7,8)"
-  ms="$(./tools/ffmpeg -i "$file" 2>&1 | grep Duration | cut -d ' ' -f4 | sed s/,// | cut -c10,11)"
+  duration2="$(./tools/ffmpeg -i "$file" 2>&1 | grep Duration | cut -d ' ' -f4 | sed s/,// | cut -d '.' -f1 | tr -d '\n')"
+  h="$(./tools/ffmpeg -i "$file" 2>&1 | grep Duration | cut -d ' ' -f4 | sed s/,// | cut -c1,2 | tr -d '\n')"
+  m="$(./tools/ffmpeg -i "$file" 2>&1 | grep Duration | cut -d ' ' -f4 | sed s/,// | cut -c4,5 | tr -d '\n')"
+  s="$(./tools/ffmpeg -i "$file" 2>&1 | grep Duration | cut -d ' ' -f4 | sed s/,// | cut -c7,8 | tr -d '\n')"
+  ms="$(./tools/ffmpeg -i "$file" 2>&1 | grep Duration | cut -d ' ' -f4 | sed s/,// | cut -c10,11 | tr -d '\n')"
 
 
   if [[ "H.264 (x264)" = "$VEncoder" ]]; then
@@ -164,7 +164,7 @@ fi
 OutputFFmpeg()
 {
 
-echo y | ./tools/ffmpeg -ss 00:00:02 -i "$file" -s 320x180 -frames:v 1 -q:v 5 /private/tmp/img.jpg 2>/dev/null &
+echo y | ./tools/ffmpeg -ss 00:00:02 -i "$file" -s 260x146 -frames:v 1 -q:v 5 /private/tmp/img.png 2>/dev/null &
 echo "ONLY:RED"
 echo "Progress:0% "
 echo "Files:file://"$file""
@@ -430,11 +430,11 @@ else
 afplay sound/Cartoon1.mp3 &> /dev/null &
 echo "Info:😡 Complete: Video file Error!!!  Total processed: $processedTime Time: $(date "+%Y-%m-%d %H:%M:%S %z")"
 echo "NOTIFICATION:"$file_end.mp4" Error!!! 😡 \r"Duration... $videoduration Size... $size""
-#rm -rf "/private/tmp/img.jpg" &> /dev/null
+#rm -rf "/private/tmp/img.png" &> /dev/null
 rm -rf "/private/tmp/FastLaunch/"* &> /dev/null
 exit
 fi
-#rm -rf "/private/tmp/img.jpg" &> /dev/null
+#rm -rf "/private/tmp/img.png" &> /dev/null
 rm -rf "/private/tmp/FastLaunch/"* &> /dev/null
 echo "ONLY:GREY"
 }
@@ -519,7 +519,7 @@ VBitRate="$(defaults read $FastLaunchPlist VBitRate)"
    fi
    fi
 
-rm -rf "/private/tmp/img.jpg" &> /dev/null
+rm -rf "/private/tmp/img.png" &> /dev/null
 echo "Files:file://"
 echo "Name:"
 echo "Seconds:"
@@ -564,7 +564,7 @@ if [[ `echo "mov qt mp4 mpg4 mpg mpeg mpe m75 m15 mts mkv mxf 3gp m4v avi wm wmv
    sleep 1
 fi
    done
-    #rm -rf "/private/tmp/img.jpg"
+    #rm -rf "/private/tmp/img.png"
 exit
     else
     

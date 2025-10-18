@@ -1,3 +1,10 @@
+//
+//  Controller.m
+//  FastLaunch
+//
+//  Created by Sergey Galan.
+//  Copyright © 2020-2025 Sergey Galan. All rights reserved.
+//
 
 
 #import "Controller.h"
@@ -5,24 +12,23 @@
 #import "DockProgressBarRed.h"
 #import "DockProgressBarBlue.h"
 #import <Quartz/Quartz.h>
+#import <UserNotifications/UserNotifications.h>
 
-// Abbreviations. Objective-C is often tediously verbose
 #define FILEMGR     [NSFileManager defaultManager]
 #define DEFAULTS    [NSUserDefaults standardUserDefaults]
 
-// Logging
 #ifdef DEBUG
     #define PLog(...) NSLog(__VA_ARGS__)
 #else
     #define PLog(...)
 #endif
 
-#ifdef DEBUG
-#endif
-
 @import AVFoundation;
 
-@interface Controller()
+static const NSInteger detailsHeight = 310;
+static NSString * const kPrefsPlistPath = @"/Preferences/org.SerhiiHalan.SettingsFastLaunch.plist";
+
+@interface Controller () <UNUserNotificationCenterDelegate>
 {
     IBOutlet NSProgressIndicator *progressBarIndicator;
     IBOutlet NSWindow *FastLaunchWindow;
@@ -55,31 +61,30 @@
     IBOutlet id FoldernameLabel1;
     IBOutlet id FolderLabel2;
     IBOutlet id FoldernameLabel2;
-    
+
     // Menu items
     IBOutlet NSMenuItem *openRecentMenuItem;
     IBOutlet NSMenu *windowMenu;
     IBOutlet NSMenu *fileMenu;
     IBOutlet NSMenu *viewMenu;
-    
+
     NSTextView *outputTextView;
-    
+
     NSTask *task;
-    
-    
+
     NSPipe *inputPipe;
     NSFileHandle *inputWriteFileHandle;
     NSPipe *outputPipe;
     NSFileHandle *outputReadFileHandle;
-    
+
     NSMutableArray <NSString *> *arguments;
     NSArray <NSString *> *interpreterArgs;
     NSString *stdinString;
-    
+
     NSString *interpreterPath;
     NSString *scriptDropPath;
     NSString *scriptStartPath;
-    
+
     BOOL isDroppable;
     BOOL remainRunning;
     BOOL acceptsFiles;
@@ -90,21 +95,24 @@
     BOOL runInBackground;
     BOOL isService;
     BOOL sendsNotifications;
-    
     BOOL acceptAnyDroppedItem;
     BOOL acceptDroppedFolders;
-    
+
     NSImage *statusItemImage;
-    
+
     BOOL isTaskRunning;
     BOOL outputEmpty;
     BOOL hasTaskRun;
     BOOL hasFinishedLaunching;
-    
+
     NSString *remnants;
-    
+
     NSMutableArray <FastLaunchJob *> *jobQueue;
-    
+
+    // Новые поля
+    NSMutableDictionary *settingsCache;
+    BOOL settingsDirty;
+    NSString *tempFolderPath;
 }
 
 @property (unsafe_unretained) IBOutlet NSArrayController *testArray1;
@@ -146,7 +154,7 @@
 @property (retain) IBOutlet NSTextField *UserTextField;
 @property (retain) IBOutlet NSTextField *CustomResolution;
 @property (retain) IBOutlet NSTextField *CustomVBitRate;
-@property (retain) IBOutlet NSTextField *PassTextField;
+@property (retain) IBOutlet NSSecureTextField *PassTextField;
 @property (retain) NSString *SecondsString;
 @property (retain) NSString *SecondsStringOld;
 @property (retain) NSString *ProgressString;
@@ -154,9 +162,25 @@
 @property (retain) NSString *FileString;
 @property (retain) NSString *OnlyString;
 @property (assign) IBOutlet NSView *view;
+
 @end
 
-static const NSInteger detailsHeight = 310;
+#pragma mark - Private helpers (prototypes)
+@interface Controller (Private)
+- (void)loadSettingsIfNeeded;
+- (void)saveSettingsIfNeeded;
+- (void)updateSettingForKey:(NSString *)key value:(id)value;
+- (NSString *)preferencesPlistPath;
+- (void)configureNotificationsIfNeeded;
+- (void)setControlsEnabled:(BOOL)enabled;
+- (void)applyProgressFilterForMode:(NSString *)mode;
+- (void)updateProgressBarWithPercent:(double)percent mode:(NSString *)mode;
+- (NSArray<NSString *> *)safePathsFromOpenPanelURLs:(NSArray<NSURL *> *)urls;
+- (NSArray<NSString *> *)safePathsFromPasteboard:(NSPasteboard *)pboard;
+- (NSString *)cleanedLine:(NSString *)line;
+- (void)handleParsedLine:(NSString *)line;
+- (void)requestKeychainPasswordIfNeeded;
+@end
 
 @implementation Controller
 
@@ -166,104 +190,163 @@ static const NSInteger detailsHeight = 310;
         arguments = [NSMutableArray array];
         outputEmpty = YES;
         jobQueue = [NSMutableArray array];
+        settingsCache = nil;
+        settingsDirty = NO;
+        tempFolderPath = nil;
     }
     return self;
 }
 
 - (void)awakeFromNib {
-    // Load settings from app bundle
     [self loadAppSettings];
-    
-    // Prepare UI
     [self initialiseInterface];
-    
-    // Listen for terminate notification
-    NSString *notificationName = NSTaskDidTerminateNotification;
+
     [[NSNotificationCenter defaultCenter] addObserver:self
                                              selector:@selector(taskFinished:)
-                                                 name:notificationName
+                                                 name:NSTaskDidTerminateNotification
                                                object:nil];
-    
-    // Register as text handling service
-    if (isService) {
-        [NSApp setServicesProvider:self];
-        NSMutableArray *sendTypes = [NSMutableArray array];
-        if (acceptsFiles) {
-            [sendTypes addObject:NSPasteboardTypeFileURL];
-        }
-        [NSApp registerServicesMenuSendTypes:sendTypes returnTypes:@[]];
-    }
-    
-    // User Notification Center
-    if (sendsNotifications) {
-        [[NSUserNotificationCenter defaultUserNotificationCenter] setDelegate:self];
-    }
+
+    [self configureNotificationsIfNeeded];
 }
 
 #pragma mark - App Settings
 
 - (void)loadAppSettings {
-    // Application bundle
     NSBundle *bundle = [NSBundle mainBundle];
-    
-    // Check if /scripts/scriptDrop file exists
     scriptDropPath = [bundle pathForResource:@"/scripts/scriptDrop" ofType:nil];
-    if ([FILEMGR fileExistsAtPath:scriptDropPath] == NO) {
+    if (![FILEMGR fileExistsAtPath:scriptDropPath]) {
         NSLog(@"/scripts/scriptDrop missing from application bundle.");
     }
-    
-    // Check if /scripts/scriptStart file exists
+
     scriptStartPath = [bundle pathForResource:@"/scripts/scriptStart" ofType:nil];
-    if ([FILEMGR fileExistsAtPath:scriptStartPath] == NO) {
+    if (![FILEMGR fileExistsAtPath:scriptStartPath]) {
         NSLog(@"/scripts/scriptStart missing from application bundle.");
     }
 
-    // Make sure scripts is executable and readable
-    NSNumber *permissions = [NSNumber numberWithUnsignedLong:493];
-    NSDictionary *attributes = @{ NSFilePosixPermissions:permissions };
+    NSNumber *permissions = @(0755);
+    NSDictionary *attributes = @{ NSFilePosixPermissions: permissions };
     [FILEMGR setAttributes:attributes ofItemAtPath:scriptDropPath error:nil];
-    if ([FILEMGR isReadableFileAtPath:scriptDropPath] == NO || [FILEMGR isExecutableFileAtPath:scriptDropPath] == NO) {
-        NSLog(@"scriptDrop file is not readable/executable.");
-    }
     [FILEMGR setAttributes:attributes ofItemAtPath:scriptStartPath error:nil];
-    if ([FILEMGR isReadableFileAtPath:scriptStartPath] == NO || [FILEMGR isExecutableFileAtPath:scriptStartPath] == NO) {
-        NSLog(@"scriptStart file is not readable/executable.");
-    }
 
     interpreterPath = @"/bin/sh";
     remainRunning = YES;
     isDroppable = NO;
     promptForFileOnLaunch = NO;
 
-    //  for drop
     acceptsFiles = YES;
     if (acceptsFiles) {
         acceptAnyDroppedItem = YES;
-        isDroppable = TRUE;
-//   acceptDroppedFolders = YES;
+        isDroppable = YES;
+    }
+
+    // Prepare a temporary folder once
+    tempFolderPath = [[NSTemporaryDirectory() stringByAppendingPathComponent:@"FastLaunch"] copy];
+    NSError *dirErr = nil;
+    if (![FILEMGR fileExistsAtPath:tempFolderPath]) {
+        [FILEMGR createDirectoryAtPath:tempFolderPath withIntermediateDirectories:YES attributes:nil error:&dirErr];
+        if (dirErr) {
+            NSLog(@"Temp folder create error: %@", dirErr.localizedDescription);
+        }
     }
 }
 
+#pragma mark - Settings cache
 
+- (NSString *)preferencesPlistPath {
+    NSString *rootPath = [NSSearchPathForDirectoriesInDomains(NSLibraryDirectory, NSUserDomainMask, YES) firstObject];
+    return [rootPath stringByAppendingPathComponent:kPrefsPlistPath];
+}
+
+- (void)loadSettingsIfNeeded {
+    if (settingsCache) { return; }
+    self.plistFileName = [self preferencesPlistPath];
+    NSData *plistData = [NSData dataWithContentsOfFile:self.plistFileName];
+    if (!plistData) {
+        // Creating a default dictionary
+        NSMutableDictionary *root = [NSMutableDictionary dictionary];
+        root[@"VEncoder"] = @"H.264 (x264)";
+        root[@"AEncoder"] = @"aac";
+        root[@"VBitRate"] = @"15000k";
+        root[@"Resolution"] = @"1920x1080";
+        root[@"Preset"] = @"medium";
+        root[@"FrameRate"] = @"25";
+        root[@"AspectRatio"] = @"16:9";
+        root[@"Chroma"] = @"yuv420p";
+        root[@"ABitRate"] = @"192k";
+        root[@"Mode"] = @"Encoding and Server";
+        root[@"Channels"] = @"2";
+        root[@"SampleRate"] = @"48000";
+        root[@"Interlaced"] = @NO;
+        root[@"Wait"] = @NO;
+        root[@"XMLfile"] = @NO;
+        root[@"sr"] = @"";
+        root[@"un"] = @"";
+        root[@"DestinationFolder"] = [self pathForDatafolderDefault1];
+        root[@"MonitoringFolder"] = [self pathForDatafolderDefault2];
+        settingsCache = root;
+        settingsDirty = YES;
+        [self saveSettingsIfNeeded];
+    } else {
+        NSError *error = nil;
+        NSPropertyListFormat format;
+        id plist = [NSPropertyListSerialization propertyListWithData:plistData options:NSPropertyListMutableContainersAndLeaves format:&format error:&error];
+        if (error || ![plist isKindOfClass:[NSDictionary class]]) {
+            NSLog(@"Error reading plist: %@", error.localizedDescription);
+            settingsCache = [NSMutableDictionary dictionary];
+        } else {
+            settingsCache = [(NSDictionary *)plist mutableCopy];
+        }
+    }
+}
+
+- (void)saveSettingsIfNeeded {
+    if (!settingsDirty || !self.plistFileName) { return; }
+    NSError *error = nil;
+    NSData *representation = [NSPropertyListSerialization dataWithPropertyList:settingsCache
+                                                                        format:NSPropertyListBinaryFormat_v1_0
+                                                                       options:0
+                                                                         error:&error];
+    if (!error) {
+        BOOL ok = [representation writeToFile:self.plistFileName atomically:YES];
+        if (!ok) {
+            NSLog(@"Failed to write plist: %@", self.plistFileName);
+        }
+    } else {
+        NSLog(@"Plist serialization error: %@", error.localizedDescription);
+    }
+    settingsDirty = NO;
+}
+
+- (void)updateSettingForKey:(NSString *)key value:(id)value {
+    if (!key) { return; }
+    id current = settingsCache[key];
+    BOOL changed = (current == nil) ? (value != nil) : ![current isEqual:value];
+    if (changed) {
+        if (value) {
+            settingsCache[key] = value;
+        } else {
+            [settingsCache removeObjectForKey:key];
+        }
+        settingsDirty = YES;
+    }
+}
+
+#pragma mark - Temp and folders
 
 - (NSString *) PathForDeleteFile
 {
 NSError *error;
-    NSString *path = @"/private/tmp/img.jpg";
+    NSString *path = @"/private/tmp/img.png";
     if ([[NSFileManager defaultManager] isDeletableFileAtPath:path]) {
     BOOL success = [[NSFileManager defaultManager] removeItemAtPath:path error:&error];
     if (!success) {
         NSLog(@"%@", error.localizedDescription);
     }
  }
-    return @"/private/tmp/img.jpg";
+    return path;
 }
 
-
-
-
-
-// Create a folder and delete the contents of the folder
+// Creating a folder and deleting folder contents
 - (NSString *) pathForDataFile
 {
     BOOL isDir;
@@ -285,690 +368,428 @@ if (![fileManager fileExistsAtPath:folder]) {
                                  error:&error];
 
 }
-     return @"/private/tmp/FastLaunch/";
-}
-
-- (NSString *) pathForDatafolderDefault1
-{
-    NSString *path = [NSSearchPathForDirectoriesInDomains(NSMoviesDirectory, NSUserDomainMask, YES) objectAtIndex:0];
-           NSString *dataPath = [path stringByAppendingPathComponent:@"/FastLaunch output"];
-           NSError *error = nil;
-    if (![[NSFileManager defaultManager] fileExistsAtPath:dataPath]){
-        [[NSFileManager defaultManager] createDirectoryAtPath:dataPath withIntermediateDirectories:NO attributes:nil error:&error]; //Create folder
-    }
-
-    return dataPath;
-}
-
-- (NSString *) pathForDatafolderDefault2
-{
-    NSString *path = [NSSearchPathForDirectoriesInDomains(NSDesktopDirectory, NSUserDomainMask, YES) objectAtIndex:0];
-           NSString *dataPath = [path stringByAppendingPathComponent:@"/FastLaunch input"];
-           NSError *error = nil;
-    if (![[NSFileManager defaultManager] fileExistsAtPath:dataPath]){
-        [[NSFileManager defaultManager] createDirectoryAtPath:dataPath withIntermediateDirectories:NO attributes:nil error:&error]; //Create folder
-    }
-
-    return dataPath;
-}
-
-- (NSString *) pathForDatafolder1
-{
-    BOOL isDir;
-    NSFileManager *fileManager = [NSFileManager defaultManager];
-    NSString *folder = self.Folder1;
-    folder = [folder stringByExpandingTildeInPath];
-    if(![fileManager fileExistsAtPath:folder isDirectory:&isDir]) {
-        if(![fileManager createDirectoryAtPath:folder withIntermediateDirectories:YES attributes:nil error:NULL])
-            NSLog(@"Error: Create folder failed %@",folder);
-    }
      return folder;
 }
 
-- (NSString *) pathForDatafolder2
-{
-    BOOL isDir;
-    NSFileManager *fileManager = [NSFileManager defaultManager];
-    NSString *folder = self.Folder2;
-    folder = [folder stringByExpandingTildeInPath];
-    if(![fileManager fileExistsAtPath:folder isDirectory:&isDir]) {
-        if(![fileManager createDirectoryAtPath:folder withIntermediateDirectories:YES attributes:nil error:NULL])
-            NSLog(@"Error: Create folder failed %@",folder);
+- (NSString *)pathForDatafolderDefault1 {
+    NSString *path = [NSSearchPathForDirectoriesInDomains(NSMoviesDirectory, NSUserDomainMask, YES) firstObject];
+    NSString *dataPath = [path stringByAppendingPathComponent:@"/FastLaunch output"];
+    if (![FILEMGR fileExistsAtPath:dataPath]) {
+        NSError *error = nil;
+        [FILEMGR createDirectoryAtPath:dataPath withIntermediateDirectories:NO attributes:nil error:&error];
+        if (error) NSLog(@"Create default output folder error: %@", error.localizedDescription);
     }
-     return folder;
+    return dataPath;
 }
 
+- (NSString *)pathForDatafolderDefault2 {
+    NSString *path = [NSSearchPathForDirectoriesInDomains(NSDesktopDirectory, NSUserDomainMask, YES) firstObject];
+    NSString *dataPath = [path stringByAppendingPathComponent:@"/FastLaunch input"];
+    if (![FILEMGR fileExistsAtPath:dataPath]) {
+        NSError *error = nil;
+        [FILEMGR createDirectoryAtPath:dataPath withIntermediateDirectories:NO attributes:nil error:&error];
+        if (error) NSLog(@"Create default input folder error: %@", error.localizedDescription);
+    }
+    return dataPath;
+}
+
+- (NSString *)pathForDatafolder1 {
+    NSString *folder = [self.Folder1 stringByExpandingTildeInPath];
+    BOOL isDir = NO;
+    if (![FILEMGR fileExistsAtPath:folder isDirectory:&isDir]) {
+        NSError *error = nil;
+        [FILEMGR createDirectoryAtPath:folder withIntermediateDirectories:YES attributes:nil error:&error];
+        if (error) NSLog(@"Create folder1 error: %@", error.localizedDescription);
+    }
+    return folder;
+}
+
+- (NSString *)pathForDatafolder2 {
+    NSString *folder = [self.Folder2 stringByExpandingTildeInPath];
+    BOOL isDir = NO;
+    if (![FILEMGR fileExistsAtPath:folder isDirectory:&isDir]) {
+        NSError *error = nil;
+        [FILEMGR createDirectoryAtPath:folder withIntermediateDirectories:YES attributes:nil error:&error];
+        if (error) NSLog(@"Create folder2 error: %@", error.localizedDescription);
+    }
+    return folder;
+}
+
+#pragma mark - Notifications
+
+- (void)configureNotificationsIfNeeded {
+    if (!sendsNotifications) { return; }
+    UNUserNotificationCenter *center = [UNUserNotificationCenter currentNotificationCenter];
+    center.delegate = self;
+    [center requestAuthorizationWithOptions:(UNAuthorizationOptionAlert | UNAuthorizationOptionSound | UNAuthorizationOptionBadge)
+                          completionHandler:^(BOOL granted, NSError * _Nullable error) {
+        NSLog(@"Notifications granted: %d, error: %@", granted, error.localizedDescription);
+    }];
+}
+
+// Show banner even if the application is active
+- (void)userNotificationCenter:(UNUserNotificationCenter *)center
+       willPresentNotification:(UNNotification *)notification
+         withCompletionHandler:(void (^)(UNNotificationPresentationOptions options))completionHandler {
+    if (@available(macOS 11.0, *)) {
+        completionHandler(UNNotificationPresentationOptionBanner | UNNotificationPresentationOptionSound | UNNotificationPresentationOptionList);
+    } else {
+        // There are no banners on macOS 10.15 - leave the sound (or 0 if you don't need anything).
+        completionHandler(UNNotificationPresentationOptionSound);
+    }
+}
 
 #pragma mark - App Delegate handlers
 
-
 - (void)applicationDidFinishLaunching:(NSNotification *)aNotification {
-
-    /*if (promptForFileOnLaunch && acceptsFiles && [jobQueue count] == 0) {
-     [self openFiles:self];
-     } else {
-     [self executeScript];
-     }*/
-
     PLog(@"Application did finish launching");
     hasFinishedLaunching = YES;
+
+    // Enable notifications by default (can be replaced with a user setting if necessary)
+    sendsNotifications = YES;
 }
 
+#pragma mark - UI helpers
+
+- (void)setControlsEnabled:(BOOL)enabled {
+    dispatch_async(dispatch_get_main_queue(), ^{
+        [CancelButton setEnabled:YES]; // кнопка всегда активна, меняется только название
+        [savePlist1 setEnabled:enabled];
+        [savePlist1a setEnabled:enabled];
+        [savePlist1b setEnabled:enabled];
+        [FolderPicker1 setEnabled:enabled];
+        [FolderPicker2 setEnabled:enabled];
+    });
+}
+
+- (void)applyProgressFilterForMode:(NSString *)mode {
+    CIFilter *filter = nil;
+    if ([mode isEqualToString:@"RED"]) {
+        filter = [CIFilter filterWithName:@"CIHueAdjust" withInputParameters:@{@"inputAngle" : @8.5}];
+    } else if ([mode isEqualToString:@"BLUE"]) {
+        filter = [CIFilter filterWithName:@"CIHueAdjust" withInputParameters:@{@"inputAngle" : @0}];
+    } else {
+        CIColor *color = [[CIColor alloc] initWithColor:[NSColor colorWithSRGBRed:0.8 green:0.8 blue:0.8 alpha:1]];
+        filter = [CIFilter filterWithName:@"CIColorMonochrome"
+                      withInputParameters:@{@"inputColor" : color, @"inputIntensity" : @1}];
+    }
+    dispatch_async(dispatch_get_main_queue(), ^{
+        progressBarIndicator.contentFilters = filter ? @[filter] : @[];
+    });
+}
+
+- (void)updateProgressBarWithPercent:(double)percent mode:(NSString *)mode {
+    dispatch_async(dispatch_get_main_queue(), ^{
+        [self applyProgressFilterForMode:mode];
+        [progressBarIndicator setIndeterminate:NO];
+        [progressBarIndicator setDoubleValue:percent];
+    });
+}
 
 #pragma mark - Interface actions
 
-
-//Save the plist by adding a key
-- (IBAction)savePlist1:(id)sender
-{
+- (IBAction)savePlist1:(id)sender {
     [ProgressIndicator setHidden:NO];
     [ProgressIndicator startAnimation:self];
-        dispatch_queue_t backgroundQueue = dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0);
-        dispatch_async(backgroundQueue, ^{
-            for (NSUInteger i = 0; i < 1; i++) {
-                [NSThread sleepForTimeInterval:0.8f];
-            dispatch_async(dispatch_get_main_queue(), ^{
-                [ProgressIndicator stopAnimation:self];
-                [ProgressIndicator setHidden:YES];
-            });
-          }
-      });
-                
-    self.ServerKey = [_ServerTextField stringValue];
-    NSLog(@"text changed: %@", self.ServerKey);
-
-    self.UserKey = [_UserTextField stringValue];
-
-    self.PassKey = [_PassTextField stringValue];
-
-    NSString * command = [NSString stringWithFormat:@"/usr/bin/security delete-generic-password -a ${USER} -s postftp 2>/dev/null; \
-    /usr/bin/security add-generic-password -a ${USER} -s postftp -w %@ 2>/dev/null", self.PassKey];
-    NSTask *taskPass = [[NSTask alloc] init];
-    [taskPass setLaunchPath:@"/bin/bash"];
-    [taskPass setArguments:[NSArray arrayWithObjects: @"-c", command, nil]];
-    [taskPass launch];
     
-    NSMutableDictionary *root = [[NSMutableDictionary alloc] initWithContentsOfFile:self.plistFileName];
-    [root setObject:self.ServerKey forKey:@"sr"];
-    [root setObject:self.UserKey forKey:@"un"];
-    [root setObject:self.XMLfileKey forKey:@"XMLfile"];
+    [self loadSettingsIfNeeded];
     
-    NSLog(@"saving data:\n%@", root);
-    NSError *error = nil;
-    NSData *representation = [NSPropertyListSerialization dataWithPropertyList:root format:NSPropertyListBinaryFormat_v1_0 options:0 error:&error];
-    if (!error)
-    {
-        BOOL ok = [representation writeToFile:self.plistFileName atomically:YES];
-        if (ok)
-        {
-            NSLog(@"ok!");
-        }
-        else
-        {
-            NSLog(@"error writing to file: %@", self.plistFileName);
-        }
+    NSString *newServer = ([_ServerTextField stringValue] ? [_ServerTextField stringValue] : @"");
+    NSString *newUser = ([_UserTextField stringValue] ? [_UserTextField stringValue] : @"");
+    NSString *newPass = ([_PassTextField stringValue] ? [_PassTextField stringValue] : @"");
+    
+    // We update the settings cache only when changes occur.
+    [self updateSettingForKey:@"sr" value:newServer];
+    [self updateSettingForKey:@"un" value:newUser];
+    [self updateSettingForKey:@"XMLfile" value:(self.XMLfileKey ? self.XMLfileKey : @NO)];
+    
+    // Keychain: We update only if the password has actually changed.
+    if (![newPass isEqualToString:self.PassKey]) {
+        self.PassKey = newPass;
+        NSString * command = [NSString stringWithFormat:@"/usr/bin/security delete-generic-password -a ${USER} -s postftp >/dev/null 2>&1; \
+        /usr/bin/security add-generic-password -a ${USER} -s postftp -w %@ >/dev/null 2>&1", self.PassKey];
+        NSTask *taskPass = [[NSTask alloc] init];
+        [taskPass setLaunchPath:@"/bin/bash"];
+        [taskPass setArguments:[NSArray arrayWithObjects: @"-c", command, nil]];
+        [taskPass launch];
+        newPass = self.PassKey;
     }
-    else
-    {
-        NSLog(@"error: %@", error);
-    }
+    
+    [self saveSettingsIfNeeded];
+   
+    dispatch_async(dispatch_get_global_queue(QOS_CLASS_USER_INITIATED, 0), ^{
+        [NSThread sleepForTimeInterval:0.8];
+
+        dispatch_async(dispatch_get_main_queue(), ^{
+            [ProgressIndicator stopAnimation:self];
+            [ProgressIndicator setHidden:YES];
+        });
+    });
 }
 
-- (IBAction)savePlist2:(id)sender
-{
+- (IBAction)savePlist2:(id)sender {
     [ProgressIndicatorPreset setHidden:NO];
     [ProgressIndicatorPreset startAnimation:self];
-    dispatch_queue_t backgroundQueue = dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0);
-    dispatch_async(backgroundQueue, ^{
-        for (NSUInteger i = 0; i < 1; i++) {
-            [NSThread sleepForTimeInterval:0.8f];
-            dispatch_async(dispatch_get_main_queue(), ^{
-                [ProgressIndicatorPreset stopAnimation:self];
-                [ProgressIndicatorPreset setHidden:YES];
-            });
-        }
-    });
     
-    [self.testArray7 remove:@{ @"name" : @"yuv420p" }];
-    [self.testArray7 remove:@{ @"name" : @"yuv420p10le" }];
-    [self.testArray7 remove:@{ @"name" : @"yuv422p" }];
-    [self.testArray7 remove:@{ @"name" : @"yuv422p10le" }];
-    [self.testArray7 remove:@{ @"name" : @"yuv444p" }];
-    [self.testArray7 remove:@{ @"name" : @"yuv444p10le" }];
-    [self.testArray7 addObject:@{ @"name" : @"yuv420p" }];
-    [self.testArray7 addObject:@{ @"name" : @"yuv420p10le" }];
-    [self.testArray7 addObject:@{ @"name" : @"yuv422p" }];
-    [self.testArray7 addObject:@{ @"name" : @"yuv422p10le" }];
-    [self.testArray7 addObject:@{ @"name" : @"yuv444p" }];
-    [self.testArray7 addObject:@{ @"name" : @"yuv444p10le" }];
+    [self loadSettingsIfNeeded];
     
-    NSMutableDictionary *root = [[NSMutableDictionary alloc] initWithContentsOfFile:self.plistFileName];
-    [root setObject:_currentlySelectedPort1 forKey:@"VEncoder"];
-    [root setObject:_currentlySelectedPort2 forKey:@"AEncoder"];
-    [root setObject:_currentlySelectedPort3 forKey:@"VBitRate"];
-    [root setObject:_currentlySelectedPort4 forKey:@"Resolution"];
-    [root setObject:_currentlySelectedPort5 forKey:@"Preset"];
-    [root setObject:_currentlySelectedPort6 forKey:@"FrameRate"];
-    [root setObject:_currentlySelectedPort8 forKey:@"ABitRate"];
-    [root setObject:_currentlySelectedPort9 forKey:@"SampleRate"];
-    [root setObject:_currentlySelectedPort10 forKey:@"Mode"];
-    [root setObject:_currentlySelectedPort11 forKey:@"Channels"];
-    [root setObject:_currentlySelectedPort12 forKey:@"AspectRatio"];
-    [root setObject:self.WaitKey forKey:@"Wait"];
-
+    // Refreshing the settings cache
+    [self updateSettingForKey:@"VEncoder" value:_currentlySelectedPort1];
+    [self updateSettingForKey:@"AEncoder" value:_currentlySelectedPort2];
+    [self updateSettingForKey:@"VBitRate" value:_currentlySelectedPort3];
+    [self updateSettingForKey:@"Resolution" value:_currentlySelectedPort4];
+    [self updateSettingForKey:@"Preset" value:_currentlySelectedPort5];
+    [self updateSettingForKey:@"FrameRate" value:_currentlySelectedPort6];
+    [self updateSettingForKey:@"ABitRate" value:_currentlySelectedPort8];
+    [self updateSettingForKey:@"SampleRate" value:_currentlySelectedPort9];
+    [self updateSettingForKey:@"Mode" value:_currentlySelectedPort10];
+    [self updateSettingForKey:@"Channels" value:_currentlySelectedPort11];
+    [self updateSettingForKey:@"AspectRatio" value:_currentlySelectedPort12];
+    [self updateSettingForKey:@"Wait" value:(self.WaitKey ? self.WaitKey : @NO)];
+    
     if ([_currentlySelectedPort1 isEqual:@"H.264 (x264)"]) {
-        [root setObject:self.InterlacedKey forKey:@"Interlaced"];
-        [root setObject:_currentlySelectedPort7 forKey:@"Chroma"];
+        [self updateSettingForKey:@"Interlaced" value:(self.InterlacedKey ? self.InterlacedKey : @"0")];
+        [self updateSettingForKey:@"Chroma" value:_currentlySelectedPort7];
         [Interlaced setEnabled:YES];
         [Preset setEnabled:YES];
-    }
-    else if ([_currentlySelectedPort1 isEqual:@"H.265 (x265)"]) {
+    } else if ([_currentlySelectedPort1 isEqual:@"H.265 (x265)"]) {
         self.InterlacedKey = @"0";
-        [root setObject:self.InterlacedKey forKey:@"Interlaced"];
-        [root setObject:_currentlySelectedPort7 forKey:@"Chroma"];
+        [self updateSettingForKey:@"Interlaced" value:self.InterlacedKey];
+        [self updateSettingForKey:@"Chroma" value:_currentlySelectedPort7];
         [Interlaced setEnabled:NO];
         [Preset setEnabled:YES];
-    }
-    else if ([_currentlySelectedPort1 isEqual:@"H.264 Hardware"]) {
+    } else if ([_currentlySelectedPort1 isEqual:@"H.264 Hardware"]) {
         self.InterlacedKey = @"0";
-        [root setObject:self.InterlacedKey forKey:@"Interlaced"];
+        [self updateSettingForKey:@"Interlaced" value:self.InterlacedKey];
         self.currentlySelectedPort7 = @"yuv420p";
-        [self.testArray7 remove:@{ @"name" : @"yuv420p" }];
-        [self.testArray7 remove:@{ @"name" : @"yuv420p10le" }];
-        [self.testArray7 remove:@{ @"name" : @"yuv422p" }];
-        [self.testArray7 remove:@{ @"name" : @"yuv422p10le" }];
-        [self.testArray7 remove:@{ @"name" : @"yuv444p" }];
-        [self.testArray7 remove:@{ @"name" : @"yuv444p10le" }];
-        [self.testArray7 addObject:@{ @"name" : @"yuv420p" }];
-        [root setObject:_currentlySelectedPort7 forKey:@"Chroma"];
+        [self updateSettingForKey:@"Chroma" value:_currentlySelectedPort7];
         [Interlaced setEnabled:NO];
         [Preset setEnabled:NO];
-    }
-    else if ([_currentlySelectedPort1 isEqual:@"H.265 Hardware"]) {
+    } else if ([_currentlySelectedPort1 isEqual:@"H.265 Hardware"]) {
         if (![_currentlySelectedPort7 isEqual:@"yuv420p"] && ![_currentlySelectedPort7 isEqual:@"yuv420p10le"]) {
             self.currentlySelectedPort7 = @"yuv420p";
         }
-        [self.testArray7 remove:@{ @"name" : @"yuv420p" }];
-        [self.testArray7 remove:@{ @"name" : @"yuv420p10le" }];
-        [self.testArray7 remove:@{ @"name" : @"yuv422p" }];
-        [self.testArray7 remove:@{ @"name" : @"yuv422p10le" }];
-        [self.testArray7 remove:@{ @"name" : @"yuv444p" }];
-        [self.testArray7 remove:@{ @"name" : @"yuv444p10le" }];
-        [self.testArray7 addObject:@{ @"name" : @"yuv420p" }];
-        [self.testArray7 addObject:@{ @"name" : @"yuv420p10le" }];
-        [root setObject:_currentlySelectedPort7 forKey:@"Chroma"];
+        [self updateSettingForKey:@"Chroma" value:_currentlySelectedPort7];
         self.InterlacedKey = @"0";
-        [root setObject:self.InterlacedKey forKey:@"Interlaced"];
+        [self updateSettingForKey:@"Interlaced" value:self.InterlacedKey];
         [Interlaced setEnabled:NO];
         [Preset setEnabled:NO];
     }
-
-    NSLog(@"saving data:\n%@", root);
-    NSError *error = nil;
-    NSData *representation = [NSPropertyListSerialization dataWithPropertyList:root format:NSPropertyListBinaryFormat_v1_0 options:0 error:&error];
-    if (!error)
-    {
-        BOOL ok = [representation writeToFile:self.plistFileName atomically:YES];
-        if (ok)
-        {
-            NSLog(@"ok!");
-        }
-        else
-        {
-            NSLog(@"error writing to file: %@", self.plistFileName);
-        }
-    }
-    else
-    {
-        NSLog(@"error: %@", error);
-    }
+    
+    [self saveSettingsIfNeeded];
+    
+    dispatch_async(dispatch_get_global_queue(QOS_CLASS_USER_INITIATED, 0), ^{
+        [NSThread sleepForTimeInterval:0.8];
+        dispatch_async(dispatch_get_main_queue(), ^{
+            [ProgressIndicatorPreset stopAnimation:self];
+            [ProgressIndicatorPreset setHidden:YES];
+        });
+    });
 }
 
-
 - (IBAction)savePlist3:(id)sender {
-    if ([sender state] == NSControlStateValueOff) {
-        [_CustomResolution setHidden:YES];
-        if (![self.CustomRes isEqual: self.currentlySelectedPort4] && self.CustomRes != nil)
-        {
+    BOOL isOff = ([sender state] == NSControlStateValueOff);
+    [_CustomResolution setHidden:isOff ? YES : NO];
+
+    if (isOff) {
+        if (self.CustomRes != nil && ![self.CustomRes isEqual:self.currentlySelectedPort4]) {
             [ProgressIndicatorPreset setHidden:NO];
             [ProgressIndicatorPreset startAnimation:self];
-            dispatch_queue_t backgroundQueue = dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0);
-            dispatch_async(backgroundQueue, ^{
-                for (NSUInteger i = 0; i < 1; i++) {
-                    [NSThread sleepForTimeInterval:0.8f];
-                    dispatch_async(dispatch_get_main_queue(), ^{
-                        [ProgressIndicatorPreset stopAnimation:self];
-                        [ProgressIndicatorPreset setHidden:YES];
-                    });
-                }
+            dispatch_async(dispatch_get_global_queue(QOS_CLASS_USER_INITIATED, 0), ^{
+                [NSThread sleepForTimeInterval:0.8];
+                dispatch_async(dispatch_get_main_queue(), ^{
+                    [ProgressIndicatorPreset stopAnimation:self];
+                    [ProgressIndicatorPreset setHidden:YES];
+                });
             });
 
-            NSMutableDictionary *root = [[NSMutableDictionary alloc] initWithContentsOfFile:self.plistFileName];
-            [root setObject:self.CustomRes forKey:@"Resolution"];
-            NSError *error = nil;
-            NSLog(@"ok!");
-            NSLog(@"saving data:\n%@", root);
-            NSData *representation = [NSPropertyListSerialization dataWithPropertyList:root format:NSPropertyListBinaryFormat_v1_0 options:0 error:&error];
-            if (!error)
-            {
-                BOOL ok = [representation writeToFile:self.plistFileName atomically:YES];
-                if (ok)
-                {
-                    NSLog(@"ok!");
-                }
-                else
-                {
-                    NSLog(@"error writing to file: %@", self.plistFileName);
-                }
-            }
-            else
-            {
-                NSLog(@"error: %@", error);
-            }
-            
-            NSString *rootPath = [NSSearchPathForDirectoriesInDomains(NSLibraryDirectory, NSUserDomainMask, YES) objectAtIndex:0];
-            NSString *plistPath = [rootPath stringByAppendingPathComponent:@"/Preferences/org.SerhiiHalan.SettingsFastLaunch.plist"];
-            
-            self.plistFileName = plistPath;
-            NSLog(@"plist file path: %@", plistPath);
-            //Получить ключи из плиста
-            NSData *plistData = [NSData dataWithContentsOfFile:self.plistFileName];
-            if (!plistData)
-            {
-                NSLog(@"error reading from file: %@", self.plistFileName);
-            }
-            NSPropertyListFormat format;
-            id plist = [NSPropertyListSerialization propertyListWithData:plistData options:NSPropertyListMutableContainersAndLeaves format:&format error:&error];
-            if (!error)
-            {
-                NSLog(@"loaded data:\n%@", root);
-            }
-            else
-            {
-                NSLog(@"error: %@", error);
-            }
-            _currentlySelectedPort4 = ((void)(@"%@"), [plist objectForKey:@"Resolution"]);
-            [self.testArray4 addObject:@{ @"name" : self.CustomRes }];
-        }
-        else
-         {
+            [self loadSettingsIfNeeded];
+            [self updateSettingForKey:@"Resolution" value:self.CustomRes];
+            [self saveSettingsIfNeeded];
+
+            self.currentlySelectedPort4 = settingsCache[@"Resolution"];
+            [self.testArray4 addObject:@{ @"name" : (self.CustomRes ? self.CustomRes : @"") }];
+        } else {
             NSLog(@"invalid parameters: %@", self.plistFileName);
-          }
         }
-    else {
-        [_CustomResolution setHidden:NO];
-
-        NSString *rootPath = [NSSearchPathForDirectoriesInDomains(NSLibraryDirectory, NSUserDomainMask, YES) objectAtIndex:0];
-        NSString *plistPath = [rootPath stringByAppendingPathComponent:@"/Preferences/org.SerhiiHalan.SettingsFastLaunch.plist"];
-        
-        self.plistFileName = plistPath;
-        NSLog(@"plist file path: %@", plistPath);
-
-        //Получить ключи из плиста
-        NSData *plistData = [NSData dataWithContentsOfFile:self.plistFileName];
-        if (!plistData)
-        {
-            NSLog(@"error reading from file: %@", self.plistFileName);
-        }
-        NSPropertyListFormat format;
-        NSError *error = nil;
-        id plist = [NSPropertyListSerialization propertyListWithData:plistData options:NSPropertyListMutableContainersAndLeaves format:&format error:&error];
-        if (!error)
-        {
-            NSMutableDictionary *root = plist;
-            NSLog(@"loaded data:\n%@", root);
-        }
-        else
-        {
-            NSLog(@"error: %@", error);
-        }
-        _CustomRes = ((void)(@"%@"), [plist objectForKey:@"Resolution"]);
-        self.CustomRes = _CustomRes;
+    } else {
+        [self loadSettingsIfNeeded];
+        self.CustomRes = settingsCache[@"Resolution"];
     }
 }
 
 - (IBAction)savePlist4:(id)sender {
-    if ([sender state] == NSControlStateValueOff) {
-        [_CustomVBitRate setHidden:YES];
-        if (![self.CustomVBit isEqual: self.currentlySelectedPort3] && self.CustomVBit != nil)
-        {
+    BOOL isOff = ([sender state] == NSControlStateValueOff);
+    [_CustomVBitRate setHidden:isOff ? YES : NO];
+
+    if (isOff) {
+        if (self.CustomVBit != nil && ![self.CustomVBit isEqual:self.currentlySelectedPort3]) {
             [ProgressIndicatorPreset setHidden:NO];
             [ProgressIndicatorPreset startAnimation:self];
-            dispatch_queue_t backgroundQueue = dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0);
-            dispatch_async(backgroundQueue, ^{
-                for (NSUInteger i = 0; i < 1; i++) {
-                    [NSThread sleepForTimeInterval:0.8f];
-                    dispatch_async(dispatch_get_main_queue(), ^{
-                        [ProgressIndicatorPreset stopAnimation:self];
-                        [ProgressIndicatorPreset setHidden:YES];
-                    });
-                }
+            dispatch_async(dispatch_get_global_queue(QOS_CLASS_USER_INITIATED, 0), ^{
+                [NSThread sleepForTimeInterval:0.8];
+                dispatch_async(dispatch_get_main_queue(), ^{
+                    [ProgressIndicatorPreset stopAnimation:self];
+                    [ProgressIndicatorPreset setHidden:YES];
+                });
             });
 
-            NSMutableDictionary *root = [[NSMutableDictionary alloc] initWithContentsOfFile:self.plistFileName];
-            [root setObject:self.CustomVBit forKey:@"VBitRate"];
-            NSError *error = nil;
-            NSLog(@"ok!");
-            NSLog(@"saving data:\n%@", root);
-            NSData *representation = [NSPropertyListSerialization dataWithPropertyList:root format:NSPropertyListBinaryFormat_v1_0 options:0 error:&error];
-            if (!error)
-            {
-                BOOL ok = [representation writeToFile:self.plistFileName atomically:YES];
-                if (ok)
-                {
-                    NSLog(@"ok!");
-                }
-                else
-                {
-                    NSLog(@"error writing to file: %@", self.plistFileName);
-                }
-            }
-            else
-            {
-                NSLog(@"error: %@", error);
-            }
-            
-            NSString *rootPath = [NSSearchPathForDirectoriesInDomains(NSLibraryDirectory, NSUserDomainMask, YES) objectAtIndex:0];
-            NSString *plistPath = [rootPath stringByAppendingPathComponent:@"/Preferences/org.SerhiiHalan.SettingsFastLaunch.plist"];
-            
-            self.plistFileName = plistPath;
-            NSLog(@"plist file path: %@", plistPath);
-            //Получить ключи из плиста
-            NSData *plistData = [NSData dataWithContentsOfFile:self.plistFileName];
-            if (!plistData)
-            {
-                NSLog(@"error reading from file: %@", self.plistFileName);
-            }
-            NSPropertyListFormat format;
-            id plist = [NSPropertyListSerialization propertyListWithData:plistData options:NSPropertyListMutableContainersAndLeaves format:&format error:&error];
-            if (!error)
-            {
-                NSLog(@"loaded data:\n%@", root);
-            }
-            else
-            {
-                NSLog(@"error: %@", error);
-            }
-            _currentlySelectedPort3 = ((void)(@"%@"), [plist objectForKey:@"VBitRate"]);
-            [self.testArray3 addObject:@{ @"name" : self.CustomVBit }];
-        }
-        else
-         {
+            [self loadSettingsIfNeeded];
+            [self updateSettingForKey:@"VBitRate" value:self.CustomVBit];
+            [self saveSettingsIfNeeded];
+
+            self.currentlySelectedPort3 = settingsCache[@"VBitRate"];
+            [self.testArray3 addObject:@{ @"name" : (self.CustomVBit ? self.CustomVBit : @"") }];
+        } else {
             NSLog(@"invalid parameters: %@", self.plistFileName);
-          }
         }
-    else {
-        [_CustomVBitRate setHidden:NO];
-
-        NSString *rootPath = [NSSearchPathForDirectoriesInDomains(NSLibraryDirectory, NSUserDomainMask, YES) objectAtIndex:0];
-        NSString *plistPath = [rootPath stringByAppendingPathComponent:@"/Preferences/org.SerhiiHalan.SettingsFastLaunch.plist"];
-        
-        self.plistFileName = plistPath;
-        NSLog(@"plist file path: %@", plistPath);
-
-        //Получить ключи из плиста
-        NSData *plistData = [NSData dataWithContentsOfFile:self.plistFileName];
-        if (!plistData)
-        {
-            NSLog(@"error reading from file: %@", self.plistFileName);
-        }
-        NSPropertyListFormat format;
-        NSError *error = nil;
-        id plist = [NSPropertyListSerialization propertyListWithData:plistData options:NSPropertyListMutableContainersAndLeaves format:&format error:&error];
-        if (!error)
-        {
-            NSMutableDictionary *root = plist;
-            NSLog(@"loaded data:\n%@", root);
-        }
-        else
-        {
-            NSLog(@"error: %@", error);
-        }
-        _CustomVBit = ((void)(@"%@"), [plist objectForKey:@"VBitRate"]);
-        self.CustomVBit = _CustomVBit;
+    } else {
+        [self loadSettingsIfNeeded];
+        self.CustomVBit = settingsCache[@"VBitRate"];
     }
 }
 
-- (IBAction)FolderPicker1:(id)sender{
+- (IBAction)FolderPicker1:(id)sender {
     NSOpenPanel *openPanel = [NSOpenPanel openPanel];
-    [openPanel setCanChooseDirectories:YES];
-    [openPanel setCanCreateDirectories:YES];
-    [openPanel setCanChooseFiles:NO];
-    if ([openPanel runModal] == NSModalResponseOK){
-        NSString *FolderPath = [[openPanel URLs][0] path];
+    openPanel.canChooseDirectories = YES;
+    openPanel.canCreateDirectories = YES;
+    openPanel.canChooseFiles = NO;
+
+    if ([openPanel runModal] == NSModalResponseOK) {
+        NSString *FolderPath = openPanel.URLs.firstObject.path;
         [FoldernameLabel1 setStringValue:FolderPath];
-        NSMutableDictionary *root = [[NSMutableDictionary alloc] initWithContentsOfFile:self.plistFileName];
-        self.Folder1 = [FoldernameLabel1 stringValue];
-        if (![self.Folder1 isEqual: self.Folder2]){
-            [root setObject:self.Folder1 forKey:@"MonitoringFolder"];
+
+        [self loadSettingsIfNeeded];
+        self.Folder1 = FolderPath;
+        if (![self.Folder1 isEqual:self.Folder2]) {
+            [self updateSettingForKey:@"MonitoringFolder" value:(self.Folder1 ? self.Folder1 : @"")];
+        } else {
+            self.Folder1 = settingsCache[@"MonitoringFolder"];
         }
-        else
-        {
-            NSString *rootPath = [NSSearchPathForDirectoriesInDomains(NSLibraryDirectory, NSUserDomainMask, YES) objectAtIndex:0];
-            NSString *plistPath = [rootPath stringByAppendingPathComponent:@"/Preferences/org.SerhiiHalan.SettingsFastLaunch.plist"];
-            self.plistFileName = plistPath;
-            NSLog(@"plist file path: %@", plistPath);
-            //Получить ключи из плиста
-            NSData *plistData = [NSData dataWithContentsOfFile:self.plistFileName];
-            if (!plistData)
-            {
-                NSLog(@"error reading from file: %@", self.plistFileName);
-            }
-            NSPropertyListFormat format;
-            NSError *error = nil;
-            id plist = [NSPropertyListSerialization propertyListWithData:plistData options:NSPropertyListMutableContainersAndLeaves format:&format error:&error];
-            _Folder1 = ((void)(@"%@"), [plist objectForKey:@"MonitoringFolder"]);
-            self.Folder1 = _Folder1;
-        }
-    
-        NSLog(@"saving data:\n%@", root);
-        NSError *error = nil;
-        NSData *representation = [NSPropertyListSerialization dataWithPropertyList:root format:NSPropertyListBinaryFormat_v1_0 options:0 error:&error];
-        if (!error)
-        {
-            BOOL ok = [representation writeToFile:self.plistFileName atomically:YES];
-            if (ok)
-            {
-                NSLog(@"ok!");
-            }
-            else
-            {
-                NSLog(@"error writing to file: %@", self.plistFileName);
-            }
-        }
-        else
-        {
-            NSLog(@"error: %@", error);
-        }
+        [self saveSettingsIfNeeded];
     }
 }
 
-- (IBAction)FolderPicker2:(id)sender{
+- (IBAction)FolderPicker2:(id)sender {
     NSOpenPanel *openPanel = [NSOpenPanel openPanel];
-    [openPanel setCanChooseDirectories:YES];
-    [openPanel setCanCreateDirectories:YES];
-    [openPanel setCanChooseFiles:NO];
-    if ([openPanel runModal] == NSModalResponseOK){
-        NSString *FolderPath = [[openPanel URLs][0] path];
+    openPanel.canChooseDirectories = YES;
+    openPanel.canCreateDirectories = YES;
+    openPanel.canChooseFiles = NO;
+
+    if ([openPanel runModal] == NSModalResponseOK) {
+        NSString *FolderPath = openPanel.URLs.firstObject.path;
         [FoldernameLabel2 setStringValue:FolderPath];
-        NSMutableDictionary *root = [[NSMutableDictionary alloc] initWithContentsOfFile:self.plistFileName];
-        self.Folder2 = [FoldernameLabel2 stringValue];
-        if (![self.Folder1 isEqual: self.Folder2]){
-            [root setObject:self.Folder2 forKey:@"DestinationFolder"];
+
+        [self loadSettingsIfNeeded];
+        self.Folder2 = FolderPath;
+        if (![self.Folder1 isEqual:self.Folder2]) {
+            [self updateSettingForKey:@"DestinationFolder" value:(self.Folder2 ? self.Folder2 : @"")];
+        } else {
+            self.Folder2 = settingsCache[@"DestinationFolder"];
         }
-        else
-        {
-            NSString *rootPath = [NSSearchPathForDirectoriesInDomains(NSLibraryDirectory, NSUserDomainMask, YES) objectAtIndex:0];
-            NSString *plistPath = [rootPath stringByAppendingPathComponent:@"/Preferences/org.SerhiiHalan.SettingsFastLaunch.plist"];
-            self.plistFileName = plistPath;
-            NSLog(@"plist file path: %@", plistPath);
-            //Получить ключи из плиста
-            NSData *plistData = [NSData dataWithContentsOfFile:self.plistFileName];
-            if (!plistData)
-            {
-                NSLog(@"error reading from file: %@", self.plistFileName);
-            }
-            NSPropertyListFormat format;
-            NSError *error = nil;
-            id plist = [NSPropertyListSerialization propertyListWithData:plistData options:NSPropertyListMutableContainersAndLeaves format:&format error:&error];
-            _Folder2 = ((void)(@"%@"), [plist objectForKey:@"DestinationFolder"]);
-            self.Folder2 = _Folder2;
-        }
-            NSLog(@"saving data:\n%@", root);
-        NSError *error = nil;
-        NSData *representation = [NSPropertyListSerialization dataWithPropertyList:root format:NSPropertyListBinaryFormat_v1_0 options:0 error:&error];
-        if (!error)
-        {
-            BOOL ok = [representation writeToFile:self.plistFileName atomically:YES];
-            if (ok)
-            {
-                NSLog(@"ok!");
-            }
-            else
-            {
-                NSLog(@"error writing to file: %@", self.plistFileName);
-            }
-        }
-        else
-        {
-            NSLog(@"error: %@", error);
-        }
+        [self saveSettingsIfNeeded];
     }
 }
 
-// Run open panel, made available to apps that accept files
 - (IBAction)openFiles:(id)sender {
-    
-    // Create open panel
     NSOpenPanel *oPanel = [NSOpenPanel openPanel];
-    [oPanel setAllowsMultipleSelection:YES];
-    [oPanel setCanChooseFiles:YES];
-    [oPanel setCanChooseDirectories:acceptDroppedFolders];
-    
+    oPanel.allowsMultipleSelection = YES;
+    oPanel.canChooseFiles = YES;
+    oPanel.canChooseDirectories = acceptDroppedFolders;
+
     if ([oPanel runModal] == NSModalResponseOK) {
-        // Convert URLs to paths
-        NSMutableArray *filePaths = [NSMutableArray array];
-        for (NSURL *url in [oPanel URLs]) {
-            [filePaths addObject:[url path]];
-        }
-        
+        NSArray<NSString *> *filePaths = [self safePathsFromOpenPanelURLs:oPanel.URLs];
         BOOL success = [self addDroppedFilesJob:filePaths];
-        
         if (!isTaskRunning && success) {
             [self executeScript];
         }
-        
-    } else {
-        // Canceled in open file dialog
-        if (!remainRunning) {
-            [[NSApplication sharedApplication] terminate:self];
-        }
+    } else if (!remainRunning) {
+        [[NSApplication sharedApplication] terminate:self];
     }
 }
 
-// Show / hide the details text field in progress bar2 interface
 - (IBAction)toggleDetails:(id)sender {
-            NSRect winRect = [FastLaunchWindow frame];
-            NSSize minSize = [FastLaunchWindow minSize];
-            NSSize maxSize = [FastLaunchWindow maxSize];
-            
-    if ([sender state] == NSControlStateValueOff) {
-            winRect.origin.y += detailsHeight;
-            winRect.size.height -= detailsHeight;
-            minSize.height -= detailsHeight;
-            maxSize.height -= detailsHeight;
+    NSRect winRect = [FastLaunchWindow frame];
+    NSSize minSize = [FastLaunchWindow minSize];
+    NSSize maxSize = [FastLaunchWindow maxSize];
 
-        }
-        else {
-            winRect.origin.y -= detailsHeight;
-            winRect.size.height += detailsHeight;
-            minSize.height += detailsHeight;
-            maxSize.height += detailsHeight;
-        }
-            
-    [DEFAULTS setBool:([sender state] == NSControlStateValueOn) forKey:@"UserShowDetails"];
-            [FastLaunchWindow setMinSize:minSize];
-            [FastLaunchWindow setMaxSize:maxSize];
-    [FastLaunchWindow setShowsResizeIndicator:([sender state] == NSControlStateValueOn)];
-            [FastLaunchWindow setFrame:winRect display:TRUE animate:TRUE];
+    if ([sender state] == NSControlStateValueOff) {
+        winRect.origin.y += detailsHeight;
+        winRect.size.height -= detailsHeight;
+        minSize.height -= detailsHeight;
+        maxSize.height -= detailsHeight;
+    } else {
+        winRect.origin.y -= detailsHeight;
+        winRect.size.height += detailsHeight;
+        minSize.height += detailsHeight;
+        maxSize.height += detailsHeight;
     }
 
-// Show the details
+    [DEFAULTS setBool:([sender state] == NSControlStateValueOn) forKey:@"UserShowDetails"];
+    [FastLaunchWindow setMinSize:minSize];
+    [FastLaunchWindow setMaxSize:maxSize];
+    [FastLaunchWindow setShowsResizeIndicator:([sender state] == NSControlStateValueOn)];
+    [FastLaunchWindow setFrame:winRect display:YES animate:YES];
+}
+
 - (IBAction)showDetails {
     if ([DetailsTriangle state] == NSControlStateValueOff) {
         [DetailsTriangle performClick:DetailsTriangle];
     }
- }
+}
 
-// Hide the details
 - (IBAction)hideDetails {
     if ([DetailsTriangle state] != NSControlStateValueOff) {
         [DetailsTriangle performClick:DetailsTriangle];
     }
- }
+}
 
 - (BOOL)validateMenuItem:(NSMenuItem *)anItem {
-
     SEL selector = [anItem action];
-    // Open should only work if it's a droppable app that accepts files
     if (acceptsFiles && selector == @selector(openFiles:)) {
         return YES;
     }
-
-    if ([anItem action] == @selector(savePlist2:)) {
+    if ([anItem action] == @selector(savePlist2:) ||
+        [anItem action] == @selector(buttonDonations:) ||
+        [anItem action] == @selector(menuItemSelected:)) {
         return YES;
     }
-    
-    if ([anItem action] == @selector(buttonDonations:)) {
-        return YES;
-    }
-    
-    if ([anItem action] == @selector(menuItemSelected:)) {
-        return YES;
-    }
-    
     return NO;
 }
 
 - (IBAction)cancel:(id)sender {
-    if (task != nil && [task isRunning]) {
+    if (task && [task isRunning]) {
         PLog(@"Task cancelled");
         [task terminate];
         jobQueue = [NSMutableArray array];
     }
-
     if ([[sender title] isEqualToString:@"Quit"]) {
         [[NSApplication sharedApplication] terminate:self];
     }
 }
 
 - (IBAction)buttonClick:(id)sender {
-        if (![task isRunning]) {
+    if (![task isRunning]) {
         [self executeScript1];
         [myImageView setImage:nil];
     }
 }
 
-- (BOOL)userNotificationCenter:(NSUserNotificationCenter *)center shouldPresentNotification:(NSUserNotification *)notification {
-    return sendsNotifications;
-}
+#pragma mark - App open files
 
 - (void)application:(NSApplication *)theApplication openFiles:(NSArray *)filenames {
     PLog(@"Received openFiles event for files: %@", [filenames description]);
-    
-    // Add the dropped files as a job for processing
+
     BOOL success = [self addDroppedFilesJob:filenames];
     [NSApp replyToOpenOrPrint:success ? NSApplicationDelegateReplySuccess : NSApplicationDelegateReplyFailure];
-    
-    // If no other job is running, we execute
+
     if (success && !isTaskRunning && hasFinishedLaunching) {
         [self executeScript];
     }
 }
 
 - (NSApplicationTerminateReply)applicationShouldTerminate:(NSApplication *)sender {
-    // Terminate task
-    if (task != nil) {
+    if (task) {
         if ([task isRunning]) {
             [task terminate];
         }
@@ -979,200 +800,133 @@ if (![fileManager fileExistsAtPath:folder]) {
 
 #pragma mark - Interface manipulation
 
-// Set up any menu items, windows, controls at application launch
 - (void)initialiseInterface {
-    // Insert code here to initialize your application
-    NSString *rootPath = [NSSearchPathForDirectoriesInDomains(NSLibraryDirectory, NSUserDomainMask, YES) objectAtIndex:0];
-    NSString *plistPath = [rootPath stringByAppendingPathComponent:@"/Preferences/org.SerhiiHalan.SettingsFastLaunch.plist"];
-    self.plistFileName = plistPath;
-    NSLog(@"plist file path: %@", plistPath);
-    
-    //If there is no plist, a default one is created
-    NSData *plistTest = [NSData dataWithContentsOfFile:self.plistFileName];
-    if (!plistTest)
-    {
-        NSMutableDictionary *root = [NSMutableDictionary dictionary];
-        [root setObject:@"H.264 (x264)" forKey:@"VEncoder"];
-        [root setObject:@"aac" forKey:@"AEncoder"];
-        [root setObject:@"15000k" forKey:@"VBitRate"];
-        [root setObject:@"1920x1080" forKey:@"Resolution"];
-        [root setObject:@"medium" forKey:@"Preset"];
-        [root setObject:@"25" forKey:@"FrameRate"];
-        [root setObject:@"16:9" forKey:@"AspectRatio"];
-        [root setObject:@"yuv420p" forKey:@"Chroma"];
-        [root setObject:@"192k" forKey:@"ABitRate"];
-        [root setObject:@"Encoding and Server" forKey:@"Mode"];
-        [root setObject:@"2" forKey:@"Channels"];
-        [root setObject:@"48000" forKey:@"SampleRate"];
-        [root setObject:@NO forKey:@"Interlaced"];
-        [root setObject:@NO forKey:@"Wait"];
-        [root setObject:@NO forKey:@"XMLfile"];
-        [root setObject:@"" forKey:@"sr"];
-        [root setObject:@"" forKey:@"un"];
-        [root setObject:self.pathForDatafolderDefault1 forKey:@"DestinationFolder"];
-        [root setObject:self.pathForDatafolderDefault2 forKey:@"MonitoringFolder"];
-        NSLog(@"Default settings saving data:\n%@", root);
-        NSError *error = nil;
-        NSData *representation = [NSPropertyListSerialization dataWithPropertyList:root format:NSPropertyListBinaryFormat_v1_0 options:0 error:&error];
-        [representation writeToFile:self.plistFileName atomically:YES];
-        [self pathForDatafolderDefault1];
-        [self pathForDatafolderDefault2];
-    }
-    
-    //Get the keys from the plist
-    NSData *plistData = [NSData dataWithContentsOfFile:self.plistFileName];
-    if (!plistData)
-    {
-        NSLog(@"error reading from file: %@", self.plistFileName);
-    }
-    NSPropertyListFormat format;
-    NSError *error = nil;
-    id plist = [NSPropertyListSerialization propertyListWithData:plistData options:NSPropertyListMutableContainersAndLeaves format:&format error:&error];
-    if (!error)
-    {
-        NSMutableDictionary *root = plist;
-        NSLog(@"loaded data:\n%@", root);
-    }
-    else
-    {
-        NSLog(@"error: %@", error);
-    }
-    
-    _currentlySelectedPort1 = ((void)(@"%@"), [plist objectForKey:@"VEncoder"]);
+    // Settings
+    [self loadSettingsIfNeeded];
+    self.plistFileName = [self preferencesPlistPath];
+
+    // Binding current values ​​from settings
+    _currentlySelectedPort1 = settingsCache[@"VEncoder"];
     [self.testArray1 addObject:@{ @"name" : @"H.264 (x264)" }];
     [self.testArray1 addObject:@{ @"name" : @"H.264 Hardware" }];
     [self.testArray1 addObject:@{ @"name" : @"H.265 (x265)" }];
     [self.testArray1 addObject:@{ @"name" : @"H.265 Hardware" }];
-    
-    _currentlySelectedPort2 = ((void)(@"%@"), [plist objectForKey:@"AEncoder"]);
+
+    _currentlySelectedPort2 = settingsCache[@"AEncoder"];
     [self.testArray2 addObject:@{ @"name" : @"aac" }];
     [self.testArray2 addObject:@{ @"name" : @"ac3" }];
     [self.testArray2 addObject:@{ @"name" : @"mp3" }];
-    
-    _currentlySelectedPort3 = ((void)(@"%@"), [plist objectForKey:@"VBitRate"]);
-    [self.testArray3 addObject:@{ @"name" : @"Auto" }];
-    [self.testArray3 addObject:@{ @"name" : @"Source" }];
-    [self.testArray3 addObject:@{ @"name" : @"1000k" }];
-    [self.testArray3 addObject:@{ @"name" : @"2000k" }];
-    [self.testArray3 addObject:@{ @"name" : @"3000k" }];
-    [self.testArray3 addObject:@{ @"name" : @"6000k" }];
-    [self.testArray3 addObject:@{ @"name" : @"7000k" }];
-    [self.testArray3 addObject:@{ @"name" : @"8000k" }];
-    [self.testArray3 addObject:@{ @"name" : @"9000k" }];
-    [self.testArray3 addObject:@{ @"name" : @"10000k" }];
-    [self.testArray3 addObject:@{ @"name" : @"11000k" }];
-    [self.testArray3 addObject:@{ @"name" : @"12000k" }];
-    [self.testArray3 addObject:@{ @"name" : @"13000k" }];
-    [self.testArray3 addObject:@{ @"name" : @"14000k" }];
-    [self.testArray3 addObject:@{ @"name" : @"15000k" }];
-    [self.testArray3 addObject:@{ @"name" : @"20000k" }];
-    [self.testArray3 addObject:@{ @"name" : @"25000k" }];
-    [self.testArray3 addObject:@{ @"name" : @"30000k" }];
-    [self.testArray3 addObject:@{ @"name" : @"50000k" }];
-    [self.testArray3 addObject:@{ @"name" : @"70000k" }];
-    [self.testArray3 addObject:@{ @"name" : @"100000k" }];
-    
-    _currentlySelectedPort4 = ((void)(@"%@"), [plist objectForKey:@"Resolution"]);
-    [self.testArray4 addObject:@{ @"name" : @"Source" }];
-    [self.testArray4 addObject:@{ @"name" : @"480x320" }];
-    [self.testArray4 addObject:@{ @"name" : @"640x480" }];
-    [self.testArray4 addObject:@{ @"name" : @"720x480" }];
-    [self.testArray4 addObject:@{ @"name" : @"960x640" }];
-    [self.testArray4 addObject:@{ @"name" : @"1280x720" }];
-    [self.testArray4 addObject:@{ @"name" : @"1920x1080" }];
-    [self.testArray4 addObject:@{ @"name" : @"2560x1440" }];
-    [self.testArray4 addObject:@{ @"name" : @"3840x2160" }];
-    
-    _currentlySelectedPort5 = ((void)(@"%@"), [plist objectForKey:@"Preset"]);
-    [self.testArray5 addObject:@{ @"name" : @"ultrafast" }];
-    [self.testArray5 addObject:@{ @"name" : @"superfast" }];
-    [self.testArray5 addObject:@{ @"name" : @"veryfast" }];
-    [self.testArray5 addObject:@{ @"name" : @"faster" }];
-    [self.testArray5 addObject:@{ @"name" : @"fast" }];
-    [self.testArray5 addObject:@{ @"name" : @"medium" }];
-    [self.testArray5 addObject:@{ @"name" : @"slow" }];
-    [self.testArray5 addObject:@{ @"name" : @"slower" }];
-    
-    _currentlySelectedPort6 = ((void)(@"%@"), [plist objectForKey:@"FrameRate"]);
-    [self.testArray6 addObject:@{ @"name" : @"Source" }];
-    [self.testArray6 addObject:@{ @"name" : @"23.976" }];
-    [self.testArray6 addObject:@{ @"name" : @"24" }];
-    [self.testArray6 addObject:@{ @"name" : @"25" }];
-    [self.testArray6 addObject:@{ @"name" : @"29.97" }];
-    [self.testArray6 addObject:@{ @"name" : @"30" }];
-    [self.testArray6 addObject:@{ @"name" : @"50" }];
-    [self.testArray6 addObject:@{ @"name" : @"59.94" }];
-    [self.testArray6 addObject:@{ @"name" : @"60" }];
-    
-    _currentlySelectedPort7 = ((void)(@"%@"), [plist objectForKey:@"Chroma"]);
-    [self.testArray7 addObject:@{ @"name" : @"yuv420p" }];
-    [self.testArray7 addObject:@{ @"name" : @"yuv420p10le" }];
-    [self.testArray7 addObject:@{ @"name" : @"yuv422p" }];
-    [self.testArray7 addObject:@{ @"name" : @"yuv422p10le" }];
-    [self.testArray7 addObject:@{ @"name" : @"yuv444p" }];
-    [self.testArray7 addObject:@{ @"name" : @"yuv444p10le" }];
-    
-    _currentlySelectedPort8 = ((void)(@"%@"), [plist objectForKey:@"ABitRate"]);
-    [self.testArray8 addObject:@{ @"name" : @"64k" }];
-    [self.testArray8 addObject:@{ @"name" : @"96k" }];
-    [self.testArray8 addObject:@{ @"name" : @"112k" }];
-    [self.testArray8 addObject:@{ @"name" : @"128k" }];
-    [self.testArray8 addObject:@{ @"name" : @"160k" }];
-    [self.testArray8 addObject:@{ @"name" : @"192k" }];
-    [self.testArray8 addObject:@{ @"name" : @"224k" }];
-    [self.testArray8 addObject:@{ @"name" : @"256k" }];
-    [self.testArray8 addObject:@{ @"name" : @"320k" }];
-    [self.testArray8 addObject:@{ @"name" : @"384k" }];
-    [self.testArray8 addObject:@{ @"name" : @"448k" }];
-    
-    _currentlySelectedPort9 = ((void)(@"%@"), [plist objectForKey:@"SampleRate"]);
-    [self.testArray9 addObject:@{ @"name" : @"48000" }];
-    [self.testArray9 addObject:@{ @"name" : @"44100" }];
-    [self.testArray9 addObject:@{ @"name" : @"32000" }];
-    [self.testArray9 addObject:@{ @"name" : @"22050" }];
-    
-    _currentlySelectedPort10 = ((void)(@"%@"), [plist objectForKey:@"Mode"]);
-    [self.testArray10 addObject:@{ @"name" : @"Encoding and Server" }];
-    [self.testArray10 addObject:@{ @"name" : @"Only FTP-server" }];
-    [self.testArray10 addObject:@{ @"name" : @"Only Encoding" }];
-    
-    _currentlySelectedPort11 = ((void)(@"%@"), [plist objectForKey:@"Channels"]);
-    [self.testArray11 addObject:@{ @"name" : @"1" }];
-    [self.testArray11 addObject:@{ @"name" : @"2" }];
-    [self.testArray11 addObject:@{ @"name" : @"4" }];
-    [self.testArray11 addObject:@{ @"name" : @"5" }];
-    [self.testArray11 addObject:@{ @"name" : @"6" }];
-    
-    _currentlySelectedPort12 = ((void)(@"%@"), [plist objectForKey:@"AspectRatio"]);
-    [self.testArray12 addObject:@{ @"name" : @"Source" }];
-    [self.testArray12 addObject:@{ @"name" : @"16:10" }];
-    [self.testArray12 addObject:@{ @"name" : @"16:9" }];
-    [self.testArray12 addObject:@{ @"name" : @"4:3" }];
-    [self.testArray12 addObject:@{ @"name" : @"3:2" }];
-    [self.testArray12 addObject:@{ @"name" : @"5:4" }];
-    [self.testArray12 addObject:@{ @"name" : @"5:3" }];
-    
-    _InterlacedKey = ((void)(@"%@"), [plist objectForKey:@"Interlaced"]);
+
+    _currentlySelectedPort3 = settingsCache[@"VBitRate"];
+    NSArray *bitRates = @[ @"Auto",@"Source",@"1000k",@"2000k",@"3000k",@"6000k",@"7000k",@"8000k",@"9000k",@"10000k",@"11000k",@"12000k",@"13000k",@"14000k",@"15000k",@"20000k",@"25000k",@"30000k",@"50000k",@"70000k",@"100000k" ];
+    for (NSString *b in bitRates) { [self.testArray3 addObject:@{ @"name" : b }]; }
+
+    _currentlySelectedPort4 = settingsCache[@"Resolution"];
+    NSArray *resolutions = @[ @"Source",@"480x320",@"640x480",@"720x480",@"960x640",@"1280x720",@"1920x1080",@"2560x1440",@"3840x2160" ];
+    for (NSString *r in resolutions) { [self.testArray4 addObject:@{ @"name" : r }]; }
+
+    _currentlySelectedPort5 = settingsCache[@"Preset"];
+    NSArray *presets = @[ @"ultrafast",@"superfast",@"veryfast",@"faster",@"fast",@"medium",@"slow",@"slower" ];
+    for (NSString *p in presets) { [self.testArray5 addObject:@{ @"name" : p }]; }
+
+    _currentlySelectedPort6 = settingsCache[@"FrameRate"];
+    NSArray *fps = @[ @"Source",@"23.976",@"24",@"25",@"29.97",@"30",@"50",@"59.94",@"60" ];
+    for (NSString *f in fps) { [self.testArray6 addObject:@{ @"name" : f }]; }
+
+    _currentlySelectedPort7 = settingsCache[@"Chroma"];
+    NSArray *chroma = @[ @"yuv420p",@"yuv420p10le",@"yuv422p",@"yuv422p10le",@"yuv444p",@"yuv444p10le" ];
+    for (NSString *c in chroma) { [self.testArray7 addObject:@{ @"name" : c }]; }
+
+    _currentlySelectedPort8 = settingsCache[@"ABitRate"];
+    NSArray *ab = @[ @"64k",@"96k",@"112k",@"128k",@"160k",@"192k",@"224k",@"256k",@"320k",@"384k",@"448k" ];
+    for (NSString *a in ab) { [self.testArray8 addObject:@{ @"name" : a }]; }
+
+    _currentlySelectedPort9 = settingsCache[@"SampleRate"];
+    NSArray *sr = @[ @"48000",@"44100",@"32000",@"22050" ];
+    for (NSString *s in sr) { [self.testArray9 addObject:@{ @"name" : s }]; }
+
+    _currentlySelectedPort10 = settingsCache[@"Mode"];
+    NSArray *modes = @[ @"Encoding and Server",@"Only FTP-server",@"Only Encoding" ];
+    for (NSString *m in modes) { [self.testArray10 addObject:@{ @"name" : m }]; }
+
+    _currentlySelectedPort11 = settingsCache[@"Channels"];
+    NSArray *channels = @[ @"1",@"2",@"4",@"5",@"6" ];
+    for (NSString *ch in channels) { [self.testArray11 addObject:@{ @"name" : ch }]; }
+
+    _currentlySelectedPort12 = settingsCache[@"AspectRatio"];
+    NSArray *aspects = @[ @"Source",@"16:10",@"16:9",@"4:3",@"3:2",@"5:4",@"5:3" ];
+    for (NSString *ar in aspects) { [self.testArray12 addObject:@{ @"name" : ar }]; }
+
+    _InterlacedKey = settingsCache[@"Interlaced"];
     self.InterlacedKey = _InterlacedKey;
-    
-    _WaitKey = ((void)(@"%@"), [plist objectForKey:@"Wait"]);
+
+    _WaitKey = settingsCache[@"Wait"];
     self.WaitKey = _WaitKey;
-    
-    _XMLfileKey = ((void)(@"%@"), [plist objectForKey:@"XMLfile"]);
+
+    _XMLfileKey = settingsCache[@"XMLfile"];
     self.XMLfileKey = _XMLfileKey;
-    
-    _ServerKey = ((void)(@"%@"), [plist objectForKey:@"sr"]);
+
+    _ServerKey = settingsCache[@"sr"];
     self.ServerKey = _ServerKey;
-    
-    _UserKey = ((void)(@"%@"), [plist objectForKey:@"un"]);
+
+    _UserKey = settingsCache[@"un"];
     self.UserKey = _UserKey;
-    
-    _Folder1 = ((void)(@"%@"), [plist objectForKey:@"MonitoringFolder"]);
+
+    _Folder1 = settingsCache[@"MonitoringFolder"];
     self.Folder1 = _Folder1;
-    
-    _Folder2 = ((void)(@"%@"), [plist objectForKey:@"DestinationFolder"]);
+
+    _Folder2 = settingsCache[@"DestinationFolder"];
     self.Folder2 = _Folder2;
-    
+
+    [self requestKeychainPasswordIfNeeded];
+
+    [self PathForDeleteFile];
+    [self pathForDataFile];
+    [self pathForDatafolder1];
+    [self pathForDatafolder2];
+
+    // Default progress bar color
+    [self applyProgressFilterForMode:@"GREY"];
+    [progressBarIndicator setDoubleValue:0];
+
+    if ([_currentlySelectedPort1 isEqual:@"H.265 (x265)"]) {
+        [Interlaced setEnabled:NO];
+    } else if ([_currentlySelectedPort1 isEqual:@"H.264 Hardware"]) {
+        [Interlaced setEnabled:NO];
+        [Preset setEnabled:NO];
+    } else if ([_currentlySelectedPort1 isEqual:@"H.265 Hardware"]) {
+        [Interlaced setEnabled:NO];
+        [Preset setEnabled:NO];
+    }
+
+    [openRecentMenuItem setEnabled:acceptsFiles];
+    if (!acceptsFiles) {
+        [fileMenu removeItemAtIndex:0];
+        [fileMenu removeItemAtIndex:0];
+        [fileMenu removeItemAtIndex:0];
+    }
+
+    if (runInBackground) {
+        [[NSApplication sharedApplication] activateIgnoringOtherApps:YES];
+    }
+
+    if (isDroppable) {
+        [FastLaunchWindow registerForDraggedTypes:@[NSPasteboardTypeFileURL, NSPasteboardTypeString]];
+    }
+
+    if ([DEFAULTS boolForKey:@"UserShowDetails"]) {
+        NSRect frame = [FastLaunchWindow frame];
+        frame.origin.y += detailsHeight;
+        [FastLaunchWindow setFrame:frame display:NO];
+        [self showDetails];
+    }
+
+    [FastLaunchWindow makeKeyAndOrderFront:self];
+}
+
+- (void)requestKeychainPasswordIfNeeded {
+    // Read from Keychain only once at startup
+    if (self.PassKey.length > 0) { return; }
     NSTask *taskPass = [[NSTask alloc] init];
     [taskPass setLaunchPath:@"/bin/bash"];
     [taskPass setArguments:[NSArray arrayWithObjects: @"-c", @"/usr/bin/security find-generic-password -a ${USER} -s postftp -w | tr -d '\n' 2>/dev/null", nil]];
@@ -1188,300 +942,155 @@ if (![fileManager fileExistsAtPath:folder]) {
     _PassKey = [[NSString alloc] initWithData: data encoding: NSUTF8StringEncoding];
     //  NSLog(@"%@",_PassKey);
     self.PassKey = _PassKey;
-    [self PathForDeleteFile];
-    [self pathForDataFile];
-    [self pathForDatafolder1];
-    [self pathForDatafolder2];
-
-    // Create color:
-    CIColor *color = [[CIColor alloc] initWithColor:[NSColor colorWithSRGBRed:0.8 green:0.8 blue:0.8 alpha:1]];
-    // Create filter:ProgressBar
-    CIFilter *colorFilter = [CIFilter filterWithName:@"CIColorMonochrome"
-                                withInputParameters:@{@"inputColor" : color,
-                                                      @"inputIntensity" : @1}];
-    // Assign to ProgressBar
-    progressBarIndicator.contentFilters = @[colorFilter];
-    
-    if ([_currentlySelectedPort1 isEqual:@"H.265 (x265)"]) {
-        [Interlaced setEnabled:NO];
-    }
-    else if ([_currentlySelectedPort1 isEqual:@"H.264 Hardware"]) {
-        [self.testArray7 remove:@{ @"name" : @"yuv420p" }];
-        [self.testArray7 remove:@{ @"name" : @"yuv420p10le" }];
-        [self.testArray7 remove:@{ @"name" : @"yuv422p" }];
-        [self.testArray7 remove:@{ @"name" : @"yuv422p10le" }];
-        [self.testArray7 remove:@{ @"name" : @"yuv444p" }];
-        [self.testArray7 remove:@{ @"name" : @"yuv444p10le" }];
-        [self.testArray7 addObject:@{ @"name" : @"yuv420p" }];
-        [Interlaced setEnabled:NO];
-        [Preset setEnabled:NO];
-    }
-    else if ([_currentlySelectedPort1 isEqual:@"H.265 Hardware"]) {
-        [self.testArray7 remove:@{ @"name" : @"yuv420p" }];
-        [self.testArray7 remove:@{ @"name" : @"yuv420p10le" }];
-        [self.testArray7 remove:@{ @"name" : @"yuv422p" }];
-        [self.testArray7 remove:@{ @"name" : @"yuv422p10le" }];
-        [self.testArray7 remove:@{ @"name" : @"yuv444p" }];
-        [self.testArray7 remove:@{ @"name" : @"yuv444p10le" }];
-        [self.testArray7 addObject:@{ @"name" : @"yuv420p" }];
-        [self.testArray7 addObject:@{ @"name" : @"yuv420p10le" }];
-        [Interlaced setEnabled:NO];
-        [Preset setEnabled:NO];
-    }
-    
-    [openRecentMenuItem setEnabled:acceptsFiles];
-    if (!acceptsFiles) {
-        [fileMenu removeItemAtIndex:0]; // Open
-        [fileMenu removeItemAtIndex:0]; // Open Recent..
-        [fileMenu removeItemAtIndex:0]; // Separator
-    }
-
-    // Script output will be dumped in outputTextView
-    // By default this is the Text Window text view
-
-    if (runInBackground == TRUE) {
-        // Old Carbon way
-        [[NSApplication sharedApplication] activateIgnoringOtherApps:YES];
-    }
-    
-                if (isDroppable) {
-                    [FastLaunchWindow registerForDraggedTypes:@[NSPasteboardTypeFileURL, NSPasteboardTypeString]];
-                }
-                
-                if ([DEFAULTS boolForKey:@"UserShowDetails"]) {
-                    NSRect frame = [FastLaunchWindow frame];
-                    frame.origin.y += detailsHeight;
-                    [FastLaunchWindow setFrame:frame display:NO];
-                   [self showDetails];
-               }
-                
-                [FastLaunchWindow makeKeyAndOrderFront:self];
 }
 
-// Prepare all the controls, windows, etc prior to executing script
 - (void)prepareInterfaceForExecution {
-    [outputTextView setString:@""];
-    // Yes, yes, this is a nasty hack. But styling in NSTextViews
-    // doesn't get applied when appending text unless there is already
-    // some text in the view. The alternative is to make very expensive
-    // calls to [textStorage setAttributes:] for all appended output,
-    // which freezes up the app when lots of text is dumped by the script
-    [outputTextView setString:@"\u200B"]; // zero-width space character
-    
-    [CancelButton setTitle:@"Cancel"];
-    [savePlist1 setEnabled:NO];
-    [savePlist1a setEnabled:NO];
-    [savePlist1b setEnabled:NO];
-    [FolderPicker1 setEnabled:NO];
-    [FolderPicker2 setEnabled:NO];
-    [[DockProgressBarRed sharedDockProgressBarRed] clearRed];
-    [myImageView setImage:nil];
-    self.FileString = nil;
-    self.SecondsString = nil;
-    self.OnlyString = nil;
-    // Create color:
-    CIColor *color = [[CIColor alloc] initWithColor:[NSColor colorWithSRGBRed:0.8 green:0.8 blue:0.8 alpha:1]];
-    // Create filter:ProgressBar
-    CIFilter *colorFilter = [CIFilter filterWithName:@"CIColorMonochrome"
-                                withInputParameters:@{@"inputColor" : color,
-                                                      @"inputIntensity" : @1}];
-    // Assign to ProgressBar
-    progressBarIndicator.contentFilters = @[colorFilter];
-    [progressBarIndicator setDoubleValue:0];
+    dispatch_async(dispatch_get_main_queue(), ^{
+        [outputTextView setString:@"\u200B"];
+        [CancelButton setTitle:@"Cancel"];
+        [self setControlsEnabled:NO];
+        [[DockProgressBarRed sharedDockProgressBarRed] clearRed];
+        [myImageView setImage:nil];
+        self.FileString = nil;
+        self.SecondsString = nil;
+        self.OnlyString = nil;
+        [self applyProgressFilterForMode:@"GREY"];
+        [progressBarIndicator setDoubleValue:0];
+    });
 }
 
-// Adjust controls, windows, etc. once script is done executing
 - (void)cleanupInterface {
-
-    [CancelButton setTitle:@"Quit"];
-    [CancelButton setEnabled:YES];
-    [savePlist1 setEnabled:YES];
-    [savePlist1a setEnabled:YES];
-    [savePlist1b setEnabled:YES];
-    [FolderPicker1 setEnabled:YES];
-    [FolderPicker2 setEnabled:YES];
+    dispatch_async(dispatch_get_main_queue(), ^{
+        [CancelButton setTitle:@"Quit"];
+        [self setControlsEnabled:YES];
+    });
 }
 
 #pragma mark - Task
 
-// Construct arguments list etc. before actually running the script
-
 - (void)prepareForExecution {
-    
-    // Clear arguments list and reconstruct it
     [arguments removeAllObjects];
-    
-    // First, add all specified arguments for interpreter
-    [arguments addObjectsFromArray:interpreterArgs];
-    
-    // Add script as argument to interpreter, if it exists
+    [arguments addObjectsFromArray:(interpreterArgs ? interpreterArgs : @[])];
+
     if (![FILEMGR fileExistsAtPath:scriptDropPath]) {
         NSLog(@"Script missing at execution path %@", scriptDropPath);
     }
     [arguments addObject:scriptDropPath];
-    
-    // Finally, dequeue job and add arguments
-    if ([jobQueue count] > 0) {
-        FastLaunchJob *job = jobQueue[0];
 
-        // We have files in the queue, to append as arguments
-        // We take the first job's arguments and put them into the arg list
-        if ([job arguments]) {
-            [arguments addObjectsFromArray:[job arguments]];
+    if (jobQueue.count > 0) {
+        FastLaunchJob *job = jobQueue.firstObject;
+        if (job.arguments) {
+            [arguments addObjectsFromArray:job.arguments];
         }
-        stdinString = [[job standardInputString] copy];
-        
+        stdinString = [job.standardInputString copy];
         [jobQueue removeObjectAtIndex:0];
     }
 }
 
 - (void)prepareForExecution1 {
-    
-    // Clear arguments list and reconstruct it
     [arguments removeAllObjects];
-    
-    // First, add all specified arguments for interpreter
-    [arguments addObjectsFromArray:interpreterArgs];
+    [arguments addObjectsFromArray:(interpreterArgs ? interpreterArgs : @[])];
 
-    // Add script1 as argument to interpreter, if it exists
     if (![FILEMGR fileExistsAtPath:scriptStartPath]) {
         NSLog(@"Script missing at execution path %@", scriptStartPath);
     }
     [arguments addObject:scriptStartPath];
 }
 
-
 - (void)executeScript {
     hasTaskRun = YES;
-    
-    // Never execute script if there is one running
-    if (isTaskRunning) {
-        return;
-    }
+    if (isTaskRunning) { return; }
     outputEmpty = NO;
-    
+
     [self prepareForExecution];
     [self prepareInterfaceForExecution];
-    
+
     isTaskRunning = YES;
-    
-    // Run the task
-        [self executeScriptWithoutPrivileges];
+    [self executeScriptWithoutPrivileges];
 }
 
 - (void)executeScript1 {
     hasTaskRun = YES;
-    
-    // Never execute script1 if there is one running
-    if (isTaskRunning) {
-        return;
-    }
+    if (isTaskRunning) { return; }
     outputEmpty = NO;
-    
+
     [self prepareForExecution1];
     [self prepareInterfaceForExecution];
-    
+
     isTaskRunning = YES;
-    
-    // Run the task
-        [self executeScriptWithoutPrivileges];
+    [self executeScriptWithoutPrivileges];
 }
 
-
-// Launch regular user-privileged process using NSTask
 - (void)executeScriptWithoutPrivileges {
-
-    // Create task and apply settings
     task = [[NSTask alloc] init];
     [task setLaunchPath:interpreterPath];
     [task setCurrentDirectoryPath:[[NSBundle mainBundle] resourcePath]];
     [task setArguments:arguments];
-    
-    // Direct output to file handle and start monitoring it if script provides feedback
+
     outputPipe = [NSPipe pipe];
     [task setStandardOutput:outputPipe];
     [task setStandardError:outputPipe];
     outputReadFileHandle = [outputPipe fileHandleForReading];
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(gotOutputData:) name:NSFileHandleReadCompletionNotification object:outputReadFileHandle];
     [outputReadFileHandle readInBackgroundAndNotify];
-    
-    // Set up stdin for writing
+
     inputPipe = [NSPipe pipe];
     [task setStandardInput:inputPipe];
     inputWriteFileHandle = [[task standardInput] fileHandleForWriting];
-    
-    // Set it off
-    //PLog(@"Running task\n%@", [task humanDescription]);
+
     [task launch];
-    
-    // Write input, if any, to stdin, and then close
+
     if (stdinString) {
         [inputWriteFileHandle writeData:[stdinString dataUsingEncoding:NSUTF8StringEncoding]];
     }
     [inputWriteFileHandle closeFile];
-    stdinString = nil;    
+    stdinString = nil;
 }
-
 
 #pragma mark - Task completion
 
-// OK, called when we receive notification that task is finished
-// Some cleaning up to do, controls need to be adjusted, etc.
 - (void)taskFinished:(NSNotification *)aNotification {
     isTaskRunning = NO;
     PLog(@"Task finished");
-    
-    // Did we receive all the data?
-    // If no data left, we do clean up
+
     if (outputEmpty) {
         [self cleanup];
     }
-    
-    // If there are more jobs waiting for us, execute
-    if ([jobQueue count] > 0 /*&& remainRunning*/) {
+    if (jobQueue.count > 0) {
         [self executeScript];
     }
 }
 
 - (void)cleanup {
-    if (isTaskRunning) {
-        return;
-    }
-    // Stop observing the filehandle for data since task is done
+    if (isTaskRunning) { return; }
+
     [[NSNotificationCenter defaultCenter] removeObserver:self
                                                     name:NSFileHandleReadCompletionNotification
                                                   object:outputReadFileHandle];
-    
-    // We make sure to clear the filehandle of any remaining data
-    if (outputReadFileHandle != nil) {
+
+    if (outputReadFileHandle) {
         NSData *data;
-        while ((data = [outputReadFileHandle availableData]) && [data length]) {
+        while ((data = [outputReadFileHandle availableData]) && data.length) {
             [self parseOutput:data];
         }
+        [outputReadFileHandle closeFile];
+        outputReadFileHandle = nil;
     }
-    
-    // Now, reset all controls etc., general cleanup since task is done
+
     [self cleanupInterface];
+    isService = YES;
 }
 
-#pragma mark - Output
+#pragma mark - Output parsing
 
-// Read from the file handle and append it to the text window
 - (void)gotOutputData:(NSNotification *)aNotification {
-    // Get the data from notification
-    NSData *data = [aNotification userInfo][NSFileHandleNotificationDataItem];
-    
-    // Make sure there's actual data
-    if ([data length]) {
+    NSData *data = aNotification.userInfo[NSFileHandleNotificationDataItem];
+
+    if (data.length) {
         outputEmpty = NO;
-        
-        // Append the output to the text field
         [self parseOutput:data];
-        
-        // We schedule the file handle to go and read more data in the background again.
         [[aNotification object] readInBackgroundAndNotify];
-    }
-    else {
+    } else {
         PLog(@"Output empty");
         outputEmpty = YES;
         if (!isTaskRunning) {
@@ -1493,332 +1102,296 @@ if (![fileManager fileExistsAtPath:folder]) {
     }
 }
 
+- (NSString *)cleanedLine:(NSString *)line {
+    if (!line) return @"";
+    NSString *trimmed = [line stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]];
+    // Remove leading control characters
+    while (trimmed.length > 0) {
+        unichar c = [trimmed characterAtIndex:0];
+        if ([[NSCharacterSet controlCharacterSet] characterIsMember:c]) {
+            trimmed = [trimmed substringFromIndex:1];
+        } else {
+            break;
+        }
+    }
+    return trimmed;
+}
 
-- (void)parseOutput:(NSData *)data {
-    // Create string from output data
-    NSMutableString *outputString = [[NSMutableString alloc] initWithData:data encoding:NSUTF8StringEncoding];
-    
-    if (![_SecondsString isEqual: _SecondsStringOld] && ![_FileString  isEqual: @""]) {
-        [self videoSlides];
-    } else{
-        NSLog(@"Skip image building");
-    }
-    _SecondsStringOld = _SecondsString;
-    
-    if (![_ProgressString isEqual: _ProgressStringOld] && ![_ProgressString isEqual: @""]) {
-        [self progressBarProgram];
-    } else{
-        NSLog(@"Skip Progress");
-    }
-    _ProgressStringOld = _ProgressString;
-    
-    if (outputString == nil) {
-        PLog(@"Warning: Output string is nil");
+- (void)handleParsedLine:(NSString *)theLine {
+    NSString *line = [self cleanedLine:theLine];
+    if (line.length == 0) { return; }
+
+    // NOTIFICATION:
+    NSRange notifRange = [line rangeOfString:@"NOTIFICATION:"];
+    if (notifRange.location != NSNotFound) {
+        NSString *notificationString = @"";
+        NSUInteger start = notifRange.location + notifRange.length;
+        if (start < line.length) {
+            notificationString = [[theLine substringFromIndex:start] stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]];
+        }
+        [self showNotification:notificationString];
         return;
     }
-    
-    PLog(@"Output:%@", outputString);
-    
-    if (remnants) {
-        [outputString insertString:remnants atIndex:0];
-    }
-    
-    // Parse line by line
-    NSMutableArray *lines = [[outputString componentsSeparatedByString:@"\n"] mutableCopy];
-    
-    // If the string did not end with a newline, it wasn't a complete line of output
-    // Thus, we store this last non-newline-terminated string
-    // It'll be prepended next time we get output
-    if ([[lines lastObject] length] > 0) { // Output didn't end with a newline
-        remnants = [lines lastObject];
-    } else {
-        remnants = nil;
-    }
-    
-    [lines removeLastObject];
-    
-    // Parse output looking for commands; if none, append line to output text field
-    for (NSString *theLine in lines) {
-        
-        
-        //        if ([theLine length] == 0) {
-        //            [self appendString:@""];
-        //            continue;
-        //        }
-        
-        
-        if ([theLine hasPrefix:@"NOTIFICATION:"]) {
-            NSString *notificationString = [theLine substringFromIndex:13];
-            [self showNotification:notificationString];
-            continue;
-        }
-        
-        
-        if ([theLine hasPrefix:@"Name:"]) {
-            NSString *NameString = [theLine substringFromIndex:5];
-            if ([NameString hasSuffix:@"%"]) {
-                NameString = [NameString substringToIndex:[NameString length]-1];
-            }
+
+    if ([line hasPrefix:@"Name:"]) {
+        NSString *NameString = [[theLine substringFromIndex:5] stringByTrimmingCharactersInSet:NSCharacterSet.newlineCharacterSet];
+        dispatch_async(dispatch_get_main_queue(), ^{
             [MessageTextFieldName setStringValue:NameString];
-            continue;
-        }
-        
-        
-        if ([theLine hasPrefix:@"ONLY:"]) {
-            NSString *OnlyString = [theLine substringFromIndex:5];
-            if ([OnlyString hasSuffix:@"%"]) {
-                OnlyString = [OnlyString substringToIndex:[OnlyString length]-1];
-            }
-            self.OnlyString = OnlyString;
-            continue;
-        }
-        
-        
-        if ([theLine hasPrefix:@"Progress:"]) {
-            NSString *ProgressString = [theLine substringFromIndex:9];
-            if ([ProgressString hasSuffix:@"%"]) {
-                ProgressString = [ProgressString substringToIndex:[ProgressString length]-1];
-            }
+        });
+        return;
+    }
+
+    if ([line hasPrefix:@"ONLY:"]) {
+        self.OnlyString = [[theLine substringFromIndex:5] stringByTrimmingCharactersInSet:NSCharacterSet.whitespaceCharacterSet];
+        return;
+    }
+
+    if ([line hasPrefix:@"Progress:"]) {
+        NSString *ProgressString = [[theLine substringFromIndex:9] stringByTrimmingCharactersInSet:NSCharacterSet.whitespaceCharacterSet];
+        dispatch_async(dispatch_get_main_queue(), ^{
             [MessageTextFieldProgress setStringValue:ProgressString];
-            self.ProgressString = ProgressString;
-            continue;
-        }
-        
-        
-        if ([theLine hasPrefix:@"FPS:"]) {
-            NSString *FPSString = [theLine substringFromIndex:4];
-            if ([FPSString hasSuffix:@"%"]) {
-                FPSString = [FPSString substringToIndex:[FPSString length]-1];
-            }
+        });
+        self.ProgressString = ProgressString;
+        return;
+    }
+
+    if ([line hasPrefix:@"FPS:"]) {
+        NSString *FPSString = [[theLine substringFromIndex:4] stringByTrimmingCharactersInSet:NSCharacterSet.newlineCharacterSet];
+        dispatch_async(dispatch_get_main_queue(), ^{
             [MessageTextFieldFPS setStringValue:FPSString];
-            continue;
-        }
-        
-        
-        if ([theLine hasPrefix:@"Size:"]) {
-            NSString *SizeString = [theLine substringFromIndex:5];
-            if ([SizeString hasSuffix:@"%"]) {
-                SizeString = [SizeString substringToIndex:[SizeString length]-1];
-            }
+        });
+        return;
+    }
+
+    if ([line hasPrefix:@"Size:"]) {
+        NSString *SizeString = [[theLine substringFromIndex:5] stringByTrimmingCharactersInSet:NSCharacterSet.newlineCharacterSet];
+        dispatch_async(dispatch_get_main_queue(), ^{
             [MessageTextFieldSize setStringValue:SizeString];
-            continue;
-        }
-        
-        
-        if ([theLine hasPrefix:@"Duration:"]) {
-            NSString *DurationString = [theLine substringFromIndex:9];
-            if ([DurationString hasSuffix:@"%"]) {
-                DurationString = [DurationString substringToIndex:[DurationString length]-1];
-            }
+        });
+        return;
+    }
+
+    if ([line hasPrefix:@"Duration:"]) {
+        NSString *DurationString = [[theLine substringFromIndex:9] stringByTrimmingCharactersInSet:NSCharacterSet.newlineCharacterSet];
+        dispatch_async(dispatch_get_main_queue(), ^{
             [MessageTextFieldDuration setStringValue:DurationString];
-            continue;
-        }
-        
-        
-        if ([theLine hasPrefix:@"Time:"]) {
-            NSString *TimeString = [theLine substringFromIndex:5];
-            if ([TimeString hasSuffix:@"%"]) {
-                TimeString = [TimeString substringToIndex:[TimeString length]-1];
-            }
+        });
+        return;
+    }
+
+    if ([line hasPrefix:@"Time:"]) {
+        NSString *TimeString = [[theLine substringFromIndex:5] stringByTrimmingCharactersInSet:NSCharacterSet.newlineCharacterSet];
+        dispatch_async(dispatch_get_main_queue(), ^{
             [MessageTextFieldTime setStringValue:TimeString];
-            continue;
-        }
-        
-        
-        if ([theLine hasPrefix:@"Speed:"]) {
-            NSString *SpeedString = [theLine substringFromIndex:6];
-            if ([SpeedString hasSuffix:@"%"]) {
-                SpeedString = [SpeedString substringToIndex:[SpeedString length]-1];
-            }
+        });
+        return;
+    }
+
+    if ([line hasPrefix:@"Speed:"]) {
+        NSString *SpeedString = [[theLine substringFromIndex:6] stringByTrimmingCharactersInSet:NSCharacterSet.newlineCharacterSet];
+        dispatch_async(dispatch_get_main_queue(), ^{
             [MessageTextFieldSpeed setStringValue:SpeedString];
-            continue;
-        }
-        
-        
-        if ([theLine hasPrefix:@"Media:"]) {
-            NSString *MediaString = [theLine substringFromIndex:6];
-            if ([MediaString hasSuffix:@"%"]) {
-                MediaString = [MediaString substringToIndex:[MediaString length]-1];
-            }
+        });
+        return;
+    }
+
+    if ([line hasPrefix:@"Media:"]) {
+        NSString *MediaString = [[theLine substringFromIndex:6] stringByTrimmingCharactersInSet:NSCharacterSet.newlineCharacterSet];
+        dispatch_async(dispatch_get_main_queue(), ^{
             [MessageTextFieldMediaInfo setStringValue:MediaString];
-            continue;
-        }
-        
-        
-        if ([theLine hasPrefix:@"Files:"]) {
-            NSString *FileString = [theLine substringFromIndex:6];
-            if ([FileString hasSuffix:@"%"]) {
-                FileString = [FileString substringToIndex:[FileString length]-1];
-            }
-            self.FileString = FileString;
-            continue;
-        }
-        
-        
-        if ([theLine hasPrefix:@"Seconds:"]) {
-            NSString *SecondsString = [theLine substringFromIndex:8];
-            if ([SecondsString hasSuffix:@"%"]) {
-                SecondsString = [SecondsString substringToIndex:[SecondsString length]-1];
-            }
-            self.SecondsString = SecondsString;
-            continue;
-        }
-        
-        
-        if ([theLine hasPrefix:@"Info:"]) {
-            NSString *InfoString = [theLine substringFromIndex:5];
-            if ([InfoString hasSuffix:@"%"]) {
-                InfoString = [InfoString substringToIndex:[InfoString length]-1];
-            }
+        });
+        return;
+    }
+
+    if ([line hasPrefix:@"Files:"]) {
+        self.FileString = [[theLine substringFromIndex:6] stringByTrimmingCharactersInSet:NSCharacterSet.whitespaceCharacterSet];
+        return;
+    }
+
+    if ([line hasPrefix:@"Seconds:"]) {
+        self.SecondsString = [[theLine substringFromIndex:8] stringByTrimmingCharactersInSet:NSCharacterSet.whitespaceCharacterSet];
+        return;
+    }
+
+    if ([line hasPrefix:@"Info:"]) {
+        NSString *InfoString = [[theLine substringFromIndex:5] stringByTrimmingCharactersInSet:NSCharacterSet.whitespaceCharacterSet];
+        dispatch_async(dispatch_get_main_queue(), ^{
             [MessageTextFieldInfo setStringValue:InfoString];
-            continue;
-        }
+        });
+        return;
     }
 }
 
-    - (void)videoSlides {
-     //Slides on screen
-        NSString *urlString = [_FileString stringByAddingPercentEncodingWithAllowedCharacters:[NSCharacterSet URLFragmentAllowedCharacterSet]]; //декодирование кириллического URL
-        NSURL *videoURL = [NSURL URLWithString:urlString];
-        AVURLAsset *asset = [[AVURLAsset alloc] initWithURL:videoURL options:nil];
-        AVAssetImageGenerator* imgGenerator = [AVAssetImageGenerator assetImageGeneratorWithAsset:asset];
-        
-        imgGenerator.appliesPreferredTrackTransform = YES;
-        imgGenerator.requestedTimeToleranceBefore = kCMTimeZero;
-        imgGenerator.requestedTimeToleranceAfter = kCMTimeZero;
-        imgGenerator.maximumSize = CGSizeMake(320, 180);
-        imgGenerator.apertureMode = AVAssetImageGeneratorApertureModeProductionAperture;
-        
-        Float64 Seconds = [_SecondsString floatValue];
-        CMTime time = CMTimeMakeWithSeconds(Seconds, 100);
-        //    CMTimeShow(time);
-
-        NSError *error;
-        CGImageRef imageRef = [imgGenerator copyCGImageAtTime:time actualTime:NULL error:NULL];
-        if (!imageRef) {
-            NSLog(@"AVAssetImageGenerator frame generate failed: %@", error);
-            NSImage* thumbnail = [[NSImage alloc]initWithContentsOfFile:@"/private/tmp/img.jpg"];
-            [myImageView setImage:thumbnail];
-        } else {
-            NSImage* thumbnail = [[NSImage alloc] initWithCGImage:imageRef size:NSMakeSize(320, 180)];
-            [myImageView setImage:thumbnail];
-
-            NSBitmapImageRep *jpgImageRep = [[NSBitmapImageRep alloc]initWithData:[thumbnail TIFFRepresentation]];
-            //add the NSBitmapImage to the representation list of the target
-            [thumbnail addRepresentation:jpgImageRep];
-            //get the data from the representation
-            NSData *jpgData = [jpgImageRep representationUsingType: NSBitmapImageFileTypeJPEG properties:@{}];
-            //write the data to a file
-            [jpgData writeToFile: @"/private/tmp/img.jpg" atomically:NO];
-        }
+- (void)parseOutput:(NSData *)data {
+    NSMutableString *outputString = [[NSMutableString alloc] initWithData:data encoding:NSUTF8StringEncoding];
+    if (!outputString) {
+        PLog(@"Warning: Output string is nil");
+        return;
     }
+
+    if (remnants) {
+        [outputString insertString:remnants atIndex:0];
+    }
+
+    // Separation
+    NSMutableArray<NSString *> *lines = [[outputString componentsSeparatedByString:@"\n"] mutableCopy];
+
+    if (lines.lastObject.length > 0) {
+        remnants = lines.lastObject;
+    } else {
+        remnants = nil;
+    }
+    [lines removeLastObject];
+
+    // Business logic on diffs (picture/progress)
+    if (self.FileString.length > 0 && ![self.SecondsString isEqualToString:self.SecondsStringOld]) {
+        [self videoSlides];
+    }
+    self.SecondsStringOld = self.SecondsString;
+
+    if (self.ProgressString.length > 0 && ![self.ProgressString isEqualToString:self.ProgressStringOld]) {
+        [self progressBarProgram];
+    }
+    self.ProgressStringOld = self.ProgressString;
+
+    for (NSString *theLine in lines) {
+        [self handleParsedLine:theLine];
+    }
+}
+
+#pragma mark - Video thumbnail
+
+- (void)videoSlides {
+    if (self.FileString.length == 0) { return; }
+
+    NSString *urlString = [self.FileString stringByAddingPercentEncodingWithAllowedCharacters:[NSCharacterSet URLFragmentAllowedCharacterSet]];
+    NSURL *videoURL = [NSURL URLWithString:urlString];
+    if (!videoURL) { return; }
+
+    AVURLAsset *asset = [[AVURLAsset alloc] initWithURL:videoURL options:nil];
+    if (!asset) {
+        NSLog(@"AVURLAsset init failed for URL: %@", self.FileString);
+        return;
+    }
+
+    AVAssetImageGenerator *imgGenerator = [AVAssetImageGenerator assetImageGeneratorWithAsset:asset];
+    imgGenerator.appliesPreferredTrackTransform = YES;
+    imgGenerator.maximumSize = CGSizeMake(260, 146);
+    imgGenerator.apertureMode = AVAssetImageGeneratorApertureModeProductionAperture;
+ // imgGenerator.requestedTimeToleranceBefore = kCMTimeZero;
+ // imgGenerator.requestedTimeToleranceAfter = kCMTimeZero;
+    
+    CMTimeScale ts = (asset.duration.timescale ? asset.duration.timescale : 600);
+    Float64 seconds = [self.SecondsString doubleValue];
+    CMTime time = CMTimeMakeWithSeconds(seconds, ts);
+
+    NSError *error = nil;
+    CGImageRef imageRef = [imgGenerator copyCGImageAtTime:time actualTime:NULL error:&error];
+
+    void (^applyImageOnMain)(NSImage *) = ^(NSImage *image){
+        dispatch_async(dispatch_get_main_queue(), ^{
+            if (image) {
+                [myImageView setImage:image];
+            } else if (isService) {
+                NSImage *thumbnail = [[NSImage alloc] initWithContentsOfFile:@"/private/tmp/img.png"];
+                [myImageView setImage:thumbnail];
+            }
+        });
+    };
+
+    if (!imageRef) {
+        if (error) {
+           // PLog(@"AVAssetImageGenerator failed: %@", error.localizedDescription);
+        }
+        applyImageOnMain(nil);
+        return;
+    }
+
+    NSImage *thumbnail = [[NSImage alloc] initWithCGImage:imageRef size:NSMakeSize(260, 146)];
+    CGImageRelease(imageRef);
+    isService = NO;
+    applyImageOnMain(thumbnail);
+}
+
+#pragma mark - Progress
 
 - (void)progressBarProgram {
-    //Progress in the program and on the dock icon
-        if ([_OnlyString  isEqual: @"RED"]) {
+    NSString *mode = (self.OnlyString ? self.OnlyString : @"GREY");
+    double value = self.ProgressString.doubleValue;
+
+    if ([mode isEqualToString:@"RED"]) {
+        dispatch_async(dispatch_get_main_queue(), ^{
             [CancelButton setTitle:@"Cancel"];
-            if (_ProgressString != nil) {
-                double progressRed = [_ProgressString intValue]/100.0;
-                // Make sure the previous ProgressBar is clear before update.
-                [[DockProgressBarRed sharedDockProgressBarRed]
-                 setProgressRed:(float)progressRed];
-                [[DockProgressBarRed sharedDockProgressBarRed] updateProgressBarRed];
-                [[DockProgressBarBlue sharedDockProgressBarBlue] hideProgressBarBlue];
-                // Create filter:ProgressBar
-                CIFilter *colorFilter = [CIFilter filterWithName:@"CIHueAdjust"
-                                             withInputParameters:@{@"inputAngle" : @8.5}];
-                // Assign to ProgressBar
-                progressBarIndicator.contentFilters = @[colorFilter];
-                double progressBarRed = [_ProgressString intValue];
-                [progressBarIndicator setIndeterminate:NO];
-                [progressBarIndicator setDoubleValue:progressBarRed];
-            }
-        }
-        else if ([_OnlyString  isEqual: @"BLUE"]) {
-            if (_ProgressString != nil) {
-                [CancelButton setTitle:@"Pause"];
-                double progressBlue = [_ProgressString intValue]/100.0;
-                // Make sure the previous ProgressBar is clear before update.
-                [[DockProgressBarBlue sharedDockProgressBarBlue]
-                 setProgressBlue:(float)progressBlue];
-                [[DockProgressBarBlue sharedDockProgressBarBlue] updateProgressBarBlue];
-                [[DockProgressBarRed sharedDockProgressBarRed] hideProgressBarRed];
-                // Create filter:ProgressBar
-                CIFilter *colorFilter = [CIFilter filterWithName:@"CIHueAdjust"
-                                             withInputParameters:@{@"inputAngle" : @0}];
-                // Assign to ProgressBar
-                progressBarIndicator.contentFilters = @[colorFilter];
-                double progressBarBlue = [_ProgressString intValue];
-                [progressBarIndicator setIndeterminate:NO];
-                [progressBarIndicator setDoubleValue:progressBarBlue];
-            }
-        }
-        else if ([_OnlyString  isEqual: @"GREY"]) {
-            // Create color:
-            CIColor *color = [[CIColor alloc] initWithColor:[NSColor colorWithSRGBRed:0.8 green:0.8 blue:0.8 alpha:1]];
-            // Create filter:ProgressBar
-            CIFilter *colorFilter = [CIFilter filterWithName:@"CIColorMonochrome"
-                                        withInputParameters:@{@"inputColor" : color,
-                                                              @"inputIntensity" : @1}];
-            // Assign to ProgressBar
-            progressBarIndicator.contentFilters = @[colorFilter];
+            [[DockProgressBarBlue sharedDockProgressBarBlue] hideProgressBarBlue];
+        });
+        double progressRed = value / 100.0;
+        [[DockProgressBarRed sharedDockProgressBarRed] setProgressRed:(float)progressRed];
+        [[DockProgressBarRed sharedDockProgressBarRed] updateProgressBarRed];
+        [self updateProgressBarWithPercent:value mode:@"RED"];
+    } else if ([mode isEqualToString:@"BLUE"]) {
+        dispatch_async(dispatch_get_main_queue(), ^{
+            [CancelButton setTitle:@"Pause"];
+            [[DockProgressBarRed sharedDockProgressBarRed] hideProgressBarRed];
+        });
+        double progressBlue = value / 100.0;
+        [[DockProgressBarBlue sharedDockProgressBarBlue] setProgressBlue:(float)progressBlue];
+        [[DockProgressBarBlue sharedDockProgressBarBlue] updateProgressBarBlue];
+        [self updateProgressBarWithPercent:value mode:@"BLUE"];
+    } else { // GREY
+        [self applyProgressFilterForMode:@"GREY"];
+        dispatch_async(dispatch_get_main_queue(), ^{
             [progressBarIndicator setDoubleValue:0];
-        }
-        if ([_ProgressString  isEqual: @"0% "]) {
-            [[DockProgressBarRed sharedDockProgressBarRed] clearRed];
-        }
+        });
     }
 
+    if ([self.ProgressString isEqualToString:@"0% "]) {
+        [[DockProgressBarRed sharedDockProgressBarRed] clearRed];
+    }
+}
 
 #pragma mark - Service handling
 
 - (void)dropService:(NSPasteboard *)pb userData:(NSString *)userData error:(NSString **)err {
     PLog(@"Received drop service data");
-    NSArray *types = [pb types];
     BOOL ret = 0;
-    id data = nil;
-    
-    if (acceptsFiles && [types containsObject:NSPasteboardTypeFileURL] && (data = [pb propertyListForType:NSPasteboardTypeFileURL])) {
-        ret = [self addDroppedFilesJob:data];  // Files
+
+    if (acceptsFiles && [[pb types] containsObject:NSPasteboardTypeFileURL]) {
+        NSArray<NSString *> *paths = [self safePathsFromPasteboard:pb];
+        ret = [self addDroppedFilesJob:paths];
     } else {
-        // Unknown
-        *err = @"Data type in pasteboard cannot be handled by this application.";
+        if (err) *err = @"Data type in pasteboard cannot be handled by this application.";
         return;
     }
-    
-    if (isTaskRunning == NO && ret) {
+
+    if (!isTaskRunning && ret) {
         [self executeScript];
     }
 }
 
 #pragma mark - Add job to queue
 
-// Processing dropped files
 - (BOOL)addDroppedFilesJob:(NSArray <NSString *> *)files {
-    if (!acceptsFiles) {
-        return NO;
-    }
-    
-    // We only accept the drag if at least one of the files meets the required types
+    if (!acceptsFiles) { return NO; }
+    if (files.count == 0) { return NO; }
+
     NSMutableArray *acceptedFiles = [NSMutableArray array];
     for (NSString *file in files) {
-        if ([self isAcceptableFileType:file]) {
+        BOOL isDir = NO;
+        BOOL exists = [FILEMGR fileExistsAtPath:file isDirectory:&isDir];
+        if (!exists) { continue; }
+        if (isDir && !acceptDroppedFolders) { continue; }
+        if (acceptAnyDroppedItem || !isDir) {
             [acceptedFiles addObject:file];
         }
     }
-    if ([acceptedFiles count] == 0) {
-        return NO;
-    }
-    
-    // We create a job and add the files as arguments
+    if (acceptedFiles.count == 0) { return NO; }
+
     FastLaunchJob *job = [FastLaunchJob jobWithArguments:acceptedFiles andStandardInput:nil];
     [jobQueue addObject:job];
-    
-    // Add to Open Recent menu
+
     for (NSString *path in acceptedFiles) {
         [[NSDocumentController sharedDocumentController] noteNewRecentDocumentURL:[NSURL fileURLWithPath:path]];
     }
-    
     return YES;
 }
 
@@ -1828,101 +1401,61 @@ if (![fileManager fileExistsAtPath:folder]) {
     return YES;
 }
 
-
-- (BOOL)isAcceptableFileType:(NSString *)file {
-    
-    // Check if it's a folder. If so, we only accept it if folders are accepted
-    BOOL isDir;
-    BOOL exists = [FILEMGR fileExistsAtPath:file isDirectory:&isDir];
-    if (!exists) {
-        return NO;
-    }
-    if (isDir) {
-        return acceptDroppedFolders;
-    }
-    
-    if (acceptAnyDroppedItem) {
-        return YES;
-    }
-    return NO;
-}
-
 #pragma mark - Drag and drop handling
 
-// Check file types against acceptable drop types here before accepting them
 - (NSDragOperation)draggingEntered:(id <NSDraggingInfo>)sender {
-    // Prevent dragging from NSOpenPanels
-    // draggingSource returns nil if the source is not in the same application
-    // as the destination. We decline any drags from within the app.
     if ([sender draggingSource]) {
         return NSDragOperationNone;
     }
-    
+
     BOOL acceptDrag = NO;
     NSPasteboard *pboard = [sender draggingPasteboard];
-    
-    // String dragged
+
     if ([[pboard types] containsObject:NSPasteboardTypeString] && acceptsText) {
         acceptDrag = YES;
-    }
-    // File dragged
-    else if ([[pboard types] containsObject:NSPasteboardTypeFileURL] && acceptsFiles) {
-        // Loop through files, see if any of the dragged files are acceptable
-        NSArray<Class> *classes = @[[NSURL class]];
-        NSDictionary *options = @{};
-        NSArray<NSURL*> *files = [pboard readObjectsForClasses:classes options:options];
-
-        
+    } else if ([[pboard types] containsObject:NSPasteboardTypeFileURL] && acceptsFiles) {
+        NSArray<NSURL*> *files = [pboard readObjectsForClasses:@[[NSURL class]] options:@{}];
         for (NSURL *url in files) {
-            NSString *file = [url path];
-            if ([self isAcceptableFileType:file]) {
+            NSString *file = url.path;
+            BOOL isDir = NO;
+            BOOL exists = [FILEMGR fileExistsAtPath:file isDirectory:&isDir];
+            if (exists && (!isDir || acceptDroppedFolders)) {
                 acceptDrag = YES;
                 break;
             }
         }
     }
-    
-    if (acceptDrag) {
-        PLog(@"Dragged items accepted");
-        return NSDragOperationLink;
-    }
-    
-    PLog(@"Dragged items refused");
-    return NSDragOperationNone;
+
+    return acceptDrag ? NSDragOperationLink : NSDragOperationNone;
 }
 
-- (BOOL)prepareForDragOperation:(id <NSDraggingInfo>)sender {
-    return YES;
-}
+- (BOOL)prepareForDragOperation:(id <NSDraggingInfo>)sender { return YES; }
 
 - (BOOL)performDragOperation:(id <NSDraggingInfo>)sender {
     NSPasteboard *pboard = [sender draggingPasteboard];
-    
-    // Determine drag data type and dispatch to job queue
     if ([[pboard types] containsObject:NSPasteboardTypeFileURL]) {
-        return [self addDroppedFilesJob:[pboard propertyListForType:@"NSFilenamesPboardType"]];
+        NSArray<NSString *> *paths = [self safePathsFromPasteboard:pboard];
+        if (paths.count > 0) {
+            return [self addDroppedFilesJob:paths];
+        }
+        return NO;
     }
     return NO;
 }
 
-// Once the drag is over, we immediately execute w. files as arguments if not already processing
 - (void)concludeDragOperation:(id <NSDraggingInfo>)sender {
-
-    // Fire off the job queue if nothing is running
-    if (!isTaskRunning && [jobQueue count] > 0) {
+    if (!isTaskRunning && jobQueue.count > 0) {
         [NSTimer scheduledTimerWithTimeInterval:0.0f target:self selector:@selector(executeScript) userInfo:nil repeats:NO];
     }
 }
 
 - (NSDragOperation)draggingUpdated:(id <NSDraggingInfo>)sender {
-    // This is needed to keep link instead of the green plus sign on web view
-    // and also required to reject non-acceptable dragged items.
     return [self draggingEntered:sender];
 }
 
 - (IBAction)menuItemSelected:(id)sender {
     [self addMenuItemSelectedJob:[sender title]];
-    if (!isTaskRunning && [jobQueue count] > 0) {
+    if (!isTaskRunning && jobQueue.count > 0) {
         [NSTimer scheduledTimerWithTimeInterval:0.01 target:self selector:@selector(executeScript) userInfo:nil repeats:NO];
     }
 }
@@ -1930,21 +1463,71 @@ if (![fileManager fileExistsAtPath:folder]) {
 #pragma mark - Utility methods
 
 - (void)showNotification:(NSString *)notificationText {
-    NSUserNotification *notification = [[NSUserNotification alloc] init];
-    [notification setInformativeText:notificationText];
-    [notification setSoundName:NSUserNotificationDefaultSoundName];
-    [[NSUserNotificationCenter defaultUserNotificationCenter] deliverNotification:notification];
+    if (notificationText.length == 0) { return; }
+
+    // If the user has disabled notifications in the app settings (your flag), do nothing.
+    if (!sendsNotifications) { return; }
+
+    if (@available(macOS 11.0, *)) {
+        UNMutableNotificationContent *content = [[UNMutableNotificationContent alloc] init];
+        content.body = notificationText;
+        content.sound = [UNNotificationSound defaultSound];
+
+        UNTimeIntervalNotificationTrigger *trigger = [UNTimeIntervalNotificationTrigger triggerWithTimeInterval:0.1 repeats:NO];
+        NSString *identifier = [[NSUUID UUID] UUIDString];
+        UNNotificationRequest *request = [UNNotificationRequest requestWithIdentifier:identifier content:content trigger:trigger];
+
+        [[UNUserNotificationCenter currentNotificationCenter] addNotificationRequest:request withCompletionHandler:^(NSError * _Nullable error) {
+            if (error) {
+                NSLog(@"Failed to deliver notification: %@", error.localizedDescription);
+            }
+        }];
+    } else {
+        // macOS 10.15 and below: Use legacy NSUserNotificationCenter to show a notification when an app is active.
+        NSUserNotification *notification = [[NSUserNotification alloc] init];
+        notification.title = [[NSProcessInfo processInfo] processName];
+        notification.informativeText = notificationText;
+        notification.soundName = NSUserNotificationDefaultSoundName;
+
+        NSUserNotificationCenter *center = [NSUserNotificationCenter defaultUserNotificationCenter];
+        center.delegate = (id<NSUserNotificationCenterDelegate>)self;
+        [center deliverNotification:notification];
+    }
 }
 
-// Donations
+// Delegate for legacy NSUserNotificationCenter (macOS 10.15): Show even when app is active
+- (BOOL)userNotificationCenter:(NSUserNotificationCenter *)center shouldPresentNotification:(NSUserNotification *)notification {
+    return YES;
+}
+
 - (IBAction)buttonDonations:(id)sender {
     [[NSWorkspace sharedWorkspace] openURL:[NSURL URLWithString:@"https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=2BREZMHRLQNZ4&source=url"]];
 }
 
-- (BOOL)applicationShouldTerminateAfterLastWindowClosed:(NSApplication *)theApplication {
-    return YES;
+- (BOOL)applicationShouldTerminateAfterLastWindowClosed:(NSApplication *)theApplication { return YES; }
+
+#pragma mark - Safe helpers
+
+- (NSArray<NSString *> *)safePathsFromOpenPanelURLs:(NSArray<NSURL *> *)urls {
+    NSMutableArray<NSString *> *paths = [NSMutableArray arrayWithCapacity:urls.count];
+    for (NSURL *url in urls) {
+        if (url.isFileURL) {
+            [paths addObject:url.path];
+        }
+    }
+    return paths;
+}
+
+- (NSArray<NSString *> *)safePathsFromPasteboard:(NSPasteboard *)pboard {
+    NSArray<NSURL *> *urls = [pboard readObjectsForClasses:@[[NSURL class]]
+                                                   options:@{ NSPasteboardURLReadingFileURLsOnlyKey : @YES }];
+    NSMutableArray<NSString *> *paths = [NSMutableArray arrayWithCapacity:urls.count];
+    for (NSURL *u in urls) {
+        if (u.isFileURL) {
+            [paths addObject:u.path];
+        }
+    }
+    return paths;
 }
 
 @end
-
-
