@@ -26,7 +26,7 @@ echo "Media:Video "$put"\r`./tools/mediainfo --Inform="General;Size.............
 ##################################################################################
 
 
-ScriptVersion=5.5.2
+ScriptVersion=5.5.3
 
 FastLaunchPlist="$HOME/Library/Preferences/org.SerhiiHalan.SettingsFastLaunch.plist" &> /dev/null
 MonitoringFolder="$(/usr/libexec/PlistBuddy -c "Print :MonitoringFolder" "$FastLaunchPlist")"
@@ -72,7 +72,7 @@ echo "Time:"
 echo "Speed:"
 echo "Duration:"
 echo "Media:"
-rm -rf "/private/tmp/img.jpg" &> /dev/null
+rm -rf "/private/tmp/img.png" &> /dev/null
 echo "Name:"
 
 for file in "$MonitoringFolder"/*.*; do

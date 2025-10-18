@@ -18,11 +18,11 @@ fi
 
 Transcoding()
 {
-  duration2="$(./tools/ffmpeg -i "$file" 2>&1 | grep Duration | cut -d ' ' -f4 | sed s/,// | cut -d '.' -f1)"
-  h="$(./tools/ffmpeg -i "$file" 2>&1 | grep Duration | cut -d ' ' -f4 | sed s/,// | cut -c1,2)"
-  m="$(./tools/ffmpeg -i "$file" 2>&1 | grep Duration | cut -d ' ' -f4 | sed s/,// | cut -c4,5)"
-  s="$(./tools/ffmpeg -i "$file" 2>&1 | grep Duration | cut -d ' ' -f4 | sed s/,// | cut -c7,8)"
-  ms="$(./tools/ffmpeg -i "$file" 2>&1 | grep Duration | cut -d ' ' -f4 | sed s/,// | cut -c10,11)"
+  duration2="$(./tools/ffmpeg -i "$file" 2>&1 | grep Duration | cut -d ' ' -f4 | sed s/,// | cut -d '.' -f1 | tr -d '\n')"
+  h="$(./tools/ffmpeg -i "$file" 2>&1 | grep Duration | cut -d ' ' -f4 | sed s/,// | cut -c1,2 | tr -d '\n')"
+  m="$(./tools/ffmpeg -i "$file" 2>&1 | grep Duration | cut -d ' ' -f4 | sed s/,// | cut -c4,5 | tr -d '\n')"
+  s="$(./tools/ffmpeg -i "$file" 2>&1 | grep Duration | cut -d ' ' -f4 | sed s/,// | cut -c7,8 | tr -d '\n')"
+  ms="$(./tools/ffmpeg -i "$file" 2>&1 | grep Duration | cut -d ' ' -f4 | sed s/,// | cut -c10,11 | tr -d '\n')"
 
 
   if [[ "H.264 (x264)" = "$VEncoder" ]]; then
@@ -131,7 +131,7 @@ fi
 
 OutputFFmpeg()
 {
- echo y | ./tools/ffmpeg -ss 00:00:02 -i "$file" -s 320x180 -frames:v 1 -q:v 5 /private/tmp/img.jpg 2>/dev/null &
+ echo y | ./tools/ffmpeg -ss 00:00:02 -i "$file" -s 260x146 -frames:v 1 -q:v 5 /private/tmp/img.png 2>/dev/null &
 echo "ONLY:RED"
 echo "Progress:0% " &
 echo "Files:file://"$file""
@@ -358,7 +358,7 @@ else
 mv "$file" "$HOME"/.Trash
 fi
 
-rm -rf "/private/tmp/img.jpg"
+rm -rf "/private/tmp/img.png"
  
 for file in "$MonitoringFolder"/*.*; do
 break

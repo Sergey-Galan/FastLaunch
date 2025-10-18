@@ -1,4 +1,11 @@
 #import "DockProgressBarRed.h"
+//
+//  DockProgressBarRed.m
+//  FastLaunch
+//
+//  Created by Sergey Galan.
+//  Copyright © 2020-2025 Sergey Galan. All rights reserved.
+//
 
 @implementation DockProgressBarRed
 
