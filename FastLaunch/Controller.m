@@ -184,6 +184,11 @@ static NSString * const kPrefsPlistPath = @"/Preferences/org.SerhiiHalan.Setting
 
 @implementation Controller
 
+// Explicitly opt-in to secure restorable state to silence AppKit warning on newer macOS
+- (BOOL)applicationSupportsSecureRestorableState:(NSApplication *)app {
+    return YES;
+}
+
 - (instancetype)init {
     self = [super init];
     if (self) {
